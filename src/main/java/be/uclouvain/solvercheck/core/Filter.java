@@ -1,7 +1,5 @@
 package be.uclouvain.solvercheck.core;
 
-import java.util.List;
-
 /**
  * Filter encapsulates the role of a global constraint. It gets a List of domains as input and
  * returns a list with the *same size* but potentially shrunk domains.

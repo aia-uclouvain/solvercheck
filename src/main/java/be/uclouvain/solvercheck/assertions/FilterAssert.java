@@ -11,12 +11,12 @@ import static org.quicktheories.generators.Generate.*;
 
 public final class FilterAssert extends AbstractAssert<FilterAssert, Filter> {
 
-    public FilterAssert(Filter actual) {
+    public FilterAssert(final Filter actual) {
         super(actual, FilterAssert.class);
     }
 
-    public static FilterAssert assertThat(final Filter f) {
-        return new FilterAssert(f);
+    public static FilterAssert assertThat(final Filter actual) {
+        return new FilterAssert(actual);
     }
 
     public FilterAssert hasSameFilteringAs(final Filter trusted) {

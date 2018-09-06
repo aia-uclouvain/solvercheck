@@ -19,8 +19,8 @@ public final class PartialAssignment implements Iterable<Domain<Object>> {
     }
 
     public int                 size()      { return domains.size();     }
-    public Domain<Object>      get(int var){ return domains.get(var);   }
-    public PartialAssignment   remove(int var, Object val) {
+    public Domain<Object>      get(final int var){ return domains.get(var);   }
+    public PartialAssignment   remove(final int var, final Object val) {
         if( var < 0 || var >= domains.size()) {
             return this;
         } else {
@@ -41,7 +41,7 @@ public final class PartialAssignment implements Iterable<Domain<Object>> {
         return domains.stream().allMatch(Domain::isFixed);
     }
 
-    public StrengthComparison compareWith(PartialAssignment that) {
+    public StrengthComparison compareWith(final PartialAssignment that) {
         if( this.size() != that.size() ) {
             return INCOMPARABLE;
         }
@@ -86,9 +86,9 @@ public final class PartialAssignment implements Iterable<Domain<Object>> {
                 .collect(Collectors.toSet());
     }
 
-    private List<Domain<Object>> toUnaryDomains(final List<Object> xs) {
-        return xs.stream()
-                .map(v -> new Domain<Object>(ImmutableSet.of(v)))
+    private List<Domain<Object>> toUnaryDomains(final List<Object> values) {
+        return values.stream()
+                .map(v -> new Domain<>(ImmutableSet.of(v)))
                 .collect(Collectors.toList());
     }
 
@@ -107,7 +107,7 @@ public final class PartialAssignment implements Iterable<Domain<Object>> {
     @Override
     public int                      hashCode() { return domains.hashCode(); }
     @Override @SuppressWarnings("unchecked")
-    public boolean                  equals(Object o) {
-        return (o instanceof PartialAssignment) && domains.equals(((PartialAssignment) o).domains);
+    public boolean                  equals(final Object other) {
+        return other instanceof PartialAssignment && domains.equals(((PartialAssignment) other).domains);
     }
 }
