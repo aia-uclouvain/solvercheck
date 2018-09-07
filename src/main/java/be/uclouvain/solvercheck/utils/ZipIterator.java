@@ -8,17 +8,18 @@ public final class ZipIterator<A, B> implements Iterator<ZipEntry<A, B>> {
 
     public ZipIterator(final Iterator<A> a, final Iterator<B> b) {
         first = a;
-        second= b;
+        second = b;
     }
 
     @Override
     public boolean hasNext() {
         return first.hasNext() || second.hasNext();
     }
+
     @Override
     public ZipEntry<A, B> next() {
         A nextA = first.hasNext() ? first.next() : null;
-        B nextB = second.hasNext()? second.next(): null;
+        B nextB = second.hasNext() ? second.next() : null;
 
         return new ZipEntry<>(nextA, nextB);
     }

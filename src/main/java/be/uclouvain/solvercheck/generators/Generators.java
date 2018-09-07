@@ -1,5 +1,6 @@
 package be.uclouvain.solvercheck.generators;
 
+import be.uclouvain.solvercheck.core.Assignment;
 import be.uclouvain.solvercheck.core.Domain;
 import be.uclouvain.solvercheck.core.PartialAssignment;
 import org.quicktheories.core.Gen;
@@ -13,16 +14,21 @@ import static org.quicktheories.generators.SourceDSL.integers;
 import static org.quicktheories.generators.SourceDSL.lists;
 
 public final class Generators {
-    /** utility class has no public constructor */
-    private Generators(){}
+    /**
+     * utility class has no public constructor
+     */
+    private Generators() {
+    }
 
     // --------- LISTS ------------------------------------------------------------------------------------------
     public static <T> Gen<List<T>> listsOf(final int n, final Gen<T> values) {
         return lists().of(values).ofSize(n);
     }
+
     public static <T> Gen<List<T>> listsOf(final int from, final int to, final Gen<T> values) {
         return lists().of(values).ofSizeBetween(from, to);
     }
+
     public static <T> Gen<List<T>> listsOfUpTo(final int n, final Gen<T> values) {
         return listsOf(0, n, values);
     }
@@ -31,9 +37,11 @@ public final class Generators {
     public static <T> Gen<Set<T>> setsOfUpTo(final int n, final Gen<T> values) {
         return listsOfUpTo(n, values).map(toSet());
     }
+
     public static <T> Gen<Set<T>> setsOf(final int from, final int to, final Gen<T> values) {
         return listsOf(from, to, values).map(toSet());
     }
+
     public static <T> Function<List<T>, Set<T>> toSet() {
         return HashSet::new;
     }
@@ -42,6 +50,17 @@ public final class Generators {
     public static GenIntDomainBuilder intDomains() {
         return new GenIntDomainBuilder();
     }
+
+    // --------- PARTIAL-ASSIGNMENT -----------------------------------------------------------------------------
+    public static GenPartialAssignmentBuilder partialAssignments() {
+        return new GenPartialAssignmentBuilder();
+    }
+
+    // --------- PARTIAL-ASSIGNMENT -----------------------------------------------------------------------------
+    public static GenAssignmentBuilder assignments() {
+        return new GenAssignmentBuilder();
+    }
+
     public static final class GenIntDomainBuilder {
         private int nbValMin = 0;
         private int nbValMax = 10;
@@ -54,6 +73,7 @@ public final class Generators {
 
             return this;
         }
+
         public GenIntDomainBuilder ofSizeUpTo(final int n) {
             ofSizeBetween(0, n);
 
@@ -72,44 +92,80 @@ public final class Generators {
         }
     }
 
-    // --------- PARTIAL-ASSIGNMENT -----------------------------------------------------------------------------
-    public static GenPartialAssignmentBuilder partialAssignments() {
-        return new GenPartialAssignmentBuilder();
-    }
     public static final class GenPartialAssignmentBuilder {
+        private final GenIntDomainBuilder domainBuilder = intDomains();
         private int nbVarsMin = 0;
         private int nbVarsMax = 10;
-
-        private final GenIntDomainBuilder domainBuilder = intDomains();
 
         public GenPartialAssignmentBuilder withVariables(int n) {
             this.nbVarsMin = n;
             this.nbVarsMax = n;
             return this;
         }
+
         public GenPartialAssignmentBuilder withUpToVariables(int n) {
             this.nbVarsMin = 0;
             this.nbVarsMax = n;
             return this;
         }
+
         public GenPartialAssignmentBuilder withVariablesRanging(int from, int to) {
             this.nbVarsMin = from;
             this.nbVarsMax = to;
             return this;
         }
+
         public GenPartialAssignmentBuilder withDomainsOfSizeUpTo(int n) {
             domainBuilder.ofSizeUpTo(n);
             return this;
         }
+
         public GenPartialAssignmentBuilder withValuesRanging(int from, int to) {
             domainBuilder.withValuesBetween(from, to);
             return this;
         }
+
         public Gen<PartialAssignment> build() {
             return lists().of(domainBuilder.build())
-                        .ofSizeBetween(nbVarsMin, nbVarsMax)
-                        .map(PartialAssignment::new);
+                    .ofSizeBetween(nbVarsMin, nbVarsMax)
+                    .map(PartialAssignment::new);
         }
     }
 
+    public static final class GenAssignmentBuilder {
+        private int nbVarsMin =   0;
+        private int nbVarsMax =  10;
+        private int valueMin  = -10;
+        private int valueMax  =  10;
+
+        public GenAssignmentBuilder withVariables(int n) {
+            this.nbVarsMin = n;
+            this.nbVarsMax = n;
+            return this;
+        }
+
+        public GenAssignmentBuilder withUpToVariables(int n) {
+            this.nbVarsMin = 0;
+            this.nbVarsMax = n;
+            return this;
+        }
+
+        public GenAssignmentBuilder withVariablesRanging(int from, int to) {
+            this.nbVarsMin = from;
+            this.nbVarsMax = to;
+            return this;
+        }
+
+        public GenAssignmentBuilder withValuesRanging(int from, int to) {
+            this.valueMin = from;
+            this.valueMax = to;
+            return this;
+        }
+
+        public Gen<Assignment> build() {
+            return lists().of(integers().between(valueMin, valueMax))
+                    .ofSizeBetween(nbVarsMin, nbVarsMax)
+                    .map(Assignment::new);
+        }
+    }
 }

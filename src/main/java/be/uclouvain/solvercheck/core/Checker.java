@@ -8,7 +8,7 @@ import java.util.function.Predicate;
  * constitutes a valid solution (according to some propagator and consistency)
  */
 @FunctionalInterface
-public interface Checker extends Predicate<PartialAssignment> {
+public interface Checker extends Predicate<Assignment> {
     @Override
-    boolean test(final PartialAssignment valuation);
+    boolean test(final Assignment valuation);
 }

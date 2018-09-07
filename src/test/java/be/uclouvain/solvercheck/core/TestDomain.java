@@ -79,12 +79,12 @@ public class TestDomain implements WithQuickTheories {
     @Test
     public void testContains() {
         qt().forAll(domains(), integers().all()).check((d, v) ->
-            d.contains(v) == d.toSet().contains(v)
+            d.contains(v) == d.asSet().contains(v)
         );
     }
     @Test
     public void testSize() {
-        qt().forAll(domains()).check(d -> d.size() == d.toSet().size());
+        qt().forAll(domains()).check(d -> d.size() == d.asSet().size());
     }
     @Test
     public void testIsEmpty() {
@@ -96,7 +96,7 @@ public class TestDomain implements WithQuickTheories {
     }
     @Test
     public void testToString() {
-        qt().forAll(domains()).check(d -> d.toString().equals(d.toSet().toString()));
+        qt().forAll(domains()).check(d -> d.toString().equals(d.asSet().toString()));
     }
     @Test
     public void testEqualsIffEquivalent() {

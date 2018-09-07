@@ -162,10 +162,6 @@ public class TestPartialAssignment implements WithQuickTheories {
         return 0 <= i && i < a.size();
     }
 
-    private <T extends Throwable> boolean  failsThrowing(Class<T> clazz, Runnable r) {
-        try { r.run(); return false; } catch (Exception e) { return clazz.isInstance(e); }
-    }
-
     private Gen<PartialAssignment> nonEmptyAssignments() {
         return Generators.partialAssignments()
                 .withVariablesRanging(1, 10)

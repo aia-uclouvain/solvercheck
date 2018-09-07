@@ -1,6 +1,7 @@
 package be.uclouvain.solvercheck.core;
 
 import be.uclouvain.solvercheck.utils.Utils;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
@@ -18,24 +19,30 @@ public final class PartialAssignment implements Iterable<Domain> {
     private final List<Domain> domains;
 
     public PartialAssignment(final List<Domain> domains) {
-        this.domains = domains;
+        this.domains = ImmutableList.copyOf(domains);
     }
 
-    public int                 size()            { return domains.size();     }
-    public Domain              get(final int var){ return domains.get(var);   }
-    public PartialAssignment   remove(final int var, final Integer val) {
-        if( var < 0 || var >= domains.size()) {
+    public int size() {
+        return domains.size();
+    }
+
+    public Domain get(final int var) {
+        return domains.get(var);
+    }
+
+    public PartialAssignment remove(final int var, final Integer val) {
+        if (var < 0 || var >= domains.size()) {
             return this;
         } else {
             Domain original = domains.get(var);
-            Domain updated  = original.remove(val);
+            Domain updated = original.remove(val);
 
             if (original.equals(updated)) {
                 return this;
             } else {
                 return new PartialAssignment(stream()
-                            .map(x-> x == original ? updated : x)
-                            .collect(Collectors.toList()));
+                        .map(x -> x == original ? updated : x)
+                        .collect(Collectors.toList()));
             }
         }
     }
@@ -43,20 +50,21 @@ public final class PartialAssignment implements Iterable<Domain> {
     public boolean isComplete() {
         return stream().allMatch(Domain::isFixed);
     }
+
     public boolean isLeaf() {
         return stream().anyMatch(Domain::isEmpty) || isComplete();
     }
 
     public StrengthComparison compareWith(final PartialAssignment that) {
-        if( this.size() != that.size() ) {
+        if (this.size() != that.size()) {
             return INCOMPARABLE;
         }
-        if( zip(this, that).stream().anyMatch(Utils::domainsAreIncomparable) ) {
+        if (zip(this, that).stream().anyMatch(Utils::domainsAreIncomparable)) {
             return INCOMPARABLE;
         }
 
         boolean hasStronger = zip(this, that).stream().anyMatch(Utils::domainIsStronger);
-        boolean hasWeaker   = zip(this, that).stream().anyMatch(Utils::domainIsWeaker  );
+        boolean hasWeaker = zip(this, that).stream().anyMatch(Utils::domainIsWeaker);
         if (hasStronger && hasWeaker) {
             return INCOMPARABLE;
         }
@@ -70,20 +78,13 @@ public final class PartialAssignment implements Iterable<Domain> {
         return EQUIVALENT;
     }
 
-    public Set<PartialAssignment> cartesianProduct() {
-        List<Set<Integer>> raw  = stream().map(Domain::toSet).collect(Collectors.toList());
+    public Set<Assignment> cartesianProduct() {
+        List<Set<Integer>> raw = stream().map(Domain::asSet).collect(Collectors.toList());
 
         return Sets.cartesianProduct(raw)
                 .stream()
-                .map(this::toUnaryDomains)
-                .map(PartialAssignment::new)
+                .map(Assignment::new)
                 .collect(Collectors.toSet());
-    }
-
-    private List<Domain> toUnaryDomains(final List<Integer> values) {
-        return values.stream()
-                .map(v -> new Domain(ImmutableSet.of(v)))
-                .collect(Collectors.toList());
     }
 
     // TODO: réutiliser l'idée des étudiants selon laquelle on peut générer le cross product de manière plus smart
@@ -95,14 +96,35 @@ public final class PartialAssignment implements Iterable<Domain> {
     //}
 
     @Override
-    public Iterator<Domain>         iterator() { return domains.iterator(); }
-    public Stream<Domain>           stream()   { return StreamSupport.stream(spliterator(), false);}
+    public Iterator<Domain> iterator() {
+        return domains.iterator();
+    }
+
+    public Stream<Domain> stream() {
+        return StreamSupport.stream(spliterator(), false);
+    }
+
     @Override
-    public String                   toString() { return domains.toString(); }
+    public String toString() {
+        return domains.toString();
+    }
+
     @Override
-    public int                      hashCode() { return domains.hashCode(); }
-    @Override @SuppressWarnings("unchecked")
-    public boolean                  equals(final Object other) {
+    public int hashCode() {
+        return domains.hashCode();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(final Object other) {
         return other instanceof PartialAssignment && domains.equals(((PartialAssignment) other).domains);
+    }
+
+    public List<Domain> asList() {
+        return domains;
+    }
+
+    public Domain[] asArray() {
+        return domains.toArray(new Domain[]{});
     }
 }

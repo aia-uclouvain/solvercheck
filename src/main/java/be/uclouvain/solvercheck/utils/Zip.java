@@ -10,7 +10,7 @@ public final class Zip<A, B> implements Iterable<ZipEntry<A, B>> {
 
     public Zip(final Iterable<A> a, final Iterable<B> b) {
         first = a;
-        second= b;
+        second = b;
     }
 
     @Override
