@@ -3,6 +3,8 @@ package be.uclouvain.solvercheck.core;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static be.uclouvain.solvercheck.core.StrengthComparison.*;
 
@@ -12,14 +14,22 @@ import static be.uclouvain.solvercheck.core.StrengthComparison.*;
  * From a technical point-of-view, this type should be considered an application of the 'new type' pattern.
  * It gives a semantically richer meaning to sets of T's while adding some benefits at the same time
  * (ie: cartesian product, partial order comparison).
- *
- * @param <T> the type of the values of the domain.
  */
-public final class Domain<T> implements Iterable<T> {
-    private final Set<T> values;
+public final class Domain implements Iterable<Integer> {
+    private final Set<Integer> values;
 
-    public Domain(final Set<T> values) {
+    public Domain(final Set<Integer> values) {
         this.values = values;
+    }
+
+    public Domain remove(final Integer val) {
+        if( !contains(val) ) {
+            return this;
+        } else {
+            return new Domain(values.stream()
+                    .filter (x -> !x.equals(val))
+                    .collect(Collectors.toSet()));
+        }
     }
 
     /*
@@ -27,49 +37,39 @@ public final class Domain<T> implements Iterable<T> {
      * I am hereby explicitly avoiding to implement the Comparable as the latter imposes a total ordering,
      * which does not apply do domains.
      */
-    public StrengthComparison compareWith(final Domain<T> that) {
+    public StrengthComparison compareWith(final Domain that) {
         if ( this.size() < that.size() ) {
-            return that.values.contains(this.values) ? STRONGER   : INCOMPARABLE;
+            return that.values.containsAll(this.values) ? STRONGER   : INCOMPARABLE;
         }
         else if ( this.size() > that.size() ) {
-            return this.values.contains(that.values) ? WEAKER     : INCOMPARABLE;
+            return this.values.containsAll(that.values) ? WEAKER     : INCOMPARABLE;
         }
         else {
-            return this.values.equals(that.values)   ? EQUIVALENT : INCOMPARABLE;
+            return this.values.equals(that.values)      ? EQUIVALENT : INCOMPARABLE;
         }
     }
 
-
-    public int         size()     { return values.size();      }
-    public boolean     isEmpty()  { return size() == 0;        }
-    public boolean     isFalse()  { return isEmpty();          }
-    public boolean     isFixed()  { return size() == 1;        }
-    public Domain<T>   remove(final T val) {
-        if( !values.contains(val) ) {
-            return this;
-        } else {
-            return new Domain<>(values.stream()
-                                        .filter (x -> !x.equals(val))
-                                        .collect(Collectors.toSet()));
-        }
-    }
-
+    public boolean           contains(int x) { return values.contains(x);                                }
+    public int               size()          { return values.size();                                     }
+    public boolean           isEmpty()       { return size() == 0;                                       }
+    public boolean           isFixed()       { return size() == 1;                                       }
     @Override
-    public Iterator<T> iterator() { return values.iterator();  }
+    public Iterator<Integer> iterator()      { return values.iterator();                                 }
+    public Stream<Integer>   stream()        { return StreamSupport.stream(spliterator(), false);}
     @Override
-    public String      toString() { return values.toString();  }
+    public String            toString()      { return values.toString();                                 }
     @Override
-    public int         hashCode() { return values.hashCode();  }
+    public int               hashCode()      { return values.hashCode();                                 }
     @Override
     @SuppressWarnings("unchecked")
-    public boolean     equals(final Object other) {
+    public boolean           equals(final Object other) {
         // note: an instanceof check is sufficient given that Domain is final
-        return (o instanceof Domain ) && this.values.equals(((Domain<T>)o).values);
+        return (other instanceof Domain ) && this.values.equals(((Domain)other).values);
     }
 
     // this should not be made public. it is only meant to be used in the core framework
     // to compute cartesian products
-    Set<T> toSet() {
+    /* package */ Set<Integer> toSet() {
         return values;
     }
 }

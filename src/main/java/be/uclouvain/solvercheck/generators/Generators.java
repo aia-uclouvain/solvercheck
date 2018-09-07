@@ -1,6 +1,7 @@
 package be.uclouvain.solvercheck.generators;
 
 import be.uclouvain.solvercheck.core.Domain;
+import be.uclouvain.solvercheck.core.PartialAssignment;
 import org.quicktheories.core.Gen;
 
 import java.util.HashSet;
@@ -8,9 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-import static org.quicktheories.generators.Generate.*;
-
-import org.quicktheories.generators.ListsDSL;
+import static org.quicktheories.generators.SourceDSL.*;
 
 public final class Generators {
     /** utility class has no public constructor */
@@ -18,10 +17,10 @@ public final class Generators {
 
     // --------- LISTS ------------------------------------------------------------------------------------------
     public static <T> Gen<List<T>> listsOf(final int n, final Gen<T> values) {
-        return new ListsDSL().of(values).ofSize(n);
+        return lists().of(values).ofSize(n);
     }
     public static <T> Gen<List<T>> listsOf(final int from, final int to, final Gen<T> values) {
-        return new ListsDSL().of(values).ofSizeBetween(from, to);
+        return lists().of(values).ofSizeBetween(from, to);
     }
     public static <T> Gen<List<T>> listsOfUpTo(final int n, final Gen<T> values) {
         return listsOf(0, n, values);
@@ -39,14 +38,6 @@ public final class Generators {
     }
 
     // --------- DOMAINS ----------------------------------------------------------------------------------------
-    public static <T> Gen<Domain<T>> domainsOfUpTo(final int n, final Gen<T> values) {
-        return setsOfUpTo(n, values).map(Domain::new);
-    }
-    public static <T> Gen<Domain<T>> domainsOf(final int from, final int to, final Gen<T> values) {
-        return setsOf(from, to, values).map(Domain::new);
-    }
-
-    // --------- INT-DOMAINS -----------------------------------------------------------------------------------
     public static GenIntDomainBuilder intDomains() {
         return new GenIntDomainBuilder();
     }
@@ -63,7 +54,7 @@ public final class Generators {
             return this;
         }
         public GenIntDomainBuilder ofSizeUpTo(final int n) {
-            ofSizeBetween(n, n);
+            ofSizeBetween(0, n);
 
             return this;
         }
@@ -75,8 +66,49 @@ public final class Generators {
             return this;
         }
 
-        public Gen<Domain<Integer>> build() {
-            return domainsOf(nbValMin, nbValMax, range(minValue, maxValue));
+        public Gen<Domain> build() {
+            return setsOf(nbValMin, nbValMax, integers().between(minValue, maxValue)).map(Domain::new);
         }
     }
+
+    // --------- PARTIAL-ASSIGNMENT -----------------------------------------------------------------------------
+    public static GenPartialAssignmentBuilder partialAssignments() {
+        return new GenPartialAssignmentBuilder();
+    }
+    public static final class GenPartialAssignmentBuilder {
+        private int nbVarsMin = 0;
+        private int nbVarsMax = 10;
+
+        private final GenIntDomainBuilder domainBuilder = intDomains();
+
+        public GenPartialAssignmentBuilder withVariables(int n) {
+            this.nbVarsMin = n;
+            this.nbVarsMax = n;
+            return this;
+        }
+        public GenPartialAssignmentBuilder withUpToVariables(int n) {
+            this.nbVarsMin = 0;
+            this.nbVarsMax = n;
+            return this;
+        }
+        public GenPartialAssignmentBuilder withVariablesRanging(int from, int to) {
+            this.nbVarsMin = from;
+            this.nbVarsMax = to;
+            return this;
+        }
+        public GenPartialAssignmentBuilder withDomainsOfSizeUpTo(int n) {
+            domainBuilder.ofSizeUpTo(n);
+            return this;
+        }
+        public GenPartialAssignmentBuilder withValuesRanging(int from, int to) {
+            domainBuilder.withValuesBetween(from, to);
+            return this;
+        }
+        public Gen<PartialAssignment> build() {
+            return lists().of(domainBuilder.build())
+                        .ofSizeBetween(nbVarsMin, nbVarsMax)
+                        .map(PartialAssignment::new);
+        }
+    }
+
 }

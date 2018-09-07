@@ -22,6 +22,7 @@ public final class FilterAssert extends AbstractAssert<FilterAssert, Filter> {
     public FilterAssert hasSameFilteringAs(final Filter trusted) {
         isNotNull();
 
+        //FIXME
         //qt().forAll()
 
         return this;
