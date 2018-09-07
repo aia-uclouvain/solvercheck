@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-import static org.quicktheories.generators.SourceDSL.*;
+import static org.quicktheories.generators.SourceDSL.integers;
+import static org.quicktheories.generators.SourceDSL.lists;
 
 public final class Generators {
     /** utility class has no public constructor */

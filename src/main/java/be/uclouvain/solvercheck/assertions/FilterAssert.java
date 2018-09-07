@@ -4,11 +4,6 @@ import be.uclouvain.solvercheck.core.Filter;
 import org.assertj.core.api.AbstractAssert;
 
 
-import static org.quicktheories.QuickTheory.qt;
-import static org.quicktheories.generators.SourceDSL.*;
-import static org.quicktheories.generators.Generate.*;
-
-
 public final class FilterAssert extends AbstractAssert<FilterAssert, Filter> {
 
     public FilterAssert(final Filter actual) {

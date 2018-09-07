@@ -1,17 +1,18 @@
 package be.uclouvain.solvercheck.core;
 
+import be.uclouvain.solvercheck.utils.Utils;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static be.uclouvain.solvercheck.core.StrengthComparison.*;
+import static be.uclouvain.solvercheck.utils.Utils.zip;
 
 public final class PartialAssignment implements Iterable<Domain> {
     private final List<Domain> domains;
@@ -50,41 +51,23 @@ public final class PartialAssignment implements Iterable<Domain> {
         if( this.size() != that.size() ) {
             return INCOMPARABLE;
         }
-
-        int weakerCount    = 0;
-        int strongerCount  = 0;
-
-        for(int i = 0; i < size(); i++) {
-            switch(this.get(i).compareWith(that.get(i))) {
-                case INCOMPARABLE:
-                    return INCOMPARABLE;
-                case WEAKER:
-                    if( strongerCount > 0) {
-                        return INCOMPARABLE;
-                    } else {
-                        weakerCount ++ ;
-                    }
-                    break;
-                case STRONGER:
-                    if( weakerCount > 0) {
-                        return INCOMPARABLE;
-                    } else {
-                        strongerCount ++;
-                    }
-                    break;
-                default:
-                    /* do nothing */
-                    break;
-            }
+        if( zip(this, that).stream().anyMatch(Utils::domainsAreIncomparable) ) {
+            return INCOMPARABLE;
         }
 
-        if( weakerCount > 0) {
-            return WEAKER;
-        } else if( strongerCount > 0) {
+        boolean hasStronger = zip(this, that).stream().anyMatch(Utils::domainIsStronger);
+        boolean hasWeaker   = zip(this, that).stream().anyMatch(Utils::domainIsWeaker  );
+        if (hasStronger && hasWeaker) {
+            return INCOMPARABLE;
+        }
+
+        if (hasStronger) {
             return STRONGER;
-        } else {
-            return EQUIVALENT;
         }
+        if (hasWeaker) {
+            return WEAKER;
+        }
+        return EQUIVALENT;
     }
 
     public Set<PartialAssignment> cartesianProduct() {

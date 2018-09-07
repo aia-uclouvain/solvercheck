@@ -1,24 +1,16 @@
 package be.uclouvain.solvercheck.core;
 
 import be.uclouvain.solvercheck.generators.Generators;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
+import be.uclouvain.solvercheck.utils.Utils;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import org.junit.Assert;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
-import java.util.Iterator;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static be.uclouvain.solvercheck.core.StrengthComparison.*;
+import static be.uclouvain.solvercheck.utils.Utils.*;
 
 public class TestPartialAssignment implements WithQuickTheories {
 
@@ -89,9 +81,9 @@ public class TestPartialAssignment implements WithQuickTheories {
             .assuming((a, b) -> a.size() == b.size() )
             .check   ((a, b) -> {
                 boolean isIncomparable         = a.compareWith(b) == INCOMPARABLE;
-                boolean hasIncomparableDomains = zip(a, b).stream().anyMatch(this::domainsAreIncomparable);
-                boolean hasStrongerDomain      = zip(a, b).stream().anyMatch(this::domainIsStronger);
-                boolean hasWeakerDomain        = zip(a, b).stream().anyMatch(this::domainIsWeaker);
+                boolean hasIncomparableDomains = zip(a, b).stream().anyMatch(Utils::domainsAreIncomparable);
+                boolean hasStrongerDomain      = zip(a, b).stream().anyMatch(Utils::domainIsStronger);
+                boolean hasWeakerDomain        = zip(a, b).stream().anyMatch(Utils::domainIsWeaker);
 
                 return isIncomparable == (hasIncomparableDomains || (hasStrongerDomain && hasWeakerDomain));
             });
@@ -104,7 +96,7 @@ public class TestPartialAssignment implements WithQuickTheories {
             .assuming((a, b) -> a.size() == b.size() )
             .check   ((a, b) -> {
                 boolean isEquivalent  = a.compareWith(b) == EQUIVALENT;
-                boolean allEquivalents= zip(a, b).stream().allMatch(this::domainsAreEquivalent);
+                boolean allEquivalents= zip(a, b).stream().allMatch(Utils::domainsAreEquivalent);
 
                 return isEquivalent == allEquivalents;
             });
@@ -116,7 +108,7 @@ public class TestPartialAssignment implements WithQuickTheories {
             .assuming((a, b) -> a.size() == b.size() )
             .check   ((a, b) -> {
                 boolean isStronger         = a.compareWith(b) == STRONGER;
-                boolean hasStrongerDomain  = zip(a, b).stream().anyMatch(this::domainIsStronger);
+                boolean hasStrongerDomain  = zip(a, b).stream().anyMatch(Utils::domainIsStronger);
                 boolean allEquivOrStronger = zip(a, b).stream().allMatch(e-> domainsAreEquivalent(e) || domainIsStronger(e));
 
                 return isStronger == (hasStrongerDomain && allEquivOrStronger);
@@ -129,7 +121,7 @@ public class TestPartialAssignment implements WithQuickTheories {
             .assuming((a, b) -> a.size() == b.size() )
             .check   ((a, b) -> {
                 boolean isWeaker         = a.compareWith(b) == WEAKER;
-                boolean hasWeakerDomain  = zip(a, b).stream().anyMatch(this::domainIsWeaker);
+                boolean hasWeakerDomain  = zip(a, b).stream().anyMatch(Utils::domainIsWeaker);
                 boolean allEquivOrWeaker = zip(a, b).stream().allMatch(e-> domainsAreEquivalent(e) || domainIsWeaker(e));
 
                 return isWeaker == (hasWeakerDomain && allEquivOrWeaker);
@@ -166,22 +158,6 @@ public class TestPartialAssignment implements WithQuickTheories {
             .check ((a, b) -> a.equals(b) == (a.hashCode() == b.hashCode()));
     }
 
-    private boolean domainsAreIncomparable(ZipEntry<Domain, Domain> entry) {
-        return domainsAre(entry, INCOMPARABLE);
-    }
-    private boolean domainsAreEquivalent(ZipEntry<Domain, Domain> entry) {
-        return domainsAre(entry, EQUIVALENT);
-    }
-    private boolean domainIsStronger(ZipEntry<Domain, Domain> entry) {
-        return domainsAre(entry, STRONGER);
-    }
-    private boolean domainIsWeaker(ZipEntry<Domain, Domain> entry) {
-        return domainsAre(entry, WEAKER);
-    }
-    private boolean domainsAre(ZipEntry<Domain, Domain> entry, StrengthComparison cmp) {
-        return entry.apply(Domain::compareWith) == cmp;
-    }
-
     private boolean isValidVarIndex(int i, PartialAssignment a) {
         return 0 <= i && i < a.size();
     }
@@ -204,60 +180,5 @@ public class TestPartialAssignment implements WithQuickTheories {
                 .withValuesRanging(-10, 10)
                 .build();
     }
-    private <A, B> Zip<A, B> zip(final Iterable<A> a, final Iterable<B> b) {
-        return new Zip<>(a, b);
-    }
 
-    private static class Zip<A, B> implements Iterable<ZipEntry<A, B>> {
-        private final Iterable<A> first;
-        private final Iterable<B> second;
-
-        public Zip(final Iterable<A> a, final Iterable<B> b) {
-            first = a;
-            second= b;
-        }
-
-        @Override
-        public Iterator<ZipEntry<A, B>> iterator() {
-            return new ZipIterator<>(first.iterator(), second.iterator());
-        }
-
-        public Stream<ZipEntry<A, B>> stream() {
-            return StreamSupport.stream(spliterator(), false);
-        }
-    }
-
-    private static class ZipIterator<A, B> implements Iterator<ZipEntry<A, B>>{
-        private final Iterator<A> first;
-        private final Iterator<B> second;
-
-        public ZipIterator(final Iterator<A> a, final Iterator<B> b) {
-            first = a;
-            second= b;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return first.hasNext() || second.hasNext();
-        }
-        @Override
-        public ZipEntry<A, B> next() {
-            A nextA = first.hasNext() ? first.next() : null;
-            B nextB = second.hasNext()? second.next(): null;
-
-            return new ZipEntry<>(nextA, nextB);
-        }
-    }
-    private static class ZipEntry<A, B> {
-        public final A first;
-        public final B second;
-        public ZipEntry(final A a, final B b) {
-            first = a;
-            second= b;
-        }
-
-        public <R> R apply(final BiFunction<A, B, R> func) {
-            return func.apply(first, second);
-        }
-    }
 }
