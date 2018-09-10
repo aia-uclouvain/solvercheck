@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static be.uclouvain.solvercheck.core.StrengthComparison.*;
@@ -24,7 +25,7 @@ public class TestPartialAssignment implements WithQuickTheories {
     @Test
     public void getReturnsTheIthElementIffItsAValidIndex(){
         qt().forAll(nonEmptyAssignments(), integers().between(-1, 10))
-            .check((a, i) -> !isValidVarIndex(i, a) || a.get(i) == Iterables.get(a, i) );
+            .check((a, i) -> !isValidVarIndex(i, a) || a.get(i) == Iterables.get(a, i >= 0 ? i : a.size()+i));
     }
 
     @Test
@@ -155,11 +156,22 @@ public class TestPartialAssignment implements WithQuickTheories {
     @Test
     public void testHashCode() {
         qt().forAll(partialAssignments(), partialAssignments())
-            .check ((a, b) -> a.equals(b) == (a.hashCode() == b.hashCode()));
+            .check ((a, b) -> !a.equals(b) || (a.hashCode() == b.hashCode()));
+    }
+
+    @Test
+    public void testUnion() {
+        qt().withExamples(3)
+            .forAll(partialAssignments())
+            .check(a -> {
+                Set<Assignment> prod = a.cartesianProduct();
+                PartialAssignment.unionOf(prod).equals(a);
+                return true;
+            });
     }
 
     private boolean isValidVarIndex(int i, PartialAssignment a) {
-        return 0 <= i && i < a.size();
+        return isValidRelaxIndex(i, a.size());
     }
 
     private Gen<PartialAssignment> nonEmptyAssignments() {

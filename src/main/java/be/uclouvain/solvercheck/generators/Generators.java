@@ -2,6 +2,7 @@ package be.uclouvain.solvercheck.generators;
 
 import be.uclouvain.solvercheck.core.Assignment;
 import be.uclouvain.solvercheck.core.Domain;
+import be.uclouvain.solvercheck.core.Operator;
 import be.uclouvain.solvercheck.core.PartialAssignment;
 import org.quicktheories.core.Gen;
 
@@ -46,6 +47,12 @@ public final class Generators {
         return HashSet::new;
     }
 
+
+    // --------- OPERATORS --------------------------------------------------------------------------------------
+    public static Gen<Operator> operators() {
+        return integers().between(0, 5).map(Operator::from);
+    }
+
     // --------- DOMAINS ----------------------------------------------------------------------------------------
     public static GenIntDomainBuilder intDomains() {
         return new GenIntDomainBuilder();
@@ -59,6 +66,11 @@ public final class Generators {
     // --------- PARTIAL-ASSIGNMENT -----------------------------------------------------------------------------
     public static GenAssignmentBuilder assignments() {
         return new GenAssignmentBuilder();
+    }
+
+    // --------- TABLES -----------------------------------------------------------------------------------------
+    public static GenTableBuilder tables() {
+        return new GenTableBuilder();
     }
 
     public static final class GenIntDomainBuilder {
@@ -166,6 +178,55 @@ public final class Generators {
             return lists().of(integers().between(valueMin, valueMax))
                     .ofSizeBetween(nbVarsMin, nbVarsMax)
                     .map(Assignment::new);
+        }
+    }
+
+    public static final class GenTableBuilder {
+        private int nbLinesMin=   0;
+        private int nbLinesMax=  10;
+
+        private GenAssignmentBuilder builder = new GenAssignmentBuilder();
+
+
+        public GenTableBuilder withVariables(int n) {
+            builder.withVariables(n);
+            return this;
+        }
+
+        public GenTableBuilder withUpToVariables(int n) {
+            builder.withUpToVariables(n);
+            return this;
+        }
+
+        public GenTableBuilder withVariablesRanging(int from, int to) {
+            builder.withVariablesRanging(from, to);
+            return this;
+        }
+
+        public GenTableBuilder withValuesRanging(int from, int to) {
+            builder.withValuesRanging(from, to);
+            return this;
+        }
+
+        public GenTableBuilder withLines(int n) {
+            nbLinesMin = n;
+            nbLinesMax = n;
+            return this;
+        }
+
+        public GenTableBuilder withUpToLines(int n) {
+            nbLinesMin = 0;
+            nbLinesMax = n;
+            return this;
+        }
+        public GenTableBuilder withLinesRanging(int from, int to) {
+            nbLinesMin = from;
+            nbLinesMax = to;
+            return this;
+        }
+
+        public Gen<List<Assignment>> build() {
+            return lists().of(builder.build()).ofSizeBetween(nbLinesMin, nbLinesMax);
         }
     }
 }

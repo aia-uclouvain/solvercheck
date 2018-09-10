@@ -17,7 +17,7 @@ public final class Assignment implements Iterable<Integer> {
     }
 
     public Integer get(int var) {
-        return values.get(var);
+        return values.get(var >= 0 ? var : values.size()+var);
     }
 
     public int size() {

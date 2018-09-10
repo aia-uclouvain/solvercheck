@@ -5,9 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -26,8 +24,8 @@ public final class PartialAssignment implements Iterable<Domain> {
         return domains.size();
     }
 
-    public Domain get(final int var) {
-        return domains.get(var);
+    public Domain get(int var) {
+        return domains.get(var >= 0 ? var : domains.size()+var);
     }
 
     public PartialAssignment remove(final int var, final Integer val) {
@@ -76,6 +74,43 @@ public final class PartialAssignment implements Iterable<Domain> {
             return WEAKER;
         }
         return EQUIVALENT;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static PartialAssignment unionOf(Set<Assignment> assignments) {
+        if( assignments.isEmpty())
+            return new PartialAssignment(ImmutableList.of());
+
+        int nbVars = assignments.stream().findAny().get().size();
+
+        // initialize the container
+        Set<Integer>[] domains = (Set<Integer>[]) new Set[nbVars];
+        for(int i = 0; i < domains.length; i++) domains[i] = new HashSet<>();
+
+        // actually compute the unions
+        for(Assignment a : assignments) {
+            if( a.size() > nbVars)
+                throw new IllegalArgumentException("Not all assignments have the same number of variables");
+
+            for(int i = 0; i < a.size(); i++) {
+                domains[i].add(a.get(i));
+            }
+        }
+
+        // and then turn that all into a partial assignment
+        return new PartialAssignment(
+                Arrays.stream(domains).map(Domain::new).collect(Collectors.toList())
+        );
+    }
+
+    private static boolean isUnitable(Collection<Assignment> assignments) {
+        int min = Integer.MAX_VALUE;
+        int max = 0;
+        for( Assignment a : assignments) {
+            if( a.size() > max ) max = a.size();
+            if( a.size() < min ) min = a.size();
+        }
+        return assignments.isEmpty() || min == max;
     }
 
     public Set<Assignment> cartesianProduct() {

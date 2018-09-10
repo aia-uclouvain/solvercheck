@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import static be.uclouvain.solvercheck.core.StrengthComparison.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
+import static be.uclouvain.solvercheck.utils.Utils.isValidRelaxIndex;
 
 public class TestAssignment implements WithQuickTheories {
     @Test
@@ -28,12 +29,19 @@ public class TestAssignment implements WithQuickTheories {
             .assuming((a, i) -> isValidIndex(i, a.size()))
             .check   ((a, i) -> a.get(i).equals(a.asArray()[i]));
     }
+    @Test
+    public void getReturnsTheIthElementFromThEndIffItsAValidNegativeIndex(){
+        qt().withGenerateAttempts(10000)
+                .forAll(assignments(), integers().between(-10, 0))
+                .assuming((a, i) -> i < 0 && isValidRelaxIndex(i, a.size()))
+                .check   ((a, i) -> a.get(i).equals(a.asArray()[a.size()+i]));
+    }
 
     @Test
     public void getFailsWithExceptionWhenItsNotAValidIndex() {
         qt().withGenerateAttempts(10000)
-            .forAll(assignments(), integers().between(-1, 10))
-            .assuming((a, i) -> !isValidIndex(i, a.size()))
+            .forAll(assignments(), integers().between(-10, 10))
+            .assuming((a, i) -> !isValidRelaxIndex(i, a.size()))
             .check   ((a, i) -> failsThrowing(IndexOutOfBoundsException.class, () -> a.get(i) ));
     }
 
