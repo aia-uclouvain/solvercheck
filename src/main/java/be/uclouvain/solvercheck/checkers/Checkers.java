@@ -1,10 +1,11 @@
 package be.uclouvain.solvercheck.checkers;
 
-import be.uclouvain.solvercheck.core.Assignment;
-import be.uclouvain.solvercheck.core.Checker;
+import be.uclouvain.solvercheck.core.data.Assignment;
+import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.Operator;
 
 import java.util.List;
+import java.util.Set;
 
 import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
 
@@ -21,7 +22,7 @@ public final class Checkers {
     }
 
     public static Checker allDiff() {
-        return s -> s.asSet().size() == s.size();
+        return s -> Set.copyOf(s).size() == s.size();
     }
 
     public static Checker sum(final Operator op, final int constant) {
@@ -42,9 +43,9 @@ public final class Checkers {
     }
 
     public static boolean element(final Assignment assignment) {
-        List<Integer> elements = assignment.asList().subList(0, assignment.size()-2);
-        int              index = assignment.get(-2);
-        int              value = assignment.get(-1);
+        List<Integer> elements = assignment.subList(0, assignment.size()-2);
+        int              index = assignment.get(assignment.size()-2);
+        int              value = assignment.get(assignment.size()-1);
         return element(elements, index, value);
     }
     public static boolean element(final List<Integer> elements, final int index, final int value) {

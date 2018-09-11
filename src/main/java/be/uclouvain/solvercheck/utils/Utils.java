@@ -1,10 +1,11 @@
 package be.uclouvain.solvercheck.utils;
 
-import be.uclouvain.solvercheck.core.Domain;
-import be.uclouvain.solvercheck.core.PartialAssignment;
-import be.uclouvain.solvercheck.core.StrengthComparison;
+import be.uclouvain.solvercheck.core.data.Domain;
+import be.uclouvain.solvercheck.utils.collections.Zip;
+import be.uclouvain.solvercheck.utils.collections.ZipEntry;
+import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 
-import static be.uclouvain.solvercheck.core.StrengthComparison.*;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.*;
 
 public final class Utils {
     /**
@@ -40,7 +41,7 @@ public final class Utils {
         return domainsAre(entry, WEAKER);
     }
 
-    public static boolean domainsAre(ZipEntry<Domain, Domain> entry, StrengthComparison cmp) {
+    public static boolean domainsAre(ZipEntry<Domain, Domain> entry, PartialOrdering cmp) {
         return entry.apply(Domain::compareWith) == cmp;
     }
 

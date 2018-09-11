@@ -1,6 +1,8 @@
-package be.uclouvain.solvercheck.utils;
+package be.uclouvain.solvercheck.utils.collections;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * This class encapsulates the notion of cartesian product of sets of things. It basically
@@ -65,9 +67,11 @@ public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomA
 
         // initialize the offsets
         this.coeff[nbCol]   = 1;
-        this.coeff[nbCol-1] = this.data[nbCol-1].size();
-        for(int i = nbCol-2; i >= 0; i--) {
-            this.coeff[i] = checkedMul(this.data[i].size(), coeff[i+1]);
+        if( nbCol > 0) {
+            this.coeff[nbCol - 1] = this.data[nbCol - 1].size();
+            for (int i = nbCol - 2; i >= 0; i--) {
+                this.coeff[i] = checkedMul(this.data[i].size(), coeff[i + 1]);
+            }
         }
     }
 
@@ -93,6 +97,50 @@ public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomA
     @Override
     public boolean contains(Object o) {
         return indexOf(o) != -1;
+    }
+
+    /**
+     * Performs the inverse of the cartesian product.
+     *
+     * @return
+     */
+    public List<Set<T>> squash() {
+        if( nbCol == 0 )
+            return new ArrayList<>();
+
+        List<Integer> incomplete = IntStream.range(0, nbCol).boxed().collect(Collectors.toList());
+        List<Set<T>>  result     = new ArrayList<>(nbCol);
+
+        for(int i = 0; i < nbCol; i++)
+            result.add(new HashSet<T>());
+
+
+        for(List<T> line : this) {
+            if(incomplete.isEmpty()) {
+                break;
+            }
+
+            incomplete = mergeLine(line, result, incomplete);
+        }
+
+        return result;
+    }
+
+    private List<Integer> mergeLine(final List<T> line, final List<Set<T>> into, final List<Integer> setsToConsider) {
+        List<Integer> stillNotComplete = new ArrayList<>(setsToConsider.size());
+
+        for(int i : setsToConsider) {
+            T      value  = line.get(i);
+            Set<T> target = into.get(i);
+
+            target.add(value);
+
+            if( !target.containsAll(data[i]) ) {
+                stillNotComplete.add(i);
+            }
+        }
+
+        return stillNotComplete;
     }
 
     /**
@@ -123,7 +171,7 @@ public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomA
      * @return the index of the object 'o' if it belongs to the product. -1 otherwise
      */
     @SuppressWarnings("unchecked")
-    public int indexOf(Object o) {
+    private int indexOf(Object o) {
         if(! (o instanceof List)) {
             return -1;
         }

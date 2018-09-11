@@ -1,10 +1,12 @@
-package be.uclouvain.solvercheck.core;
+package be.uclouvain.solvercheck.core.task;
+
+import be.uclouvain.solvercheck.core.data.Assignment;
 
 import java.util.function.Predicate;
 
 /**
  * Interface embodies the simplest form of correctness validation.
- * A checker simply inspects some given valuation and tells whether or not it
+ * A checker simply inspects some given assignment and tells whether or not it
  * constitutes a valid solution (according to some propagator and consistency)
  */
 @FunctionalInterface
