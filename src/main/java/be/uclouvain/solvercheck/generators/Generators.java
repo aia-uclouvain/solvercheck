@@ -107,7 +107,7 @@ public final class Generators {
     public static final class GenPartialAssignmentBuilder {
         private final GenIntDomainBuilder domainBuilder = intDomains();
         private int nbVarsMin = 0;
-        private int nbVarsMax = 10;
+        private int nbVarsMax = 5;
 
         public GenPartialAssignmentBuilder withVariables(int n) {
             this.nbVarsMin = n;
@@ -146,7 +146,7 @@ public final class Generators {
 
     public static final class GenAssignmentBuilder {
         private int nbVarsMin =   0;
-        private int nbVarsMax =  10;
+        private int nbVarsMax =   5;
         private int valueMin  = -10;
         private int valueMax  =  10;
 
@@ -182,8 +182,8 @@ public final class Generators {
     }
 
     public static final class GenTableBuilder {
-        private int nbLinesMin=   0;
-        private int nbLinesMax=  10;
+        private int nbLinesMin= 0;
+        private int nbLinesMax= 5;
 
         private GenAssignmentBuilder builder = new GenAssignmentBuilder();
 

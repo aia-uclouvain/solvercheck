@@ -183,7 +183,7 @@ public class TestPartialAssignment implements WithQuickTheories {
     }
     private Gen<PartialAssignment> partialAssignments() {
         return Generators.partialAssignments()
-                .withUpToVariables(10)
+                .withUpToVariables(5)
                 .withDomainsOfSizeUpTo(10)
                 .withValuesRanging(-10, 10)
                 .build();

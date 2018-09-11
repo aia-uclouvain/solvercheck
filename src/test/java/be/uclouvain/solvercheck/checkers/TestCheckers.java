@@ -79,6 +79,6 @@ public class TestCheckers implements WithQuickTheories {
         return Generators.assignments().build();
     }
     private Gen<Assignment> assignmentWithAtLeast(int nVars) {
-        return Generators.assignments().withVariablesRanging(3, 10).build();
+        return Generators.assignments().withVariablesRanging(3, 6).build();
     }
 }
