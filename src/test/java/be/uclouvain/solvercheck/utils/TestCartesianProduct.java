@@ -13,7 +13,7 @@ public class TestCartesianProduct implements WithQuickTheories {
 
     @Test
     public void TheProductOfAnEmptyListTheUnitProduct() {
-        CartesianProduct unitProduct = new CartesianProduct<>(new ArrayList<>());
+        CartesianProduct unitProduct = CartesianProduct.of(new ArrayList<>());
 
         Assert.assertEquals(1, unitProduct.size());
         Assert.assertEquals(new ArrayList<>(), unitProduct.get(0));
@@ -24,14 +24,14 @@ public class TestCartesianProduct implements WithQuickTheories {
         qt().withGenerateAttempts(10000)
             .forAll(listsOfSets())
             .assuming(l -> l.stream().anyMatch(Set::isEmpty))
-            .check(l -> new CartesianProduct<>(l).isEmpty() );
+            .check(l -> CartesianProduct.of(l).isEmpty() );
     }
 
     @Test
     public void theSizeOfTheCartesianProductEqualsTheProductOfTheSizesOfTheSets() {
         qt().forAll(listsOfSets())
             .check(l -> {
-                int actualSize = new CartesianProduct<>(l).size();
+                int actualSize = CartesianProduct.of(l).size();
                 int checkSize  = 1;
                 for( Set<Integer> s : l) { checkSize *= s.size(); }
                 return checkSize == actualSize;
@@ -53,7 +53,7 @@ public class TestCartesianProduct implements WithQuickTheories {
                                 projection.add( targetSet.get(index % targetSet.size()) );
                             }
 
-                            return new CartesianProduct<>(sets).contains(projection);
+                            return CartesianProduct.of(sets).contains(projection);
                         })
             );
     }
@@ -62,7 +62,7 @@ public class TestCartesianProduct implements WithQuickTheories {
     public void testProductIsEmptySize(){
         qt().forAll(listsOfSets())
             .check(l -> {
-                CartesianProduct product = new CartesianProduct<>(l);
+                CartesianProduct product = CartesianProduct.of(l);
                 return product.isEmpty() == (product.size() == 0);
             } );
     }
@@ -72,7 +72,7 @@ public class TestCartesianProduct implements WithQuickTheories {
         qt().forAll(listsOfSets())
             .check(sets -> {
                 int count = 0;
-                CartesianProduct product   = new CartesianProduct<>(sets);
+                CartesianProduct product   = CartesianProduct.of(sets);
                 Iterator<List<Integer>> it = product.iterator();
 
                 while(it.hasNext()) { it.next(); count++; }
@@ -80,26 +80,6 @@ public class TestCartesianProduct implements WithQuickTheories {
                 return count == product.size();
             });
     }
-
-    @Test
-    public void squashIsIdemPotentProvidedThatProductIsNotEmpty(){
-        qt().forAll(listsOfSets())
-            .assuming(sets -> sets.stream().allMatch(x->!x.isEmpty()))
-            .check(   sets -> new CartesianProduct<>(sets).squash().equals(sets) );
-    }
-
-    @Test
-    public void squashIsYieldsListOfEmptySetsWhenItContainsNoTuples(){
-        qt().withGenerateAttempts(10000)
-            .forAll(listsOfSets())
-            .assuming(sets -> sets.stream().anyMatch(Set::isEmpty))
-            .check(   sets ->
-                        new CartesianProduct<>(sets)
-                                .squash()
-                                .equals(sets.stream().map(x-> Set.of()).collect(Collectors.toList()))
-                );
-    }
-
     public Gen<List<Set<Integer>>> listsOfSets(){
         return lists().of(sets()).ofSizeBetween(0, 5);
     }

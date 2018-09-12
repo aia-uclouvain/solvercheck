@@ -29,7 +29,7 @@ import java.util.stream.IntStream;
  *
  * @param <T> the type from objects composing the lists from the cartesian product.
  */
-public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomAccess {
+public final class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomAccess {
     /**
      * This is the actual data, the 'sets' from which we are going to pick values to build
      * the tuples composing the cartesian product.
@@ -56,11 +56,23 @@ public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomA
     private final int nbCol;
 
     /**
+     * Factory method whose only purpose is to make the creation of a cartesian product
+     * feel more natural.
+     *
+     * @param data the list of sets of values for which to compute the cartesian product
+     * @param <T>  the type of the inner elements of the tuples
+     * @return the cartesian product of the given list of sets
+     */
+    public static <T> CartesianProduct<T> of(final List<? extends Set<T>> data) {
+        return new CartesianProduct<T>(data);
+    }
+
+    /**
      * Creates the cartesian product from all the given sets.
      * @param data the sets from which to compute the cartesian product
      */
     @SuppressWarnings("unchecked")
-    public CartesianProduct(final List<Set<T>> data) {
+    private CartesianProduct(final List<? extends Set<T>> data) {
         this.data  = data.stream().map(ArrayList::new).toArray(ArrayList[]::new);
         this.nbCol = this.data.length;
         this.coeff = new int[nbCol+1];
@@ -97,50 +109,6 @@ public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomA
     @Override
     public boolean contains(Object o) {
         return indexOf(o) != -1;
-    }
-
-    /**
-     * Performs the inverse from the cartesian product.
-     *
-     * @return
-     */
-    public List<Set<T>> squash() {
-        if( nbCol == 0 )
-            return new ArrayList<>();
-
-        List<Integer> incomplete = IntStream.range(0, nbCol).boxed().collect(Collectors.toList());
-        List<Set<T>>  result     = new ArrayList<>(nbCol);
-
-        for(int i = 0; i < nbCol; i++)
-            result.add(new HashSet<T>());
-
-
-        for(List<T> line : this) {
-            if(incomplete.isEmpty()) {
-                break;
-            }
-
-            incomplete = mergeLine(line, result, incomplete);
-        }
-
-        return result;
-    }
-
-    private List<Integer> mergeLine(final List<T> line, final List<Set<T>> into, final List<Integer> setsToConsider) {
-        List<Integer> stillNotComplete = new ArrayList<>(setsToConsider.size());
-
-        for(int i : setsToConsider) {
-            T      value  = line.get(i);
-            Set<T> target = into.get(i);
-
-            target.add(value);
-
-            if( !target.containsAll(data[i]) ) {
-                stillNotComplete.add(i);
-            }
-        }
-
-        return stillNotComplete;
     }
 
     /**
