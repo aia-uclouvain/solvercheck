@@ -194,7 +194,8 @@ public class TestPartialAssignment implements WithQuickTheories {
 
     @Test
     public void oneCannotCallAsAssignmentWhenNotAllDomainsAreFixed() {
-        qt().forAll(partialAssignments())
+        qt().withGenerateAttempts(10000)
+            .forAll(partialAssignments())
             .assuming(x -> x.stream().anyMatch(dom -> !dom.isFixed()))
             .check(x -> failsThrowing(IllegalStateException.class, ()->x.asAssignment()));
     }
