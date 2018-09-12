@@ -1,10 +1,12 @@
 package be.uclouvain.solvercheck.checkers;
 
+import be.uclouvain.solvercheck.consistencies.ArcConsitency;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
 import be.uclouvain.solvercheck.core.data.impl.DomainFactory;
 import be.uclouvain.solvercheck.core.data.impl.PartialAssignmentFactory;
+import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.generators.Generators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Assert;
@@ -96,12 +98,9 @@ public class TestCheckers implements WithQuickTheories {
             )
         );
 
-        PartialAssignment actual = PartialAssignmentFactory.unionOf(
-                CartesianProduct.of(initial).stream()
-                        .map(AssignmentFactory::from)
-                        .filter(gccVar(List.of(1, 2)))
-                        .collect(Collectors.toList())
-        );
+        Filter gccAc = new ArcConsitency(gccVar(List.of(1, 2)));
+
+        PartialAssignment actual = gccAc.filter(initial);
 
         PartialAssignment expected = PartialAssignmentFactory.unionOf(
                 List.of(
