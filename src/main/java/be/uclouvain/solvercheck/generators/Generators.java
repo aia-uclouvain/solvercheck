@@ -2,7 +2,7 @@ package be.uclouvain.solvercheck.generators;
 
 import be.uclouvain.solvercheck.core.data.*;
 import be.uclouvain.solvercheck.core.data.impl.*;
-import be.uclouvain.solvercheck.core.Operator;
+import be.uclouvain.solvercheck.core.data.Operator;
 import org.quicktheories.core.Gen;
 
 import java.util.HashSet;
@@ -49,12 +49,16 @@ public final class Generators {
 
     // --------- OPERATORS --------------------------------------------------------------------------------------
     public static Gen<Operator> operators() {
-        return integers().between(0, 5).map(Operator::from);
+        return integers().between(0, 5).map(Generators::operatorFrom);
+    }
+
+    private static Operator operatorFrom(int i) {
+        return Operator.values()[i%Operator.values().length];
     }
 
     // --------- DOMAINS ----------------------------------------------------------------------------------------
-    public static GenIntDomainBuilder intDomains() {
-        return new GenIntDomainBuilder();
+    public static GenDomainBuilder domains() {
+        return new GenDomainBuilder();
     }
 
     // --------- PARTIAL-ASSIGNMENT -----------------------------------------------------------------------------
@@ -72,26 +76,26 @@ public final class Generators {
         return new GenTableBuilder();
     }
 
-    public static final class GenIntDomainBuilder {
+    public static final class GenDomainBuilder {
         private int nbValMin = 0;
         private int nbValMax = 10;
         private int minValue = Integer.MIN_VALUE;
         private int maxValue = Integer.MAX_VALUE;
 
-        public GenIntDomainBuilder ofSizeBetween(final int from, final int to) {
+        public GenDomainBuilder ofSizeBetween(final int from, final int to) {
             nbValMin = from;
             nbValMax = to;
 
             return this;
         }
 
-        public GenIntDomainBuilder ofSizeUpTo(final int n) {
+        public GenDomainBuilder ofSizeUpTo(final int n) {
             ofSizeBetween(0, n);
 
             return this;
         }
 
-        public GenIntDomainBuilder withValuesBetween(final int from, final int to) {
+        public GenDomainBuilder withValuesBetween(final int from, final int to) {
             minValue = from;
             maxValue = to;
 
@@ -99,12 +103,13 @@ public final class Generators {
         }
 
         public Gen<Domain> build() {
-            return setsOf(nbValMin, nbValMax, integers().between(minValue, maxValue)).map(BasicDomain::new);
+            return setsOf(nbValMin, nbValMax, integers().between(minValue, maxValue))
+                    .map(DomainFactory::fromCollection);
         }
     }
 
     public static final class GenPartialAssignmentBuilder {
-        private final GenIntDomainBuilder domainBuilder = intDomains();
+        private final GenDomainBuilder domainBuilder = domains();
         private int nbVarsMin = 0;
         private int nbVarsMax = 5;
 
@@ -126,6 +131,11 @@ public final class Generators {
             return this;
         }
 
+        public GenPartialAssignmentBuilder withDomainsOfSizeBetween(int x, int y) {
+            domainBuilder.ofSizeBetween(x, y);
+            return this;
+        }
+
         public GenPartialAssignmentBuilder withDomainsOfSizeUpTo(int n) {
             domainBuilder.ofSizeUpTo(n);
             return this;
@@ -139,7 +149,7 @@ public final class Generators {
         public Gen<PartialAssignment> build() {
             return lists().of(domainBuilder.build())
                     .ofSizeBetween(nbVarsMin, nbVarsMax)
-                    .map(BasicPartialAssignment::new);
+                    .map(PartialAssignmentFactory::from);
         }
     }
 
@@ -176,7 +186,7 @@ public final class Generators {
         public Gen<Assignment> build() {
             return lists().of(integers().between(valueMin, valueMax))
                     .ofSizeBetween(nbVarsMin, nbVarsMax)
-                    .map(BasicAssignment::new);
+                    .map(AssignmentFactory::from);
         }
     }
 

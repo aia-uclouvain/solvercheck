@@ -5,29 +5,29 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * This class encapsulates the notion of cartesian product of sets of things. It basically
- * represents the set of all the lists composed with one item from each of the given sets
+ * This class encapsulates the notion from cartesian product from sets from things. It basically
+ * represents the set from all the lists composed with one item from each from the given sets
  * (in order).
  *
  * .. Complexity::
- *    Even though this class represents the complete cartesian product of the given sets,
+ *    Even though this class represents the complete cartesian product from the given sets,
  *    its space complexity is only $\theta(N)$ as all the computations are made lazily.
  *
  * .. Credits::
- *    This implementation of the computation of the cartesian product of several sets was
+ *    This implementation from the computation from the cartesian product from several sets was
  *    inspired by Guava's implementation. It should however be +much+ simpler to read.
- *    Additionally, micro-benchmarking revealed that is runs more than an order of
- *    magnitude faster than Guava's implementation when iterating over the set of all
+ *    Additionally, micro-benchmarking revealed that is runs more than an order from
+ *    magnitude faster than Guava's implementation when iterating over the set from all
  *    possible lists.
  *
  * .. Further Improvements::
  *    Even though it showcases very decent performances, this class could be made even
- *    faster by simply avoiding the allocation/gc cost incurred by the creation of
+ *    faster by simply avoiding the allocation/gc cost incurred by the creation from
  *    transient objects.
  *    Concretely, this means that we could gain some performance boost by letting the
  *    iterator always return the same object, only updating the 'index' value.
  *
- * @param <T> the type of objects composing the lists of the cartesian product.
+ * @param <T> the type from objects composing the lists from the cartesian product.
  */
 public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomAccess {
     /**
@@ -44,20 +44,20 @@ public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomA
      * This array holds memoized multiplicative coefficients. These serve to know how to
      * parse a given number 'i' and produce the corresponding ith tuple.
      *
-     * Each cell `coeff[j]` of the array holds the value of the product of the sizes
-     * of the sets `data[j]` to `data[nbCol-1]`. This means that `coeff[0]` store the
-     * result of the multiplication of the sizes of all the sets. That is to say,
-     * `coeff[0]` stores the **size** of the cartesian product.
+     * Each cell `coeff[j]` from the array holds the value from the product from the sizes
+     * from the sets `data[j]` to `data[nbCol-1]`. This means that `coeff[0]` store the
+     * result from the multiplication from the sizes from all the sets. That is to say,
+     * `coeff[0]` stores the **size** from the cartesian product.
      */
     private final int[] coeff;
     /**
-     * This field stores the number of columns of each tuple in the cartesian product
+     * This field stores the number from columns from each tuple in the cartesian product
      */
     private final int nbCol;
 
     /**
-     * Creates the cartesian product of all the given sets.
-     * @param data the sets of which to compute the cartesian product
+     * Creates the cartesian product from all the given sets.
+     * @param data the sets from which to compute the cartesian product
      */
     @SuppressWarnings("unchecked")
     public CartesianProduct(final List<Set<T>> data) {
@@ -100,7 +100,7 @@ public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomA
     }
 
     /**
-     * Performs the inverse of the cartesian product.
+     * Performs the inverse from the cartesian product.
      *
      * @return
      */
@@ -144,20 +144,20 @@ public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomA
     }
 
     /**
-     * This method has the same meaning as in the context of a List.
-     * It returns the `index`th tuple of the cartesian set, where "index-th" is to be
-     * interpreted according to the internal order of the cartesian prod.
+     * This method has the same meaning as in the context from a List.
+     * It returns the `index`th tuple from the cartesian set, where "index-th" is to be
+     * interpreted according to the internal order from the cartesian prod.
      *
      * .. The Internal Order::
-     *    Internally, the tuples of the cartesian product are assumed to be ordered
+     *    Internally, the tuples from the cartesian product are assumed to be ordered
      *    according to some 'generalized' counter. Which one is simply an integer that
-     *    can be decomposed to find the indices of all the items in all the 'sets'.
+     *    can be decomposed to find the indices from all the items in all the 'sets'.
      *    The correspondence "counter" to tuple is given by the following formula:
      *    $$
      *      \sum_{i=0}^{nbCol} value_i * coeff[i-1]
      *    $$
      *
-     * @param index the index of the desired tuple in the internal ordering
+     * @param index the index from the desired tuple in the internal ordering
      * @return the index-th tuple.
      */
     public List<T> get(int index) {
@@ -165,10 +165,10 @@ public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomA
     }
 
     /**
-     * The index (according to the internal order) of the object `o` if that is a tuple
+     * The index (according to the internal order) from the object `o` if that is a tuple
      * from the cartesian product. Or -1 if `o` is not a tuple from the cartesian product.
      * @param o the object whose index is searched for.
-     * @return the index of the object 'o' if it belongs to the product. -1 otherwise
+     * @return the index from the object 'o' if it belongs to the product. -1 otherwise
      */
     @SuppressWarnings("unchecked")
     private int indexOf(Object o) {
@@ -196,12 +196,12 @@ public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomA
     }
 
     /**
-     * Returns the offset of the value for the `column`th column as it has been encoded
+     * Returns the offset from the value for the `column`th column as it has been encoded
      * into the given `index`.
      *
      * @param index an index identifying some tuple
      * @param column a column. belonging to the range [0..nbCol[
-     * @return the position of th value of the ith column of the tuple identified by index
+     * @return the position from th value from the ith column from the tuple identified by index
      *    in the original "column"th set.
      */
     private int posInColumn(int index, int column) {
@@ -226,7 +226,7 @@ public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomA
 
     /**
      * This class provides a list-view into the cartesian product. The represented list
-     * constitutes one of the tuples of the product.
+     * constitutes one from the tuples from the product.
      */
     private class Line extends AbstractList<T> {
         /** An index identifying the tuple shown as a list */
@@ -255,7 +255,7 @@ public class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomA
      * this cartesian product.
      */
     private class LineIter implements Iterator<List<T>> {
-        /** The index of the current tuple */
+        /** The index from the current tuple */
         private int cursor;
 
         /** {@inheritDoc} */

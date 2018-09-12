@@ -7,7 +7,7 @@ import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
 import static be.uclouvain.solvercheck.checkers.Checkers.*;
-import static be.uclouvain.solvercheck.core.Operator.*;
+import static be.uclouvain.solvercheck.core.data.Operator.*;
 import static be.uclouvain.solvercheck.generators.Generators.tables;
 import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
 

@@ -14,9 +14,9 @@ import java.util.stream.StreamSupport;
  *    this iterable will generate entries with null-padding.
  */
 public final class Zip<A, B> implements Iterable<ZipEntry<A, B>> {
-    /** The items that will make the first member of the returned tuples */
+    /** The items that will make the first member from the returned tuples */
     private final Iterable<A> first;
-    /** The items that will make the second member of the returned tuples */
+    /** The items that will make the second member from the returned tuples */
     private final Iterable<B> second;
 
     /** Creates a new zipper from the given two iterables */
@@ -32,7 +32,7 @@ public final class Zip<A, B> implements Iterable<ZipEntry<A, B>> {
     }
 
     /**
-     * @return a stream of 2-tuples (ZipEntry), each composed of one item from the
+     * @return a stream from 2-tuples (ZipEntry), each composed from one item from the
      *         first sequence, and one from the second.
      */
     public Stream<ZipEntry<A, B>> stream() {

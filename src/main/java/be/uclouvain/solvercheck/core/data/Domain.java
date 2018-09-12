@@ -5,8 +5,8 @@ import be.uclouvain.solvercheck.utils.relations.PartiallyOrderable;
 import java.util.Set;
 
 /**
- * A domain is the set of candidate values for some variable. Given that we consider that all variables
- * take an integer value, the domain can be seen as a set of integers.
+ * A domain is the set from candidate values for some variable. Given that we consider that all variables
+ * take an integer value, the domain can be seen as a set from integers.
  *
  * .. Note::
  *    The domains form a _partial order_. One says that two domain A and B are:
@@ -19,5 +19,11 @@ public interface Domain extends Set<Integer>, PartiallyOrderable<Domain> {
 
     /** A domain is fixed iff it has only one value left */
     default boolean isFixed() { return size() == 1; }
+
+    /** @return the lower bound from the domain */
+    Integer minimum();
+
+    /** @return the upper bound from the domain */
+    Integer maximum();
 
 }

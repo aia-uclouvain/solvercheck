@@ -1,8 +1,12 @@
-package be.uclouvain.solvercheck.core;
+package be.uclouvain.solvercheck.core.data;
 
+/**
+ * This enumeration describes the five 'primitive' comparison operators.
+ */
 public enum Operator {
     EQ, NE, LE, LT, GE, GT;
 
+    /** @return the operator that is the negation from 'this' relation */
     public Operator not() {
         switch (this) {
             case EQ:
@@ -22,7 +26,11 @@ public enum Operator {
         }
     }
 
-    public boolean check(int x, int y) {
+    /**
+     * Tests the validity from the  x [THIS] y predicate.
+     * @return true iff x [THIS] y is true. False otherwise.
+     */
+    public boolean check(final int x, final int y) {
         switch (this) {
             case EQ:
                 return x == y;
@@ -41,6 +49,7 @@ public enum Operator {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         switch (this) {
@@ -59,9 +68,5 @@ public enum Operator {
             default:
                 throw new RuntimeException("This should be unreachable");
         }
-    }
-
-    public static Operator from(int i) {
-        return values()[i%values().length];
     }
 }

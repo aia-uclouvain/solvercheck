@@ -1,6 +1,7 @@
 package be.uclouvain.solvercheck.core.data;
 
-import be.uclouvain.solvercheck.core.data.impl.BasicDomain;
+import be.uclouvain.solvercheck.core.data.impl.DomainFactory;
+import be.uclouvain.solvercheck.generators.Generators;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
@@ -8,26 +9,25 @@ import org.quicktheories.core.Gen;
 
 import java.util.Iterator;
 
+import static be.uclouvain.solvercheck.core.data.Operator.NE;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.*;
-import static be.uclouvain.solvercheck.generators.Generators.intDomains;
 
-public class TestBasicDomain implements WithQuickTheories {
+public class TestDomain implements WithQuickTheories {
 
-
-    /* FIXME: y a des remove partout !
     @Test
-    public void removeReturnsTheSameInstanceWhenItemDoesNotBelongToDomain(){
+    public void restrictReturnsTheSameInstanceWhenItemDoesNotBelongToDomain(){
         qt().forAll(domains(), integers().all())
                 .assuming((domain, value) -> !domain.contains(value))
-                .check   ((domain, value) -> domain.remove(value) == domain );
+                .check   ((domain, value) -> DomainFactory.restrict(domain, NE, value) == domain );
     }
 
     @Test
-    public void removeCreatesAProperSubdomainUponRemoval(){
-        qt().forAll(domains()).check(d ->
-            d.stream().allMatch(vx -> {
-                BasicDomain modified = d.remove(vx);
-                return modified.stream().allMatch(vy -> vx.equals(vy) || modified.contains(vy));
+    public void restrictCreatesAProperSubdomainUponRemoval(){
+        qt().forAll(domains()).check(dom ->
+            dom.stream().allMatch(value -> {
+                Domain modified = DomainFactory.restrict(dom, NE, value);
+                return !modified.contains(value)
+                     && modified.stream().allMatch(vy -> value.equals(vy) || modified.contains(vy));
             })
         );
     }
@@ -37,11 +37,15 @@ public class TestBasicDomain implements WithQuickTheories {
         qt().forAll(domains()).check(d -> {
             boolean isReflexive  = d.compareWith(d) == EQUIVALENT;
             boolean isSymmetric  = d.stream().allMatch(v -> {
-                BasicDomain a = d.remove(v); BasicDomain b = d.remove(v);
-                return a.compareWith(b) == EQUIVALENT && b.compareWith(a) == EQUIVALENT;
+                Domain a = DomainFactory.restrict(d, NE, v);
+                Domain b = DomainFactory.restrict(d, NE, v);
+                return a.compareWith(b) == EQUIVALENT
+                    && b.compareWith(a) == EQUIVALENT;
             });
             boolean isTransitive = d.stream().allMatch(v -> {
-                BasicDomain a = d.remove(v); BasicDomain b = d.remove(v); BasicDomain c = d.remove(v);
+                Domain a = DomainFactory.restrict(d, NE, v);
+                Domain b = DomainFactory.restrict(d, NE, v);
+                Domain c = DomainFactory.restrict(d, NE, v);
 
                 return a.compareWith(b) == EQUIVALENT
                     && b.compareWith(c) == EQUIVALENT
@@ -55,14 +59,14 @@ public class TestBasicDomain implements WithQuickTheories {
     @Test
     public void aSubDomainMustBeStrongerThanItsParent(){
         qt().forAll(domains()).check(d ->
-            d.stream().allMatch(v -> d.remove(v).compareWith(d) == STRONGER)
+                d.stream().allMatch(v -> DomainFactory.restrict(d, NE, v).compareWith(d) == STRONGER)
         );
     }
 
     @Test
     public void aSuperDomainMustBeWeakerThanItsChild(){
         qt().forAll(domains()).check(d ->
-            d.stream().allMatch(v -> d.compareWith(d.remove(v)) == WEAKER)
+            d.stream().allMatch(v -> d.compareWith(DomainFactory.restrict(d, NE, v)) == WEAKER)
         );
     }
 
@@ -72,36 +76,13 @@ public class TestBasicDomain implements WithQuickTheories {
             if( domain.size() < 2 ) return true;
 
             Iterator<Integer> it = domain.iterator();
-            BasicDomain a = domain.remove(it.next());
-            BasicDomain b = domain.remove(it.next());
+            Domain a = DomainFactory.restrict(domain, NE, it.next());
+            Domain b = DomainFactory.restrict(domain, NE, it.next());
 
             return a.compareWith(b) == PartialOrdering.INCOMPARABLE;
         });
     }
 
-    // I hesistated to write these tests... but given they're easy
-    @Test
-    public void testContains() {
-        qt().forAll(domains(), integers().all()).check((d, v) ->
-            d.contains(v) == d.asSet().contains(v)
-        );
-    }
-    @Test
-    public void testSize() {
-        qt().forAll(domains()).check(d -> d.size() == d.asSet().size());
-    }
-    @Test
-    public void testIsEmpty() {
-        qt().forAll(domains()).check(d -> d.isEmpty() == (d.size() == 0));
-    }
-    @Test
-    public void testIsFixed() {
-        qt().forAll(domains()).check(d -> d.isFixed() == (d.size() == 1));
-    }
-    @Test
-    public void testToString() {
-        qt().forAll(domains()).check(d -> d.toString().equals(d.asSet().toString()));
-    }
     @Test
     public void testEqualsIffEquivalent() {
         qt().forAll(domains(), domains())
@@ -112,11 +93,16 @@ public class TestBasicDomain implements WithQuickTheories {
         qt().forAll(domains()).check(d -> {
             boolean isReflexive  = d.equals(d);
             boolean isSymmetric  = d.stream().allMatch(v -> {
-                BasicDomain a = d.remove(v); BasicDomain b = d.remove(v);
+                Domain a = DomainFactory.restrict(d, NE, v);
+                Domain b = DomainFactory.restrict(d, NE, v);
+
                 return a.equals(b) && b.equals(a);
             });
             boolean isTransitive = d.stream().allMatch(v -> {
-                BasicDomain a = d.remove(v); BasicDomain b = d.remove(v); BasicDomain c = d.remove(v);
+                Domain a = DomainFactory.restrict(d, NE, v);
+                Domain b = DomainFactory.restrict(d, NE, v);
+                Domain c = DomainFactory.restrict(d, NE, v);
+
                 return a.equals(b) && b.equals(c) && a.equals(c);
             });
 
@@ -127,17 +113,17 @@ public class TestBasicDomain implements WithQuickTheories {
     public void testHashCode() {
         qt().forAll(domains()).check(d ->
             d.stream().allMatch(v -> {
-                BasicDomain a = d.remove(v); BasicDomain b = d.remove(v);
+                Domain a = DomainFactory.restrict(d, NE, v);
+                Domain b = DomainFactory.restrict(d, NE, v);
                 return a.hashCode() == b.hashCode();
             })
         );
     }
 
-    private Gen<BasicDomain> domains() {
+    private Gen<Domain> domains() {
         return domains(1, 10);
     }
-    private Gen<BasicDomain> domains(int from, int to) {
-        return intDomains().ofSizeBetween(from, to).build();
+    private Gen<Domain> domains(int from, int to) {
+        return Generators.domains().ofSizeBetween(from, to).build();
     }
-    */
 }

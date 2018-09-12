@@ -1,22 +1,20 @@
 package be.uclouvain.solvercheck.core.data;
 
-import be.uclouvain.solvercheck.core.data.impl.BasicAssignment;
+import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
 import be.uclouvain.solvercheck.generators.Generators;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static be.uclouvain.solvercheck.utils.Utils.*;
 
-public class TestBasicAssignment implements WithQuickTheories {
+public class TestAssignment implements WithQuickTheories {
     @Test
     public void testSize() {
         qt().forAll(listOfInt()).check(a ->
-                a.size() == new BasicAssignment(a).size()
+                a.size() == AssignmentFactory.from(a).size()
         );
     }
 
@@ -25,21 +23,21 @@ public class TestBasicAssignment implements WithQuickTheories {
         qt().withGenerateAttempts(10000)
             .forAll(listOfInt(), integers().between(0, 10))
             .assuming((a, i) -> isValidIndex(i, a.size()))
-            .check   ((a, i) -> a.get(i).equals(new BasicAssignment(a).get(i)));
+            .check   ((a, i) -> a.get(i).equals(AssignmentFactory.from(a).get(i)));
     }
 
     @Test
     public void getFailsWithExceptionWhenItsNotAValidIndex() {
         qt().withGenerateAttempts(10000)
-            .forAll(assignments(), integers().between(-10, 10))
-            .assuming((a, i) -> !isValidRelaxIndex(i, a.size()))
+            .forAll(assignments(), integers().between(0, 10))
+            .assuming((a, i) -> !isValidIndex(i, a.size()))
             .check   ((a, i) -> failsThrowing(IndexOutOfBoundsException.class, () -> a.get(i) ));
     }
 
     @Test
     public void testEqualsAllValuesMatch() {
         qt().forAll(listOfInt(), listOfInt())
-            .check ((a, b) -> a.equals(b) == (new BasicAssignment(a)).equals(new BasicAssignment(b)));
+            .check ((a, b) -> a.equals(b) == AssignmentFactory.from(a).equals(AssignmentFactory.from(b)));
     }
 
     @Test

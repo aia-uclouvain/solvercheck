@@ -2,7 +2,7 @@ package be.uclouvain.solvercheck.checkers;
 
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.task.Checker;
-import be.uclouvain.solvercheck.core.Operator;
+import be.uclouvain.solvercheck.core.data.Operator;
 
 import java.util.List;
 import java.util.Set;
@@ -31,7 +31,7 @@ public final class Checkers {
 
     /**
      * This checker assumes the following structure:
-     *  - variables in [0;size-3] constitute the array of plain variables
+     *  - variables in [0;size-3] constitute the array from plain variables
      *  - variable at size-2 is the 'index  variable
      *  - varaible at size-1 is the 'value'
      *

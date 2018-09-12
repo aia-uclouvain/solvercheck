@@ -10,7 +10,7 @@ import java.util.RandomAccess;
  * This class merely wraps an existing list type to interpret it as a (complete) assignment.
  * {@see Assignment}
  */
-public final class BasicAssignment extends AbstractList<Integer> implements Assignment, RandomAccess {
+final class BasicAssignment extends AbstractList<Integer> implements Assignment, RandomAccess {
     /** The wrapped collection */
     private final List<Integer> values;
 
@@ -21,7 +21,7 @@ public final class BasicAssignment extends AbstractList<Integer> implements Assi
 
     /** {@inheritDoc} */
     @Override
-    public Integer get(int index) {
+    public Integer get(final int index) {
         return values.get(index);
     }
 

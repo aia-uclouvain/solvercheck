@@ -3,10 +3,8 @@ package be.uclouvain.solvercheck.core.data.impl;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 
-import java.util.AbstractSet;
-import java.util.Iterator;
-import java.util.RandomAccess;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.*;
 
@@ -14,26 +12,14 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.*;
  * This class merely wraps an existing set to interpret it as a Domain.
  * {@see Domain}
  */
-public final class BasicDomain extends AbstractSet<Integer> implements Domain, RandomAccess {
+final class BasicDomain extends AbstractSet<Integer> implements Domain, RandomAccess {
     /** The wrapped collection */
-    private final Set<Integer> values;
+    private final List<Integer> values;
 
     /** Creates a new (immutable !) value from the given set */
-    public BasicDomain(final Set<Integer> values) {
-        this.values = Set.copyOf(values);
+    public BasicDomain(final int...values) {
+        this.values = Arrays.stream(values).sorted().boxed().collect(Collectors.toList());
     }
-
-    /*
-    public BasicDomain remove(final Integer val) {
-        if (!contains(val)) {
-            return this;
-        } else {
-            return new BasicDomain(values.stream()
-                    .filter(x -> !x.equals(val))
-                    .collect(Collectors.toSet()));
-        }
-    }
-    */
 
     /** {@inheritDoc} */
     @Override
@@ -44,6 +30,28 @@ public final class BasicDomain extends AbstractSet<Integer> implements Domain, R
     @Override
     public int size() {
         return values.size();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Integer minimum() {
+        if( isEmpty() ) {
+            throw new NoSuchElementException("The domain is empty");
+        }
+        else {
+            return values.get(0);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Integer maximum() {
+        if( isEmpty() ) {
+            throw new NoSuchElementException("The domain is empty");
+        }
+        else {
+            return values.get(size()-1);
+        }
     }
 
     /** {@inheritDoc} */

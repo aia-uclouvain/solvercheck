@@ -1,71 +1,93 @@
 package be.uclouvain.solvercheck.core.data;
 
-import be.uclouvain.solvercheck.core.data.impl.BasicDomain;
-import be.uclouvain.solvercheck.core.data.impl.BasicPartialAssignment;
+import be.uclouvain.solvercheck.core.data.impl.DomainFactory;
+import be.uclouvain.solvercheck.core.data.impl.PartialAssignmentFactory;
 import be.uclouvain.solvercheck.generators.Generators;
 import be.uclouvain.solvercheck.utils.Utils;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import static be.uclouvain.solvercheck.core.data.Operator.NE;
+import static be.uclouvain.solvercheck.generators.Generators.domains;
 import static be.uclouvain.solvercheck.utils.Utils.*;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.*;
 
-public class TestBasicPartialAssignment implements WithQuickTheories {
-/*
+public class TestPartialAssignment implements WithQuickTheories {
+
     @Test
     public void testSize() {
-        qt().forAll(listOfInt().map(x -> new BasicDomain(x)).check(a ->
-           a.size() == new BasicPartialAssignment(a).size()
+        qt().forAll(lists().of(domains().build()).ofSizeBetween(0, 10))
+            .check(a -> a.size() == PartialAssignmentFactory.from(a).size()
         );
     }
 
     @Test
-    public void getReturnsTheIthElementIffItsAValidIndex(){
-        qt().forAll(nonEmptyAssignments(), integers().between(-1, 10))
-            .check((a, i) -> !isValidVarIndex(i, a) || a.get(i) == Iterables.get(a, i >= 0 ? i : a.size()+i));
+    public void getReturnsTheIthElementIfItsAValidIndex(){
+        qt().forAll(lists().of(domains().build()).ofSizeBetween(1, 10))
+            .checkAssert(domains ->
+                    qt().forAll(integers().between(0, domains.size()-1))
+                        .check(index -> domains.get(index).equals(PartialAssignmentFactory.from(domains).get(index)))
+            );
+    }
+    @Test
+    public void getFailsWithAnExceptionWhenGivenAWrongIndex(){
+        qt().forAll(lists().of(domains().build()).ofSizeBetween(1, 10))
+            .checkAssert(domains ->
+                qt().forAll(integers().between(-100, -1))
+                    .check(index ->
+                        failsThrowing(IndexOutOfBoundsException.class,
+                                      () -> PartialAssignmentFactory.from(domains).get(index))
+                    ));
+
+        qt().forAll(lists().of(domains().build()).ofSizeBetween(1, 10))
+            .checkAssert(domains ->
+                qt().forAll(integers().between(domains.size()+1, domains.size()+100))
+                        .check(index ->
+                                failsThrowing(IndexOutOfBoundsException.class,
+                                        () -> PartialAssignmentFactory.from(domains).get(index))
+                        ));
     }
 
     @Test
-    public void getFailsWithExceptionWhenItsNotAValidIndex() {
-        qt().forAll(partialAssignments(), integers().between(-1, 10))
-            .check((a,i) -> isValidVarIndex(i, a) || failsThrowing(IndexOutOfBoundsException.class, () -> a.get(i) ));
-    }
-
-    @Test
-    public void removeReturnsSelfWhenGivenAWrongVariable() {
-        qt().forAll(partialAssignments(), integers().between(-1, 10), integers().between(-10, 10))
+    public void restrictFailsWhenGivenAWrongVariable() {
+        qt().forAll(notFailedPartialAssignments(), integers().between(-1, 10), integers().between(-10, 10))
             .check((ass, var, val) ->
                     isValidVarIndex(var, ass)
-                 || ass.remove(var, val) == ass);
+                 || failsThrowing(IndexOutOfBoundsException.class,
+                            () -> PartialAssignmentFactory.restrict(ass, var, NE, val))
+            );
     }
 
     @Test
-    public void removeReturnsSelfWhenGivenAWrongValue() {
+    public void restrictReturnsSelfWhenGivenAWrongValue() {
         qt().withGenerateAttempts(10000)
             .forAll(partialAssignments(), integers().between(0, 10), integers().between(-10, 10))
             .assuming((ass, var, val) -> isValidVarIndex(var, ass) && !ass.get(var).contains(val))
-            .check(   (ass, var, val) -> ass.remove(var, val) == ass );
+            .check(   (ass, var, val) -> PartialAssignmentFactory.restrict(ass, var, NE, val) == ass );
     }
 
     @Test
-    public void removeReturnsAProperSubAssignment() {
-        qt().forAll(partialAssignments(), integers().between(-1, 10), integers().between(-10, 10))
-                .check((ass, var, val) -> {
-                    boolean isProper = true;
-                    BasicPartialAssignment modified  = ass.remove(var, val);
-                    for(int i = 0; isProper && i < ass.size(); i++) {
-                        if( i == var) {
-                            isProper &= ass.get(i).remove(val).equals(modified.get(i));
-                        } else {
-                            isProper &= ass.get(i).equals(modified.get(i));
+    public void restrictReturnsAProperSubAssignment() {
+        qt().forAll(nonEmptyAssignments())
+            .checkAssert(ass ->
+                qt().forAll(integers().between(0, ass.size()-1), integers().all())
+                    .check((var, val) -> {
+                        boolean isProper = true;
+                        PartialAssignment modified  = PartialAssignmentFactory.restrict(ass, var, NE, val);
+                        for(int i = 0; isProper && i < ass.size(); i++) {
+                            if( i == var) {
+                                isProper &= DomainFactory.restrict(ass.get(i), NE, val).equals(modified.get(i));
+                            } else {
+                                isProper &= ass.get(i).equals(modified.get(i));
+                            }
                         }
-                    }
-                    return isProper;
-                });
+                        return isProper;
+                    })
+            );
     }
 
     @Test
@@ -144,11 +166,6 @@ public class TestBasicPartialAssignment implements WithQuickTheories {
     }
 
     @Test
-    public void testToString() {
-        qt().forAll(partialAssignments())
-            .check(a -> a.toString().equals(a.stream().collect(Collectors.toList()).toString()));
-    }
-    @Test
     public void testEqualsIffEquivalent() {
         qt().forAll(partialAssignments(), partialAssignments())
                 .check ((a, b) -> a.equals(b) == (a.compareWith(b) == EQUIVALENT));
@@ -160,8 +177,16 @@ public class TestBasicPartialAssignment implements WithQuickTheories {
             .check ((a, b) -> !a.equals(b) || (a.hashCode() == b.hashCode()));
     }
 
-    private boolean isValidVarIndex(int i, BasicPartialAssignment a) {
-        return isValidRelaxIndex(i, a.size());
+    private boolean isValidVarIndex(int i, Collection<?> a) {
+        return isValidIndex(i, a.size());
+    }
+
+    private Gen<PartialAssignment> notFailedPartialAssignments() {
+        return Generators.partialAssignments()
+                .withVariablesRanging(1, 10)
+                .withDomainsOfSizeBetween(1, 10)
+                .withValuesRanging(-10, 10)
+                .build();
     }
 
     private Gen<PartialAssignment> nonEmptyAssignments() {
@@ -182,5 +207,7 @@ public class TestBasicPartialAssignment implements WithQuickTheories {
     private Gen<List<Integer>> listOfInt() {
         return lists().of(integers().all()).ofSizeBetween(0, 100);
     }
-    */
+    private Gen<List<Domain>> listOfDomains() {
+        return lists().of(domains().build()).ofSizeBetween(0, 100);
+    }
 }

@@ -17,9 +17,6 @@ public final class Utils {
     public static boolean isValidIndex(int index, int size) {
         return 0 <= index && index < size;
     }
-    public static boolean isValidRelaxIndex(int index, int size) {
-        return index >= 0 ? isValidIndex(index, size) : isValidIndex(size+index, size);
-    }
 
     public static  <T extends Throwable> boolean failsThrowing(Class<T> clazz, Runnable r) {
         try { r.run(); return false; } catch (Exception e) { return clazz.isInstance(e); }

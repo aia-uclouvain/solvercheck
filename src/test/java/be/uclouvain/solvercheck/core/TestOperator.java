@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 
-import static be.uclouvain.solvercheck.core.Operator.*;
+import static be.uclouvain.solvercheck.core.data.Operator.*;
 
 public class TestOperator implements WithQuickTheories {
 

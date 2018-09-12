@@ -17,33 +17,14 @@ import static be.uclouvain.solvercheck.utils.Utils.zip;
  * This class merely decorates an existing list type to interpret it as a partial assignment.
  * {@see PartialAssignment}
  */
-public final class BasicPartialAssignment extends AbstractList<Domain> implements PartialAssignment, RandomAccess {
+final class BasicPartialAssignment extends AbstractList<Domain> implements PartialAssignment, RandomAccess {
     /** The wrapped collection */
     private final List<Domain> domains;
 
-    /** Creates a new (immutable !) value from the given list of domains */
+    /** Creates a new (immutable !) value from the given list from domains */
     public BasicPartialAssignment(final List<Domain> domains) {
         this.domains = List.copyOf(domains);
     }
-
-    /*
-    public BasicPartialAssignment remove(final int var, final Integer val) {
-        if (var < 0 || var >= domains.size()) {
-            return this;
-        } else {
-            Domain original = domains.get(var);
-            Domain updated = original.remove(val);
-
-            if (original.equals(updated)) {
-                return this;
-            } else {
-                return new BasicPartialAssignment(stream()
-                        .map(x -> x == original ? updated : x)
-                        .collect(Collectors.toList()));
-            }
-        }
-    }
-    */
 
     /** {@inheritDoc} */
     @Override
@@ -52,7 +33,7 @@ public final class BasicPartialAssignment extends AbstractList<Domain> implement
     }
     /** {@inheritDoc} */
     @Override
-    public Domain get(int var) {
+    public Domain get(final int var) {
         return domains.get(var);
     }
 
@@ -104,7 +85,7 @@ public final class BasicPartialAssignment extends AbstractList<Domain> implement
 
     /**
      * This class provides an `Assignment` view for the current PartialAssignment.
-     * It allows the 'conversion' of a partial assignment into a complete assignment
+     * It allows the 'conversion' from a partial assignment into a complete assignment
      * without incurring the costs that are normally associated with that operation.
      *
      * .. Important::
