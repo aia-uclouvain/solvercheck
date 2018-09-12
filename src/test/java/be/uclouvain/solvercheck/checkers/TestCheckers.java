@@ -1,10 +1,20 @@
 package be.uclouvain.solvercheck.checkers;
 
 import be.uclouvain.solvercheck.core.data.Assignment;
+import be.uclouvain.solvercheck.core.data.PartialAssignment;
+import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
+import be.uclouvain.solvercheck.core.data.impl.DomainFactory;
+import be.uclouvain.solvercheck.core.data.impl.PartialAssignmentFactory;
 import be.uclouvain.solvercheck.generators.Generators;
+import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
+import org.junit.Assert;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static be.uclouvain.solvercheck.checkers.Checkers.*;
 import static be.uclouvain.solvercheck.core.data.Operator.*;
@@ -70,6 +80,37 @@ public class TestCheckers implements WithQuickTheories {
     public void testTable() {
         qt().forAll(tables().build(), assignments())
             .check((t, a) -> table(t).test(a) == t.contains(a));
+    }
+
+    @Test
+    public void dbgGccVar() {
+        PartialAssignment initial = PartialAssignmentFactory.from(
+            List.of(
+                // variables
+                DomainFactory.from(1, 2),
+                DomainFactory.from(1, 2),
+                DomainFactory.from(1, 2),
+                // Cardinalities
+                DomainFactory.from(0, 3),
+                DomainFactory.from(0, 3)
+            )
+        );
+
+        PartialAssignment actual = PartialAssignmentFactory.unionOf(
+                CartesianProduct.of(initial).stream()
+                        .map(AssignmentFactory::from)
+                        .filter(gccVar(List.of(1, 2)))
+                        .collect(Collectors.toList())
+        );
+
+        PartialAssignment expected = PartialAssignmentFactory.unionOf(
+                List.of(
+                    List.of(1, 1, 1, 3, 0),
+                    List.of(2, 2, 2, 0, 3)
+                )
+        );
+
+        Assert.assertEquals(actual, expected);
     }
 
     private Gen<Assignment> assignments() {

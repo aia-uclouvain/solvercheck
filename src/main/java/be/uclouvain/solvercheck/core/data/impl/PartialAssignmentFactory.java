@@ -51,7 +51,7 @@ public final class PartialAssignmentFactory {
      *
      * @return a partial assignment creating domains from the values appearing in the columns of all tuples
      */
-    public static PartialAssignment unionOf(Collection<List<Integer>> tuples) {
+    public static PartialAssignment unionOf(Collection<? extends List<Integer>> tuples) {
         if( tuples.isEmpty())
             return from(List.of());
 
