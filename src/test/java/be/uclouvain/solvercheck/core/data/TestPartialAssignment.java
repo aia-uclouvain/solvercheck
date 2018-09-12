@@ -1,5 +1,6 @@
 package be.uclouvain.solvercheck.core.data;
 
+import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
 import be.uclouvain.solvercheck.core.data.impl.DomainFactory;
 import be.uclouvain.solvercheck.core.data.impl.PartialAssignmentFactory;
 import be.uclouvain.solvercheck.generators.Generators;
@@ -175,6 +176,27 @@ public class TestPartialAssignment implements WithQuickTheories {
     public void testHashCode() {
         qt().forAll(partialAssignments(), partialAssignments())
             .check ((a, b) -> !a.equals(b) || (a.hashCode() == b.hashCode()));
+    }
+
+    @Test
+    public void whenAllDomainsAreFixedAPartialAssignmentCanBeSeenAsTheCorrespondingAssignment() {
+        qt().forAll(lists().of(integers().all()).ofSizeBetween(0, 20))
+            .check( lst ->
+                PartialAssignmentFactory.unionOf(List.of(lst))
+                        .asAssignment()
+                        .equals(AssignmentFactory.from(lst))
+                &&
+                // check it in both directions
+                AssignmentFactory.from(lst)
+                        .equals(PartialAssignmentFactory.unionOf(List.of(lst)).asAssignment())
+            );
+    }
+
+    @Test
+    public void oneCannotCallAsAssignmentWhenNotAllDomainsAreFixed() {
+        qt().forAll(partialAssignments())
+            .assuming(x -> x.stream().anyMatch(dom -> !dom.isFixed()))
+            .check(x -> failsThrowing(IllegalStateException.class, ()->x.asAssignment()));
     }
 
     private boolean isValidVarIndex(int i, Collection<?> a) {

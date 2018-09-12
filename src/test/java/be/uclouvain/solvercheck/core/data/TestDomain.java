@@ -3,14 +3,19 @@ package be.uclouvain.solvercheck.core.data;
 import be.uclouvain.solvercheck.core.data.impl.DomainFactory;
 import be.uclouvain.solvercheck.generators.Generators;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
+import org.junit.Assert;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static be.uclouvain.solvercheck.core.data.Operator.NE;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 
 public class TestDomain implements WithQuickTheories {
 
@@ -120,8 +125,27 @@ public class TestDomain implements WithQuickTheories {
         );
     }
 
+    @Test
+    public void minimumReturnsTheSmallestOfAllValuesInTheDomain(){
+        qt().forAll(domains(1, 20))
+            .check(x -> x.minimum().equals(Collections.min(x)));
+    }
+    @Test
+    public void minimumFailsWhenDomainIsEmpty(){
+        assertThat(catchThrowable(() -> DomainFactory.from().minimum())).isInstanceOf(NoSuchElementException.class);
+    }
+    @Test
+    public void maximimReturnsTheHighestOfAllValuesInTheDomain(){
+        qt().forAll(domains(1, 20))
+                .check(x -> x.maximum().equals(Collections.max(x)));
+    }
+    @Test
+    public void maximumFailsWhenDomainIsEmpty(){
+        assertThat(catchThrowable(() -> DomainFactory.from().maximum())).isInstanceOf(NoSuchElementException.class);
+    }
+
     private Gen<Domain> domains() {
-        return domains(1, 10);
+        return domains(0, 10);
     }
     private Gen<Domain> domains(int from, int to) {
         return Generators.domains().ofSizeBetween(from, to).build();
