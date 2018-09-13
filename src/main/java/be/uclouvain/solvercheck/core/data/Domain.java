@@ -2,6 +2,7 @@ package be.uclouvain.solvercheck.core.data;
 
 import be.uclouvain.solvercheck.utils.relations.PartiallyOrderable;
 
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -16,6 +17,16 @@ import java.util.Set;
  *       - A is INCOMPARABLE to B: iff $A \not\subseteq B$ and $B \not \subseteq A$
  */
 public interface Domain extends Set<Integer>, PartiallyOrderable<Domain> {
+
+    /**
+     * {@inheritDoc}
+     *
+     * .. Note::
+     *    This iterator must guarantee to iterate over the elements of the set
+     *    in *increasing* order.
+     */
+    @Override
+    Iterator<Integer> iterator();
 
     /** A domain is fixed iff it has only one value left */
     default boolean isFixed() { return size() == 1; }

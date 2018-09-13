@@ -1,8 +1,6 @@
 package be.uclouvain.solvercheck.utils.collections;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * This class encapsulates the notion from cartesian product from sets from things. It basically
@@ -63,7 +61,7 @@ public final class CartesianProduct<T> extends AbstractSet<List<T>> implements R
      * @param <T>  the type of the inner elements of the tuples
      * @return the cartesian product of the given list of sets
      */
-    public static <T> CartesianProduct<T> of(final List<? extends Set<T>> data) {
+    public static <T> CartesianProduct<T> of(final List<? extends Collection<T>> data) {
         return new CartesianProduct<T>(data);
     }
 
@@ -72,7 +70,7 @@ public final class CartesianProduct<T> extends AbstractSet<List<T>> implements R
      * @param data the sets from which to compute the cartesian product
      */
     @SuppressWarnings("unchecked")
-    private CartesianProduct(final List<? extends Set<T>> data) {
+    private CartesianProduct(final List<? extends Collection<T>> data) {
         this.data  = data.stream().map(ArrayList::new).toArray(ArrayList[]::new);
         this.nbCol = this.data.length;
         this.coeff = new int[nbCol+1];

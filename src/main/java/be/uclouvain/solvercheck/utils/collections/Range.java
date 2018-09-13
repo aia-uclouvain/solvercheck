@@ -16,10 +16,41 @@ public final class Range extends AbstractSet<Integer> {
      * Creates the given range of values spanning from `from` (inclusive)
      * until `to` (inclusive) stepping by one.
      *
+     * .. Note::
+     *    This factory method is a mere wrapper to the constructor. Its
+     *    only purpose is to improve the readability of client code
+     *
      * @param from the lower bound (incl.) of the set
      * @param to the upper bound (incl.) of the set
      */
-    public Range(final int from, final int to){
+    public static Range between(final int from, final int to) {
+        return new Range(from, to);
+    }
+
+    /**
+     * Creates the given range of values spanning from `from` (inclusive)
+     * until `to` (inclusive) stepping by `step` items.
+     *
+     * .. Note::
+     *    This factory method is a mere wrapper to the constructor. Its
+     *    only purpose is to improve the readability of client code
+     *
+     * @param from the lower bound (incl.) of the set
+     * @param to the upper bound (incl.) of the set
+     * @param step the step size between any two elements of the set
+     */
+    public static Range between(final int from, final int to, final int step) {
+        return new Range(from, to, step);
+    }
+
+    /**
+     * Creates the given range of values spanning from `from` (inclusive)
+     * until `to` (inclusive) stepping by one.
+     *
+     * @param from the lower bound (incl.) of the set
+     * @param to the upper bound (incl.) of the set
+     */
+    private Range(final int from, final int to){
         this(from, to, 1);
     }
 
@@ -31,7 +62,7 @@ public final class Range extends AbstractSet<Integer> {
      * @param to the upper bound (incl.) of the set
      * @param step the step size between any two elements of the set
      */
-    public Range(final int from, final int to, final int step){
+    private Range(final int from, final int to, final int step){
         if(! isFeasible(from, to, step)){
             throw new IllegalArgumentException("The range ["+from+";"+to+":"+step+"] has an infinite size");
         }

@@ -18,7 +18,7 @@ public class TestRange implements WithQuickTheories {
             .forAll(integers().all(), integers().all(), integers().all())
             .assuming((from, to, step) -> step == 0 || step > 0 && from > to || step < 0 && from < to)
             .checkAssert((from, to, step) ->
-                assertThat(catchThrowable(()-> new Range(from, to, step)))
+                assertThat(catchThrowable(()-> Range.between(from, to, step)))
                     .isInstanceOf(IllegalArgumentException.class)
             );
     }
@@ -29,8 +29,8 @@ public class TestRange implements WithQuickTheories {
             .forAll(integers().all(), integers().all(), integers().all())
             .assuming((from, to, step) -> (from <= to && step > 0) || (from > to && step < 0))
             .check((from, to, step) ->
-                    new Range(from, to, step).size() ==
-                            (int) new Range(from, to, step).stream().count()
+                    Range.between(from, to, step).size() ==
+                            (int) Range.between(from, to, step).stream().count()
             );
     }
 
@@ -40,7 +40,7 @@ public class TestRange implements WithQuickTheories {
             .forAll(integers().between(-100, 100), integers().between(-100, 100), integers().between(-100, 100))
             .assuming((from, to, step) -> (from <= to && step > 0) || (from > to && step < 0))
             .checkAssert((from, to, step) -> {
-                Range tested = new Range(from, to, step);
+                Range tested = Range.between(from, to, step);
                 for(int i = from; i <= to; i+= step) {
                     Assert.assertTrue(tested.contains(i));
                 }

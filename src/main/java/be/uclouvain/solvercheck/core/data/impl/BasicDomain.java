@@ -21,11 +21,18 @@ final class BasicDomain extends AbstractSet<Integer> implements Domain, RandomAc
         this.values = Arrays.stream(values).sorted().boxed().collect(Collectors.toList());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     *
+     * .. Note::
+     *    This iterator guarantees to iterate over the elements of the set
+     *    in *increasing* order.
+     */
     @Override
     public Iterator<Integer> iterator() {
         return values.iterator();
     }
+
     /** {@inheritDoc} */
     @Override
     public int size() {
