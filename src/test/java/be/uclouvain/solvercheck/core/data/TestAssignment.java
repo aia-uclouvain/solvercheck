@@ -1,6 +1,5 @@
 package be.uclouvain.solvercheck.core.data;
 
-import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
 import be.uclouvain.solvercheck.generators.Generators;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
@@ -8,13 +7,14 @@ import org.quicktheories.core.Gen;
 
 import java.util.List;
 
-import static be.uclouvain.solvercheck.utils.Utils.*;
+import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
+import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
 
 public class TestAssignment implements WithQuickTheories {
     @Test
     public void testSize() {
         qt().forAll(listOfInt()).check(a ->
-                a.size() == AssignmentFactory.from(a).size()
+                a.size() == Assignment.from(a).size()
         );
     }
 
@@ -23,7 +23,7 @@ public class TestAssignment implements WithQuickTheories {
         qt().withGenerateAttempts(10000)
             .forAll(listOfInt(), integers().between(0, 10))
             .assuming((a, i) -> isValidIndex(i, a.size()))
-            .check   ((a, i) -> a.get(i).equals(AssignmentFactory.from(a).get(i)));
+            .check   ((a, i) -> a.get(i).equals(Assignment.from(a).get(i)));
     }
 
     @Test
@@ -37,7 +37,7 @@ public class TestAssignment implements WithQuickTheories {
     @Test
     public void testEqualsAllValuesMatch() {
         qt().forAll(listOfInt(), listOfInt())
-            .check ((a, b) -> a.equals(b) == AssignmentFactory.from(a).equals(AssignmentFactory.from(b)));
+            .check ((a, b) -> a.equals(b) == Assignment.from(a).equals(Assignment.from(b)));
     }
 
     @Test

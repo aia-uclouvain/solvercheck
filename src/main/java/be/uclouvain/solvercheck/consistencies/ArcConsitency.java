@@ -1,8 +1,7 @@
 package be.uclouvain.solvercheck.consistencies;
 
+import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
-import be.uclouvain.solvercheck.core.data.impl.PartialAssignmentFactory;
 import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
@@ -18,9 +17,9 @@ public final class ArcConsitency implements Filter {
 
     @Override
     public PartialAssignment filter(PartialAssignment partial) {
-        return PartialAssignmentFactory.unionOf(
+        return PartialAssignment.unionOf(
                 CartesianProduct.of(partial).stream()
-                     .map(AssignmentFactory::from)
+                     .map(Assignment::from)
                      .filter(checker)
                      .collect(Collectors.toList())
         );

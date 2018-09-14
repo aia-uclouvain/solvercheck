@@ -1,8 +1,11 @@
 package be.uclouvain.solvercheck.core.data;
 
+import be.uclouvain.solvercheck.core.data.impl.PartialAssignmentFactory;
 import be.uclouvain.solvercheck.utils.relations.PartiallyOrderable;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collector;
 
 /**
  * A partial assignment represents a mapping from variables to domains. The domains are not
@@ -54,4 +57,45 @@ public interface PartialAssignment extends List<Domain>, PartiallyOrderable<Part
      */
     Assignment asAssignment();
 
+
+    /** Creates a new PartialAssignement from the given list of domains */
+    static PartialAssignment from(final List<Domain> domains) {
+        return PartialAssignmentFactory.from(domains);
+    }
+
+    /**
+     * This method returns a copy of the given `partial` assignment in which the domain of `variable`
+     * has been restricted according to [`op`, `value`]. {@see DomainFactory.restrict}.
+     *
+     * @param partial the partial assignment for which one of the variables domain must be restricted
+     * @param variable the variable whose domain must be restricted
+     * @param op the operator defining the restriction relation to apply
+     * @param value the value completing the definition of the restriction
+     * @return a copy of the given `partial` assignment in which the domain of variable has been restricted
+     */
+    static PartialAssignment restrict(
+            final PartialAssignment partial,
+            final int variable,
+            final Operator op,
+            final int value) {
+
+        return PartialAssignmentFactory.restrict(partial, variable, op, value);
+    }
+
+    /**
+     * This method returns a Partial Assignment whose domains are built from the values appearing in
+     * all the tuples.
+     *
+     * @return a partial assignment creating domains from the values appearing in the columns of all tuples
+     */
+    static PartialAssignment unionOf(Collection<? extends List<Integer>> tuples) {
+        return PartialAssignmentFactory.unionOf(tuples);
+    }
+
+    /**
+     * @return a collector that combines any given domain-representing collection into a PartialAssignment
+     */
+    static Collector<Collection<Integer>, ? , PartialAssignment> collector() {
+        return PartialAssignmentFactory.collector();
+    }
 }

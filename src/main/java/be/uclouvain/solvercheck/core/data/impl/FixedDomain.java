@@ -3,7 +3,6 @@ package be.uclouvain.solvercheck.core.data.impl;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 
-import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,7 +11,7 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.*;
 /**
  * This class implements the particular case from a domain having one single value.
  */
-final class FixedDomain extends AbstractSet<Integer> implements Domain {
+final class FixedDomain extends AbstractDomain {
     /** The single value held by the domain */
     private final Integer value;
 
@@ -40,7 +39,13 @@ final class FixedDomain extends AbstractSet<Integer> implements Domain {
 
     /** {@inheritDoc} */
     @Override
-    public Iterator<Integer> iterator() {
+    public Iterator<Integer> increasing() {
+        return List.of(value).iterator();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Iterator<Integer> decreasing() {
         return List.of(value).iterator();
     }
 

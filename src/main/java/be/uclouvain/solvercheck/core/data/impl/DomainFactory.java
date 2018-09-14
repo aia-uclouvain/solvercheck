@@ -4,7 +4,9 @@ import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collector;
 
 import static be.uclouvain.solvercheck.core.data.Operator.*;
 import static java.util.stream.Collectors.toList;
@@ -25,17 +27,22 @@ public final class DomainFactory {
     }
 
     /** Creates a new domain comprising the given values, when the values are given as a collection */
-    public static Domain fromCollection(final Collection<Integer> values) {
-        return from(values.stream().mapToInt(Integer::intValue).toArray());
+    public static Domain from(final Collection<Integer> values) {
+        if( values instanceof Domain) {
+            return (Domain) values;
+        }
+
+        switch (values.size()) {
+            case 0: return EmptyDomain.getInstance();
+            case 1: return new FixedDomain(values.stream().findFirst().get());
+            default:
+                return new BasicDomain(values);
+        }
     }
 
     /**
      * Creates a new domain by removing from `dom` all the values that do not match
      * the restriction imposed by [op, value].
-     *
-     * .. Note::
-     *    Whenever applicable, this method will strive to return the same instance from `dom`
-     *    that was given as an argument.
      *
      * @param dom   the domain to restrict
      * @param op    the operator used to impose some restriction on `dom`
@@ -43,26 +50,6 @@ public final class DomainFactory {
      * @return a domain corresponding to dom with all the values not matching [op, value] removed.
      */
     public static Domain restrict(final Domain dom, final Operator op, final int value) {
-        Collection<Integer> values = filter(dom, op, value);
-
-        if( values instanceof Domain) {
-            return (Domain) values;
-        }
-        if( values.contains(dom) ) {
-            return dom;
-        }
-
-        return fromCollection(values);
-    }
-
-    /**
-     * Filters the values from the domain according to the given restriction.
-     *
-     * .. Note::
-     *    This method should strive to (but is not forced to) return a Domain whenever it is
-     *    obvious.
-     */
-    private static Collection<Integer> filter(final Domain dom, final Operator op, final int value) {
         switch (op) {
             case EQ:
                 return filterEq(dom, value);
@@ -80,21 +67,35 @@ public final class DomainFactory {
                 throw new RuntimeException("Unreachable code");
         }
     }
+
+    /**
+     * @return a collector that combines any given stream of integer into a Domain
+     */
+    public static Collector<Integer, ?, Domain> collector() {
+        return Collector.of(
+                ()          -> new HashSet<Integer>(),        // supplier aka "mutable container"
+                (set, item) -> set.add(item),                 // accumulator function
+                (s1, s2)    -> { s1.addAll(s2); return s1; }, // combiner (to handle parallel processing)
+                (set)       -> from(set),                     // finisher (performs the final conversion)
+                Collector.Characteristics.UNORDERED
+        );
+    }
+
     /** @return $dom \cap {value}$ */
-    private static Collection<Integer> filterEq(final Domain dom, final int value) {
-        return dom.contains(value) ? List.of(value) : EmptyDomain.getInstance();
+    private static Domain filterEq(final Domain dom, final int value) {
+        return dom.contains(value) ? from(value) : EmptyDomain.getInstance();
     }
     /** @return $dom \setminus {value}$ */
-    private static Collection<Integer> filterNe(final Domain dom, final int value) {
+    private static Domain filterNe(final Domain dom, final int value) {
         return !dom.contains(value) ? dom : filterDefault(dom, NE, value);
     }
 
     /** @return ${ x | x \in dom \wedge x <= value}$ */
-    private static Collection<Integer> filterLe(final Domain dom, final int value) {
+    private static Domain filterLe(final Domain dom, final int value) {
         return filterLt(dom, value+1);
     }
     /** @return ${ x | x \in dom \wedge x <  value}$ */
-    private static Collection<Integer> filterLt(final Domain dom, final int value) {
+    private static Domain filterLt(final Domain dom, final int value) {
         if( dom.minimum() >= value ){
             return EmptyDomain.getInstance();
         }
@@ -105,11 +106,11 @@ public final class DomainFactory {
     }
 
     /** @return ${ x | x \in dom \wedge x >= value}$ */
-    private static Collection<Integer> filterGe(final Domain dom, final int value) {
+    private static Domain filterGe(final Domain dom, final int value) {
         return filterGt(dom, value-1);
     }
     /** @return ${ x | x \in dom \wedge x >  value}$ */
-    private static Collection<Integer> filterGt(final Domain dom, final int value) {
+    private static Domain filterGt(final Domain dom, final int value) {
         if( dom.maximum() <= value ){
             return EmptyDomain.getInstance();
         }
@@ -120,9 +121,9 @@ public final class DomainFactory {
     }
 
     /** @return ${ x | x \in dom \wedge x OP value}$ */
-    private static Collection<Integer> filterDefault(final Domain dom, final Operator op, final int value) {
+    private static Domain filterDefault(final Domain dom, final Operator op, final int value) {
         return dom.stream()
                 .filter(x -> op.check(x, value))
-                .collect(toList());
+                .collect(collector());
     }
 }

@@ -5,7 +5,7 @@ import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.Collector;
 
 /** The point of this factory is to create partial assignments, potentially restricting some of its domains */
 public final class PartialAssignmentFactory {
@@ -34,7 +34,7 @@ public final class PartialAssignmentFactory {
             final Operator op,
             final int value) {
 
-        final Domain restricted = DomainFactory.restrict(partial.get(variable), op, value);
+        final Domain restricted = Domain.restrict(partial.get(variable), op, value);
         if( restricted.equals(partial.get(variable)) ) {
             return partial;
         } else {
@@ -74,6 +74,18 @@ public final class PartialAssignmentFactory {
         }
 
         // and then turn that all into a partial assignment
-        return from(domains.stream().map(DomainFactory::fromCollection).collect(Collectors.toList()));
+        return domains.stream().collect(collector());
+    }
+
+    /**
+     * @return a collector that combines any given domain-representing collection into a PartialAssignment
+     */
+    public static Collector<Collection<Integer>, ? , PartialAssignment> collector() {
+        return Collector.of(
+                ()          -> new ArrayList<Domain>(),
+                (acc, item) -> acc.add(Domain.from(item)),   // Domain.from == identity when item is already a domain
+                (a1,  a2)   -> { a1.addAll(a2); return a1; },
+                (set)       -> from(set)
+        );
     }
 }

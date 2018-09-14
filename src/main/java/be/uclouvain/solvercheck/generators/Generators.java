@@ -1,8 +1,9 @@
 package be.uclouvain.solvercheck.generators;
 
-import be.uclouvain.solvercheck.core.data.*;
-import be.uclouvain.solvercheck.core.data.impl.*;
+import be.uclouvain.solvercheck.core.data.Assignment;
+import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
+import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import org.quicktheories.core.Gen;
 
 import java.util.HashSet;
@@ -104,7 +105,7 @@ public final class Generators {
 
         public Gen<Domain> build() {
             return setsOf(nbValMin, nbValMax, integers().between(minValue, maxValue))
-                    .map(DomainFactory::fromCollection);
+                    .map(set -> Domain.from(set));
         }
     }
 
@@ -149,7 +150,7 @@ public final class Generators {
         public Gen<PartialAssignment> build() {
             return lists().of(domainBuilder.build())
                     .ofSizeBetween(nbVarsMin, nbVarsMax)
-                    .map(PartialAssignmentFactory::from);
+                    .map(PartialAssignment::from);
         }
     }
 
@@ -186,7 +187,7 @@ public final class Generators {
         public Gen<Assignment> build() {
             return lists().of(integers().between(valueMin, valueMax))
                     .ofSizeBetween(nbVarsMin, nbVarsMax)
-                    .map(AssignmentFactory::from);
+                    .map(Assignment::from);
         }
     }
 

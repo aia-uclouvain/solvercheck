@@ -1,8 +1,5 @@
 package be.uclouvain.solvercheck.core.data;
 
-import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
-import be.uclouvain.solvercheck.core.data.impl.DomainFactory;
-import be.uclouvain.solvercheck.core.data.impl.PartialAssignmentFactory;
 import be.uclouvain.solvercheck.generators.Generators;
 import be.uclouvain.solvercheck.utils.Utils;
 import org.junit.Test;
@@ -22,7 +19,7 @@ public class TestPartialAssignment implements WithQuickTheories {
     @Test
     public void testSize() {
         qt().forAll(lists().of(domains().build()).ofSizeBetween(0, 10))
-            .check(a -> a.size() == PartialAssignmentFactory.from(a).size()
+            .check(a -> a.size() == PartialAssignment.from(a).size()
         );
     }
 
@@ -31,7 +28,7 @@ public class TestPartialAssignment implements WithQuickTheories {
         qt().forAll(lists().of(domains().build()).ofSizeBetween(1, 10))
             .checkAssert(domains ->
                     qt().forAll(integers().between(0, domains.size()-1))
-                        .check(index -> domains.get(index).equals(PartialAssignmentFactory.from(domains).get(index)))
+                        .check(index -> domains.get(index).equals(PartialAssignment.from(domains).get(index)))
             );
     }
     @Test
@@ -41,7 +38,7 @@ public class TestPartialAssignment implements WithQuickTheories {
                 qt().forAll(integers().between(-100, -1))
                     .check(index ->
                         failsThrowing(IndexOutOfBoundsException.class,
-                                      () -> PartialAssignmentFactory.from(domains).get(index))
+                                      () -> PartialAssignment.from(domains).get(index))
                     ));
 
         qt().forAll(lists().of(domains().build()).ofSizeBetween(1, 10))
@@ -49,7 +46,7 @@ public class TestPartialAssignment implements WithQuickTheories {
                 qt().forAll(integers().between(domains.size()+1, domains.size()+100))
                         .check(index ->
                                 failsThrowing(IndexOutOfBoundsException.class,
-                                        () -> PartialAssignmentFactory.from(domains).get(index))
+                                        () -> PartialAssignment.from(domains).get(index))
                         ));
     }
 
@@ -59,7 +56,7 @@ public class TestPartialAssignment implements WithQuickTheories {
             .check((ass, var, val) ->
                     isValidVarIndex(var, ass)
                  || failsThrowing(IndexOutOfBoundsException.class,
-                            () -> PartialAssignmentFactory.restrict(ass, var, NE, val))
+                            () -> PartialAssignment.restrict(ass, var, NE, val))
             );
     }
 
@@ -68,7 +65,7 @@ public class TestPartialAssignment implements WithQuickTheories {
         qt().withGenerateAttempts(10000)
             .forAll(partialAssignments(), integers().between(0, 10), integers().between(-10, 10))
             .assuming((ass, var, val) -> isValidVarIndex(var, ass) && !ass.get(var).contains(val))
-            .check(   (ass, var, val) -> PartialAssignmentFactory.restrict(ass, var, NE, val) == ass );
+            .check(   (ass, var, val) -> PartialAssignment.restrict(ass, var, NE, val) == ass );
     }
 
     @Test
@@ -78,10 +75,10 @@ public class TestPartialAssignment implements WithQuickTheories {
                 qt().forAll(integers().between(0, ass.size()-1), integers().all())
                     .check((var, val) -> {
                         boolean isProper = true;
-                        PartialAssignment modified  = PartialAssignmentFactory.restrict(ass, var, NE, val);
+                        PartialAssignment modified  = PartialAssignment.restrict(ass, var, NE, val);
                         for(int i = 0; isProper && i < ass.size(); i++) {
                             if( i == var) {
-                                isProper &= DomainFactory.restrict(ass.get(i), NE, val).equals(modified.get(i));
+                                isProper &= Domain.restrict(ass.get(i), NE, val).equals(modified.get(i));
                             } else {
                                 isProper &= ass.get(i).equals(modified.get(i));
                             }
@@ -182,13 +179,13 @@ public class TestPartialAssignment implements WithQuickTheories {
     public void whenAllDomainsAreFixedAPartialAssignmentCanBeSeenAsTheCorrespondingAssignment() {
         qt().forAll(lists().of(integers().all()).ofSizeBetween(0, 20))
             .check( lst ->
-                PartialAssignmentFactory.unionOf(List.of(lst))
+                    PartialAssignment.unionOf(List.of(lst))
                         .asAssignment()
-                        .equals(AssignmentFactory.from(lst))
+                        .equals(Assignment.from(lst))
                 &&
                 // check it in both directions
-                AssignmentFactory.from(lst)
-                        .equals(PartialAssignmentFactory.unionOf(List.of(lst)).asAssignment())
+                Assignment.from(lst)
+                        .equals(PartialAssignment.unionOf(List.of(lst)).asAssignment())
             );
     }
 

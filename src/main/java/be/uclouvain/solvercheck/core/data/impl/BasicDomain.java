@@ -12,7 +12,7 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.*;
  * This class merely wraps an existing set to interpret it as a Domain.
  * {@see Domain}
  */
-final class BasicDomain extends AbstractSet<Integer> implements Domain, RandomAccess {
+final class BasicDomain extends AbstractDomain implements Domain, RandomAccess {
     /** The wrapped collection */
     private final List<Integer> values;
 
@@ -21,16 +21,21 @@ final class BasicDomain extends AbstractSet<Integer> implements Domain, RandomAc
         this.values = Arrays.stream(values).sorted().boxed().collect(Collectors.toList());
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * .. Note::
-     *    This iterator guarantees to iterate over the elements of the set
-     *    in *increasing* order.
-     */
+    /** Creates a new (immutable !) value from the given set */
+    public BasicDomain(final Collection<Integer> values) {
+        this.values = values.stream().sorted().collect(Collectors.toList());
+    }
+
+    /** {@inheritDoc} */
     @Override
-    public Iterator<Integer> iterator() {
+    public Iterator<Integer> increasing() {
         return values.iterator();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Iterator<Integer> decreasing() {
+        return new DecreasingIterator();
     }
 
     /** {@inheritDoc} */
@@ -82,5 +87,28 @@ final class BasicDomain extends AbstractSet<Integer> implements Domain, RandomAc
     @Override
     public boolean equals(final Object other) {
         return (other instanceof Domain) && super.equals(other);
+    }
+
+    /** An iterator to iterate on the values of the current domain in **decreasing** order */
+    private class DecreasingIterator implements Iterator<Integer> {
+        /** The current position in the iteration */
+        private int currentPos;
+
+        /** creates a new instance of the iterator */
+        public DecreasingIterator() {
+            currentPos = size();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean hasNext() {
+            return currentPos > 0;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Integer next() {
+            return values.get(--currentPos);
+        }
     }
 }

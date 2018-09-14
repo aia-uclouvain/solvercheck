@@ -15,7 +15,7 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
  * This class represents an empty domain. Because any two occurrences from the empty domains
  * represent the same empty set, this class is implemented using the singleton pattern.
  */
-final class EmptyDomain extends AbstractSet<Integer> implements Domain {
+final class EmptyDomain extends AbstractDomain {
     /** The singleton instance */
     private static final EmptyDomain SINGLETON = new EmptyDomain();
 
@@ -63,7 +63,13 @@ final class EmptyDomain extends AbstractSet<Integer> implements Domain {
 
     /** {@inheritDoc} */
     @Override
-    public Iterator<Integer> iterator() {
+    public Iterator<Integer> increasing() {
+        return Collections.emptyIterator();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Iterator<Integer> decreasing() {
         return Collections.emptyIterator();
     }
 
