@@ -4,10 +4,10 @@ import be.uclouvain.solvercheck.core.data.impl.DomainFactory;
 import be.uclouvain.solvercheck.utils.relations.PartiallyOrderable;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 /**
  * A domain is the set from candidate values for some variable. Given that we consider that all variables
@@ -21,6 +21,11 @@ import java.util.stream.Collector;
  *       - A is INCOMPARABLE to B: iff $A \not\subseteq B$ and $B \not \subseteq A$
  */
 public interface Domain extends Set<Integer>, PartiallyOrderable<Domain> {
+    /** @return the lower bound from the domain */
+    Integer minimum();
+
+    /** @return the upper bound from the domain */
+    Integer maximum();
 
     /**
      * @return an iterator that guarantees to iterate over the values of the domain
@@ -34,19 +39,19 @@ public interface Domain extends Set<Integer>, PartiallyOrderable<Domain> {
      */
     Iterator<Integer> decreasing();
 
-    /** {@inheritDoc} */
-    @Override
-    default Iterator<Integer> iterator() { return increasing(); };
+    /**
+     * @return a stream to process the values of the domain in *increasing* order.
+     *   (underlying spliterators must have the ORDERED, DISTINCT, IMMUTABLE, SIZED and SUBSIZED characteristics)
+     */
+    Stream<Integer> increasingStream();
+    /**
+     * @return a stream to process the values of the domain in *decreasing* order.
+     *   (underlying spliterators must have the ORDERED, DISTINCT, IMMUTABLE, SIZED and SUBSIZED characteristics)
+     */
+    Stream<Integer> decreasingStream();
 
     /** A domain is fixed iff it has only one value left */
     default boolean isFixed() { return size() == 1; }
-
-    /** @return the lower bound from the domain */
-    Integer minimum();
-
-    /** @return the upper bound from the domain */
-    Integer maximum();
-
 
     /** Creates a new empty domain */
     static Domain emptyDomain() {

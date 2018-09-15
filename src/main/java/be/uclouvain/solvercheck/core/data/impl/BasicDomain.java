@@ -23,7 +23,10 @@ final class BasicDomain extends AbstractDomain implements Domain, RandomAccess {
 
     /** Creates a new (immutable !) value from the given set */
     public BasicDomain(final Collection<Integer> values) {
-        this.values = values.stream().sorted().collect(Collectors.toList());
+        this.values = values
+                .stream()
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     /** {@inheritDoc} */

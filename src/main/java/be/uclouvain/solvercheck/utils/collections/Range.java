@@ -74,7 +74,7 @@ public final class Range extends AbstractSet<Integer> {
     /** {@inheritDoc} */
     @Override
     public int size() {
-        return (to-from)/step;
+        return 1+(to-from)/step;
     }
 
     /**

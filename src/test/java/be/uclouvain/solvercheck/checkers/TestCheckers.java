@@ -1,11 +1,12 @@
 package be.uclouvain.solvercheck.checkers;
 
-import be.uclouvain.solvercheck.consistencies.ConsistencyUtil;
+import be.uclouvain.solvercheck.consistencies.*;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.generators.Generators;
+import be.uclouvain.solvercheck.utils.collections.Range;
 import org.junit.Assert;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
@@ -17,6 +18,8 @@ import static be.uclouvain.solvercheck.checkers.Checkers.*;
 import static be.uclouvain.solvercheck.core.data.Operator.*;
 import static be.uclouvain.solvercheck.generators.Generators.tables;
 import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
 
 public class TestCheckers implements WithQuickTheories {
 
@@ -84,27 +87,64 @@ public class TestCheckers implements WithQuickTheories {
         PartialAssignment initial = PartialAssignment.from(
             List.of(
                 // variables
-                Domain.from(1, 2),
-                Domain.from(1, 2),
-                Domain.from(1, 2),
+                Domain.from(1, 2, 3),
+                Domain.from(1, 2, 3),
+                Domain.from(1, 2, 3),
                 // Cardinalities
                 Domain.from(0, 3),
                 Domain.from(0, 3)
             )
         );
 
-        Filter gccAc = ConsistencyUtil.arcConsistent(gccVar(List.of(1, 2)));
-
-        PartialAssignment actual = gccAc.filter(initial);
-
+        Filter gccAc  = new ArcConsitency(    gccVar(List.of(1, 3)));
+        PartialAssignment actualAC = gccAc .filter(initial);
         PartialAssignment expected = PartialAssignment.unionOf(
                 List.of(
                     List.of(1, 1, 1, 3, 0),
-                    List.of(2, 2, 2, 0, 3)
+                    List.of(3, 3, 3, 0, 3),
+                    List.of(2, 2, 2, 0, 0)
                 )
         );
 
-        Assert.assertEquals(actual, expected);
+        Assert.assertEquals(expected, actualAC);
+    }
+
+    @Test
+    public void foireux(){
+        Domain.from(Range.between(4, 10));
+    }
+
+    @Test
+    public void dbgSum() {
+        PartialAssignment initial = PartialAssignment.from(
+                List.of(
+                        // variables
+                        Domain.from(List.of(1, 2, 4)),
+                        Domain.from(List.of(1, 4))
+                ));
+
+        Filter sumAc  = new ArcConsitency(sum(EQ, 5));
+        Filter sumBcD = new BoundDConsistency(sum(EQ, 5));
+        Filter sumBcZ = new BoundZConsistency(sum(EQ, 5));
+        Filter sumRng = new RangeConsistency(sum(EQ, 5));
+
+        Filter sumHyb = new HybridConsistency(
+                sum(EQ, 5),
+                ArcConsitency::domainFilter,
+                ArcConsitency::domainFilter);
+
+        PartialAssignment actualAc  = sumAc.filter(initial);
+        PartialAssignment actualBcD = sumBcD.filter(initial);
+        PartialAssignment actualBcZ = sumBcZ.filter(initial);
+        PartialAssignment actualRng = sumRng.filter(initial);
+        PartialAssignment actualHyb = sumHyb.filter(initial);
+
+
+        Assert.assertEquals(WEAKER, actualBcD.compareWith(actualAc));
+        Assert.assertEquals(WEAKER, actualBcZ.compareWith(actualAc));
+        Assert.assertEquals(WEAKER, actualRng.compareWith(actualAc));
+
+        Assert.assertEquals(EQUIVALENT, actualHyb.compareWith(actualAc));
     }
 
     private Gen<Assignment> assignments() {

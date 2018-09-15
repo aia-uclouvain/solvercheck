@@ -2,8 +2,6 @@ package be.uclouvain.solvercheck.core.task;
 
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 
-import java.util.function.Predicate;
-
 /**
  * A PartialChecker is one that can possibly operate on partial assignment. That is
  * to say, in addition to being able to discriminate solutions from non solutions on

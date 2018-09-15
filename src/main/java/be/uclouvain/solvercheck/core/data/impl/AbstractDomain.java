@@ -4,15 +4,45 @@ import be.uclouvain.solvercheck.core.data.Domain;
 
 import java.util.AbstractSet;
 import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
- * The base class of all Domains.
- * Its purpose is really just to avoid repeating the implementation of the `iterator` method
+ * The base class of all Domains. It provides some facility wrt iterators and spliterators.
  */
 abstract class AbstractDomain extends AbstractSet<Integer> implements Domain {
     /** {@inheritDoc} */
     @Override
     public Iterator<Integer> iterator() {
         return increasing();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Stream<Integer> increasingStream() {
+        return StreamSupport.stream(from(this::decreasing), true);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Stream<Integer> decreasingStream() {
+        return StreamSupport.stream(from(this::decreasing), true);
+    }
+
+    /** @return a spliterator for the given iterator supplier. assuming all characteristics of an abstract domain */
+    private Spliterator<Integer> from(final Supplier<Iterator<Integer>> supplier) {
+        return Spliterators.spliterator(supplier.get(), size(), characteristics());
+    }
+
+    /** @return the characteristics describing how spliterators can be used by Stream */
+    private int characteristics() {
+        return Spliterator.ORDERED
+                | Spliterator.DISTINCT
+                | Spliterator.IMMUTABLE
+                | Spliterator.SIZED
+                | Spliterator.SUBSIZED;
     }
 }

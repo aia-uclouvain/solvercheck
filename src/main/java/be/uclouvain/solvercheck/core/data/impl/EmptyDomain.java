@@ -3,7 +3,6 @@ package be.uclouvain.solvercheck.core.data.impl;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 
-import java.util.AbstractSet;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
