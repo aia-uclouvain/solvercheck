@@ -1,4 +1,4 @@
-package be.uclouvain.solvercheck.consistencies;
+package be.uclouvain.solvercheck.core.task;
 
 import be.uclouvain.solvercheck.core.data.Domain;
 

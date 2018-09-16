@@ -2,6 +2,7 @@ package be.uclouvain.solvercheck.consistencies;
 
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.task.Checker;
+import be.uclouvain.solvercheck.core.task.DomainFilter;
 
 import static be.uclouvain.solvercheck.consistencies.ConsistencyUtil.boundSupport;
 import static be.uclouvain.solvercheck.consistencies.ConsistencyUtil.exists;

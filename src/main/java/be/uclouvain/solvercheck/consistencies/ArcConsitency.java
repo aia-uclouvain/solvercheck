@@ -4,6 +4,7 @@ import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Checker;
+import be.uclouvain.solvercheck.core.task.DomainFilter;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 

@@ -9,7 +9,7 @@ import be.uclouvain.solvercheck.core.data.PartialAssignment;
 @FunctionalInterface
 public interface Filter {
     /**
-     * Filters the given domains according to some propagator
+     * Filters the domains of the given partial assignment according to some propagator
      */
     PartialAssignment filter(final PartialAssignment partial);
 }

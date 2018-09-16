@@ -3,6 +3,7 @@ package be.uclouvain.solvercheck.consistencies;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Checker;
+import be.uclouvain.solvercheck.core.task.DomainFilter;
 import be.uclouvain.solvercheck.core.task.Filter;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class HybridConsistency implements Filter {
                 Domain reduced = domainFilter[i].filter(i, domains);
 
                 if (reduced.isEmpty()) {
-                    return PartialAssignment.from(domains);
+                    return noSolution(partialAssignment);
                 }
                 if (!reduced.equals(domains.get(i))) {
                     domains.set(i, reduced);
@@ -49,5 +50,16 @@ public class HybridConsistency implements Filter {
         }
 
         return PartialAssignment.from(domains);
+    }
+
+    /**
+     * @returns a partial assignment having all domains cleared.
+     *      This method can be used to signify that the given partial assignment is a dead end and, any
+     *      of its extensions should be rejected.
+     */
+    private PartialAssignment noSolution(final PartialAssignment original){
+        return original.stream()
+                .map(x-> Domain.emptyDomain())
+                .collect(PartialAssignment.collector());
     }
 }
