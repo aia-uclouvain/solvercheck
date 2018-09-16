@@ -62,7 +62,7 @@ public final class CartesianProduct<T> extends AbstractSet<List<T>> implements R
      * @return the cartesian product of the given list of sets
      */
     public static <T> CartesianProduct<T> of(final List<? extends Collection<T>> data) {
-        return new CartesianProduct<T>(data);
+        return new CartesianProduct<>(data);
     }
 
     /**

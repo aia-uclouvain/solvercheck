@@ -195,7 +195,7 @@ public final class Generators {
         private int nbLinesMin= 0;
         private int nbLinesMax= 5;
 
-        private GenAssignmentBuilder builder = new GenAssignmentBuilder();
+        private final GenAssignmentBuilder builder = new GenAssignmentBuilder();
 
 
         public GenTableBuilder withVariables(int n) {

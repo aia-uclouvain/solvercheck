@@ -60,7 +60,7 @@ public abstract class AbstractUniformConsistency implements Filter {
     }
 
     /**
-     * @returns a partial assignment having all domains cleared.
+     * @return a partial assignment having all domains cleared.
      *      This method can be used to signify that the given partial assignment is a dead end and, any
      *      of its extensions should be rejected.
      */

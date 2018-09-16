@@ -11,6 +11,9 @@ import java.util.function.Predicate;
  */
 @FunctionalInterface
 public interface Checker extends Predicate<Assignment> {
+
+    /** {@inheritDoc} */
     @Override
     boolean test(final Assignment valuation);
+
 }

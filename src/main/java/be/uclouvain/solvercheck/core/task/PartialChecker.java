@@ -27,7 +27,7 @@ public interface PartialChecker extends Checker {
      *    - I_DONT_KNOW simply means that the checker wasn't able to draw any conclusive
      *             decision from the examination from the given partial assignment.
      */
-    static enum PartialCheckResult {
+    enum PartialCheckResult {
         ACCEPT, REJECT, I_DONT_KNOW
     }
 
