@@ -9,10 +9,21 @@ import org.quicktheories.core.Gen;
 import java.util.Collection;
 import java.util.List;
 
-import static be.uclouvain.solvercheck.core.data.Operator.NE;
 import static be.uclouvain.solvercheck.generators.Generators.domains;
-import static be.uclouvain.solvercheck.utils.Utils.*;
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.*;
+
+import static be.uclouvain.solvercheck.core.data.Operator.NE;
+
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARABLE;
+
+import static be.uclouvain.solvercheck.utils.Utils.domainsAreEquivalent;
+import static be.uclouvain.solvercheck.utils.Utils.domainIsStronger;
+import static be.uclouvain.solvercheck.utils.Utils.domainIsWeaker;
+import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
+import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
+import static be.uclouvain.solvercheck.utils.Utils.zip;
 
 public class TestPartialAssignment implements WithQuickTheories {
 
@@ -222,12 +233,5 @@ public class TestPartialAssignment implements WithQuickTheories {
                 .withDomainsOfSizeUpTo(10)
                 .withValuesRanging(-10, 10)
                 .build();
-    }
-
-    private Gen<List<Integer>> listOfInt() {
-        return lists().of(integers().all()).ofSizeBetween(0, 100);
-    }
-    private Gen<List<Domain>> listOfDomains() {
-        return lists().of(domains().build()).ofSizeBetween(0, 100);
     }
 }

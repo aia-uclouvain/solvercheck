@@ -5,7 +5,10 @@ import be.uclouvain.solvercheck.utils.collections.Zip;
 import be.uclouvain.solvercheck.utils.collections.ZipEntry;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.*;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARABLE;
 
 public final class Utils {
     /**

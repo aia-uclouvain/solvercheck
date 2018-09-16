@@ -1,6 +1,11 @@
 package be.uclouvain.solvercheck.checkers;
 
-import be.uclouvain.solvercheck.consistencies.*;
+import be.uclouvain.solvercheck.consistencies.ArcConsitency;
+import be.uclouvain.solvercheck.consistencies.BoundDConsistency;
+import be.uclouvain.solvercheck.consistencies.BoundZConsistency;
+import be.uclouvain.solvercheck.consistencies.RangeConsistency;
+import be.uclouvain.solvercheck.consistencies.HybridConsistency;
+
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
@@ -14,12 +19,24 @@ import org.quicktheories.core.Gen;
 
 import java.util.List;
 
-import static be.uclouvain.solvercheck.checkers.Checkers.*;
-import static be.uclouvain.solvercheck.core.data.Operator.*;
-import static be.uclouvain.solvercheck.generators.Generators.tables;
-import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
+import static be.uclouvain.solvercheck.checkers.Checkers.allDiff;
+import static be.uclouvain.solvercheck.checkers.Checkers.sum;
+import static be.uclouvain.solvercheck.checkers.Checkers.element;
+import static be.uclouvain.solvercheck.checkers.Checkers.gccVar;
+import static be.uclouvain.solvercheck.checkers.Checkers.table;
+
+import static be.uclouvain.solvercheck.core.data.Operator.GT;
+import static be.uclouvain.solvercheck.core.data.Operator.GE;
+import static be.uclouvain.solvercheck.core.data.Operator.EQ;
+import static be.uclouvain.solvercheck.core.data.Operator.NE;
+import static be.uclouvain.solvercheck.core.data.Operator.LE;
+import static be.uclouvain.solvercheck.core.data.Operator.LT;
+
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
+
+import static be.uclouvain.solvercheck.generators.Generators.tables;
+import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
 
 public class TestCheckers implements WithQuickTheories {
 

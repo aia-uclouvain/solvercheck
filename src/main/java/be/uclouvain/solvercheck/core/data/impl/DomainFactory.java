@@ -7,7 +7,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.stream.Collector;
 
-import static be.uclouvain.solvercheck.core.data.Operator.*;
+import static be.uclouvain.solvercheck.core.data.Operator.GT;
+import static be.uclouvain.solvercheck.core.data.Operator.NE;
+import static be.uclouvain.solvercheck.core.data.Operator.LT;
 
 /** The point of this factory is to create domain instances, potentially using specialized implementations */
 public final class DomainFactory {

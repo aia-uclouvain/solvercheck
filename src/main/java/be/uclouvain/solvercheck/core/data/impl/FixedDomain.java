@@ -6,7 +6,10 @@ import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 import java.util.Iterator;
 import java.util.List;
 
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.*;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARABLE;
 
 /**
  * This class implements the particular case from a domain having one single value.

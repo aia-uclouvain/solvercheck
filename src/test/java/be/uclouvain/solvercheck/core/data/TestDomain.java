@@ -2,7 +2,6 @@ package be.uclouvain.solvercheck.core.data;
 
 import be.uclouvain.solvercheck.generators.Generators;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
-import org.junit.Assert;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
@@ -12,7 +11,11 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import static be.uclouvain.solvercheck.core.data.Operator.NE;
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.*;
+
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 

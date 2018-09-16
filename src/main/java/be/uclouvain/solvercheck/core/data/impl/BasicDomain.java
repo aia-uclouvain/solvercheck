@@ -6,7 +6,10 @@ import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.*;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARABLE;
 
 /**
  * This class merely wraps an existing set to interpret it as a Domain.
