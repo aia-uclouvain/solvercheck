@@ -7,15 +7,23 @@ import java.util.List;
 import java.util.RandomAccess;
 
 /**
- * This class merely wraps an existing list type to interpret it as a (complete) assignment.
- * {@see Assignment}
+ * This class merely wraps an existing list type to interpret it as a (complete)
+ * assignment {@see Assignment}.
  */
-final class BasicAssignment extends AbstractList<Integer> implements Assignment, RandomAccess {
-    /** The wrapped collection */
+final class BasicAssignment extends AbstractList<Integer>
+        implements Assignment, RandomAccess {
+
+    /** The wrapped collection. */
     private final List<Integer> values;
 
-    /** Creates a new (immutable !) value from the given list */
-    public BasicAssignment(final List<Integer> values) {
+    /**
+     * Creates a new (immutable !) value from the given list of values.
+     *
+     * @param values the list of values assigned to each of the variables.
+     *               (ith item in the list corresponds to the value assigned
+     *               to variable x_i)
+     */
+    BasicAssignment(final List<Integer> values) {
         this.values = List.copyOf(values);
     }
 

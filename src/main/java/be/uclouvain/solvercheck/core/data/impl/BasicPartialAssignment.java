@@ -17,15 +17,23 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALEN
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARABLE;
 
 /**
- * This class merely decorates an existing list type to interpret it as a partial assignment.
- * {@see PartialAssignment}
+ * This class merely decorates an existing list type to interpret it as a
+ * partial assignment {@see PartialAssignment}.
  */
-final class BasicPartialAssignment extends AbstractList<Domain> implements PartialAssignment, RandomAccess {
-    /** The wrapped collection */
+final class BasicPartialAssignment extends AbstractList<Domain>
+        implements PartialAssignment, RandomAccess {
+
+    /** The wrapped collection. */
     private final List<Domain> domains;
 
-    /** Creates a new (immutable !) value from the given list from domains */
-    public BasicPartialAssignment(final List<Domain> domains) {
+    /** Creates a new (immutable !) partial assignment from the given list of
+     * domains.
+     *
+     * @param domains the domains of all the variables represented in this
+     *                partial assignment. (ith item in the list corresponds to
+     *                the domain of variable x_i)
+     */
+    BasicPartialAssignment(final List<Domain> domains) {
         this.domains = List.copyOf(domains);
     }
 
@@ -43,8 +51,8 @@ final class BasicPartialAssignment extends AbstractList<Domain> implements Parti
     /** {@inheritDoc} */
     @Override
     public Assignment asAssignment() {
-        if(!isComplete()) {
-            throw new IllegalStateException("PartialAssignment is not complete");
+        if (!isComplete()) {
+           throw new IllegalStateException("PartialAssignment is not complete");
         }
         return new CompleteAssignmentView();
     }
@@ -55,12 +63,12 @@ final class BasicPartialAssignment extends AbstractList<Domain> implements Parti
         if (this.size() != that.size()) {
             return INCOMPARABLE;
         }
-        if (zip(this, that).stream().anyMatch(Utils::domainsAreIncomparable)) {
+        if (haveSomeIncomparableDomain(that)) {
             return INCOMPARABLE;
         }
 
-        boolean hasStronger = zip(this, that).stream().anyMatch(Utils::domainIsStronger);
-        boolean hasWeaker = zip(this, that).stream().anyMatch(Utils::domainIsWeaker);
+        boolean hasStronger = hasSomeDomainStrongerThan(that);
+        boolean hasWeaker = hasSomeDomainWeakerThan(that);
         if (hasStronger && hasWeaker) {
             return INCOMPARABLE;
         }
@@ -87,17 +95,51 @@ final class BasicPartialAssignment extends AbstractList<Domain> implements Parti
     }
 
     /**
-     * This class provides an `Assignment` view for the current PartialAssignment.
-     * It allows the 'conversion' from a partial assignment into a complete assignment
-     * without incurring the costs that are normally associated with that operation.
+     * @param that an other partial assignment
+     * @return true iff this and that have domains which are incomparable
+     */
+    private boolean haveSomeIncomparableDomain(final PartialAssignment that) {
+        return zip(this, that).stream()
+                .anyMatch(Utils::domainsAreIncomparable);
+    }
+
+    /**
+     * @param that an other partial assignment
+     * @return true iff there is at least one domain which is stronger in
+     * `this` than in `that`.
+     */
+    private boolean hasSomeDomainStrongerThan(final PartialAssignment that) {
+        return zip(this, that).stream()
+                .anyMatch(Utils::domainIsStronger);
+    }
+
+    /**
+     * @param that an other partial assignment
+     * @return true iff there is at least one domain which is weaker in
+     * `this` than in `that`.
+     */
+    private boolean hasSomeDomainWeakerThan(final PartialAssignment that) {
+        return zip(this, that).stream()
+                .anyMatch(Utils::domainIsWeaker);
+    }
+
+    /**
+     * This class provides an `Assignment` view for the current
+     * PartialAssignment. It allows the 'conversion' from a partial
+     * assignment into a complete assignment without incurring the costs that
+     * are normally associated with that operation.
      *
      * .. Important::
-     *    One such object may be created iff the current partial assignment is complete.
+     *    One such object may be created iff the current partial assignment
+     *    is complete.
      */
-    private class CompleteAssignmentView extends AbstractList<Integer> implements Assignment {
+    private class CompleteAssignmentView
+            extends    AbstractList<Integer>
+            implements Assignment {
+
         /** {@inheritDoc} */
         @Override
-        public Integer get(int index) {
+        public Integer get(final int index) {
             return domains.get(index).iterator().next();
         }
         /** {@inheritDoc} */

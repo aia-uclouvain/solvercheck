@@ -14,6 +14,6 @@ public interface Checker extends Predicate<Assignment> {
 
     /** {@inheritDoc} */
     @Override
-    boolean test(final Assignment valuation);
+    boolean test(Assignment valuation);
 
 }

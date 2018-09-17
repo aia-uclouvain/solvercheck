@@ -9,19 +9,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class can serve as a base class for all the filters willing to implement an 'uniform'
- * consistency. That is to say, for all the classes willing to implement a consistency filter;
- * filtering the domains of **all** variables according to one same variable filtering policy.
+ * This class can serve as a base class for all the filters willing to implement
+ * an 'uniform' consistency. That is to say, for all the classes willing to
+ * implement a consistency filter; filtering the domains of **all** variables
+ * according to one same variable filtering policy.
  *
- * Notable examples extending this class: {@see BoundDConsistency}, {@see BoundZConsistency}
- * and {@see RangeConsistency}. For efficiency reasons, the `ArcConsistency` was **not**
- * implemented as a subclass of `AbstractUniformConsistency`.
+ * Notable examples extending this class: {@see BoundDConsistency},
+ * {@see BoundZConsistency} and {@see RangeConsistency}. For efficiency
+ * reasons, the `ArcConsistency` was **not** implemented as a subclass of
+ * `AbstractUniformConsistency`.
  */
 public abstract class AbstractUniformConsistency implements Filter {
-    /** The single variable filtering policy that must apply to all the variables */
+    /**
+     * The single variable filtering policy that must apply to all the
+     * variables.
+     */
     private final DomainFilter domainFilter;
 
-    /** Creates a new instance */
+    /**
+     * Creates a new instance.
+     *
+     * @param domainFilter the domain filter that needs to be enforced on all
+     *                     variables for a partial assignment to be considered
+     *                     'consistent' according to the implemented policy.
+     */
     public AbstractUniformConsistency(final DomainFilter domainFilter) {
         this.domainFilter = domainFilter;
     }
@@ -29,12 +40,12 @@ public abstract class AbstractUniformConsistency implements Filter {
     /**
      * {@inheritDoc}
      *
-     * Filters the domains of the variables of the given partial assignment until the
-     * least fixpoint has been reached (one additional application of the domain filtering
-     * will not prune any additional value).
+     * Filters the domains of the variables of the given partial assignment
+     * until the least fixpoint has been reached (one additional application
+     * of the domain filtering will not prune any additional value).
      */
     @Override
-    public PartialAssignment filter(PartialAssignment partialAssignment) {
+    public final PartialAssignment filter(final PartialAssignment partialAssignment) {
         // Make a temporary, modifiable version of the partial assignment
         List<Domain> domains = new ArrayList<>(partialAssignment);
 
@@ -60,13 +71,16 @@ public abstract class AbstractUniformConsistency implements Filter {
     }
 
     /**
+     * @param original the original partial assignment that was shown to hold
+     *                 no acceptable solution according to this level of
+     *                 consistency.
      * @return a partial assignment having all domains cleared.
-     *      This method can be used to signify that the given partial assignment is a dead end and, any
-     *      of its extensions should be rejected.
+     *      This method can be used to signify that the given partial assignment
+     *      is a dead end and, any of its extensions should be rejected.
      */
-    private PartialAssignment noSolution(final PartialAssignment original){
+    private PartialAssignment noSolution(final PartialAssignment original) {
         return original.stream()
-                .map(x-> Domain.emptyDomain())
+                .map(x -> Domain.emptyDomain())
                 .collect(PartialAssignment.collector());
     }
 }

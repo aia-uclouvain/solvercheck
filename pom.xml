@@ -13,6 +13,29 @@
         <maven.compiler.target>1.10</maven.compiler.target>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <!--
+                        Use my own checkstyle configuration which adapts SUN
+                        rules set to allow:
+                        1. shadowing by constructor parameters
+                        2. targetted warning suppression through annotations
+                    -->
+                    <configLocation>./checkstyle.xml</configLocation>
+                    <!-- Ignore the style of tests source code -->
+                    <sourceDirectories>
+                        ${project.build.sourceDirectory}
+                    </sourceDirectories>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <!-- QuickTheories the PBT library for java                                               -->
         <!-- Note: it is not test scoped because it is at the heart from what SolverCheck should do -->
@@ -39,6 +62,5 @@
         </dependency>
 
     </dependencies>
-
 
 </project>

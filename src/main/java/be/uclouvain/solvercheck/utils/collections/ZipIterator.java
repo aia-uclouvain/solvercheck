@@ -10,14 +10,28 @@ import java.util.Iterator;
  * .. Note::
  *    In the event where the two iterables do not have the same size,
  *    this iterable will generate entries with null-padding.
+ *
+ * @param <A> the type of the elements held in the first component of the
+ *           2-tuples iterated upon.
+ * @param <B> the type of the elements held in the second component of the
+ *           2-tuples iterated upon.
  */
 public final class ZipIterator<A, B> implements Iterator<ZipEntry<A, B>> {
-    /** The 1st element */
+    /** The 1st component of the 2-tuples. */
     private final Iterator<A> first;
-    /** The 2nd element */
+    /** The 2nd component of the 2-tuples. */
     private final Iterator<B> second;
 
-    public ZipIterator(final Iterator<A> a, final Iterator<B> b) {
+    /**
+     * Creates a new iterator to iterate over 2-tuples ({@see ZipEntry}) made
+     * of one element of each `a` and `b`.
+     *
+     * @param a the sequence of items making up the first component of all
+     *          zip entries
+     * @param b the sequence of items making up the second component of all
+     *          zip entries
+     */
+    ZipIterator(final Iterator<A> a, final Iterator<B> b) {
         first = a;
         second = b;
     }
@@ -31,9 +45,26 @@ public final class ZipIterator<A, B> implements Iterator<ZipEntry<A, B>> {
     /** {@inheritDoc} */
     @Override
     public ZipEntry<A, B> next() {
-        A nextA = first.hasNext() ? first.next() : null;
-        B nextB = second.hasNext() ? second.next() : null;
+        A nextA = getNextOrDefaultNull(first);
+        B nextB = getNextOrDefaultNull(second);
 
         return new ZipEntry<>(nextA, nextB);
+    }
+
+    /**
+     * Returns the next item from the given iterator or null when `iterator`
+     * is out of next elements.
+     *
+     * @param iterator an iterator whose next element is desired.
+     * @param <T> the type of the element to return.
+     * @return the next element of `iterator` or null if the end of the
+     * sequence has been reached.
+     */
+    private static <T> T getNextOrDefaultNull(final Iterator<T> iterator) {
+        if (iterator.hasNext()) {
+            return iterator.next();
+        } else {
+            return null;
+        }
     }
 }

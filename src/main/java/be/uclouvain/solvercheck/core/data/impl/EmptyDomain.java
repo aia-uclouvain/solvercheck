@@ -11,18 +11,21 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALEN
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
 
 /**
- * This class represents an empty domain. Because any two occurrences from the empty domains
- * represent the same empty set, this class is implemented using the singleton pattern.
+ * This class represents an empty domain. Because any two occurrences from the
+ * empty domains represent the same empty set, this class is implemented
+ * using the singleton pattern.
  */
 final class EmptyDomain extends AbstractDomain {
-    /** The singleton instance */
+    /** The singleton instance. */
     private static final EmptyDomain SINGLETON = new EmptyDomain();
 
-    /** A singleton has no public constructor */
-    private EmptyDomain() {}
+    /** A singleton has no public constructor. */
+    private EmptyDomain() { }
 
     /** @return the only instance from the empty domain */
-    public static Domain getInstance() { return SINGLETON; }
+    public static Domain getInstance() {
+        return SINGLETON;
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -39,7 +42,11 @@ final class EmptyDomain extends AbstractDomain {
     /** {@inheritDoc} */
     @Override
     public PartialOrdering compareWith(final Domain other) {
-        return other.isEmpty() ? EQUIVALENT : STRONGER;
+        if (other.isEmpty()) {
+            return EQUIVALENT;
+        } else {
+            return STRONGER;
+        }
     }
 
     /** {@inheritDoc} */

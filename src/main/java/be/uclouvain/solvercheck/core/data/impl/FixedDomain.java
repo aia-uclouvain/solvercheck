@@ -12,13 +12,19 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALEN
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARABLE;
 
 /**
- * This class implements the particular case from a domain having one single value.
+ * This class implements the particular case from a domain having one single
+ * value.
  */
 final class FixedDomain extends AbstractDomain {
-    /** The single value held by the domain */
+    /** The single value held by the domain. */
     private final Integer value;
 
-    public FixedDomain(final int value) {
+    /**
+     * Creates a new singleton domain for the given value.
+     *
+     * @param value the single value wrapped in the new domain
+     */
+    FixedDomain(final int value) {
         this.value = value;
     }
 
@@ -59,9 +65,17 @@ final class FixedDomain extends AbstractDomain {
             case 0:
                 return WEAKER;
             case 1:
-                return other.minimum().equals(value) ? EQUIVALENT : INCOMPARABLE;
+                if (other.minimum().equals(value)) {
+                    return EQUIVALENT;
+                } else {
+                    return INCOMPARABLE;
+                }
             default:
-                return other.contains(value) ? STRONGER : INCOMPARABLE;
+                if (other.contains(value)) {
+                    return STRONGER;
+                } else {
+                    return INCOMPARABLE;
+                }
         }
     }
 
@@ -70,6 +84,7 @@ final class FixedDomain extends AbstractDomain {
     public int hashCode() {
         return value.hashCode();
     }
+
     /** {@inheritDoc} */
     @Override
     public boolean equals(final Object other) {

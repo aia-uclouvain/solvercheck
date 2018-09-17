@@ -4,9 +4,20 @@ package be.uclouvain.solvercheck.core.data;
  * This enumeration describes the five 'primitive' comparison operators.
  */
 public enum Operator {
-    EQ, NE, LE, LT, GE, GT;
+    /** EQ means **equality** operator. */
+    EQ,
+    /** NE means **different from** operator. */
+    NE,
+    /** LE means lesser or equal (<=) operator. */
+    LE,
+    /** LT means strictly lesser than (<) operator. */
+    LT,
+    /** GE means greater or equal to (>=) operator. */
+    GE,
+    /** GT means strictly greater than (>) operator. */
+    GT;
 
-    /** @return the operator that is the negation from 'this' relation */
+    /** @return the operator that is the negation from 'this' relation. */
     public Operator not() {
         switch (this) {
             case EQ:
@@ -28,6 +39,10 @@ public enum Operator {
 
     /**
      * Tests the validity from the  x [THIS] y predicate.
+     *
+     * @param x the first operand of the binary operator
+     * @param y the second operand of the binary operator
+     *
      * @return true iff x [THIS] y is true. False otherwise.
      */
     public boolean check(final int x, final int y) {

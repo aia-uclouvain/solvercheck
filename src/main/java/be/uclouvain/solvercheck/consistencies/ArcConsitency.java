@@ -21,22 +21,30 @@ import static be.uclouvain.solvercheck.consistencies.ConsistencyUtil.support;
  * .. Note::
  *    This arc-consistent filter is built by taking the cartesian product of
  *    all possible values of the different domains. Even though the
- *    implementation of the cartesian product is fairly efficient, while designing
- *    new tests, one should account for the fact that 10 variables each having
- *    a ten valued domain is roughly-intractable (10^10 possibilities).
+ *    implementation of the cartesian product is fairly efficient, while
+ *    designing new tests, one should account for the fact that 10 variables
+ *    each having a ten valued domain is roughly-intractable (10^10
+ *    possibilities).
  */
 public final class ArcConsitency implements Filter {
-    /** The checker implementing a test to verify whether some constraint is satisfied */
+    /**
+     * The checker implementing a test to verify whether some constraint
+     * is satisfied.
+     */
     private final Checker checker;
 
-    /** Creates a new arc consistent filter from the given checker */
+    /**
+     * Creates a new arc consistent filter from the given checker.
+     * @param checker the checker implementing a test to verify whether or not
+     *                some constraint is satisfied
+     */
     public ArcConsitency(final Checker checker) {
         this.checker = checker;
     }
 
     /** {@inheritDoc} */
     @Override
-    public PartialAssignment filter(PartialAssignment partial) {
+    public PartialAssignment filter(final PartialAssignment partial) {
         return PartialAssignment.unionOf(
                 CartesianProduct.of(partial).stream()
                      .map(Assignment::from)
@@ -46,21 +54,24 @@ public final class ArcConsitency implements Filter {
     }
 
     /**
-     * This method returns a domain checker that ensures that all the values of the domain
-     * of one given variable have an actual support in the domains of other variables.
-     *
-     * This is a convenience method which can be used to build hybrid consistencies.
+     * This is a convenience method which can be used to build hybrid
+     * consistencies. It returns a domain checker that ensures that all the
+     * values of the domain of one given variable have an actual support in
+     * the domains of other variables.
      *
      * @param checker the checker testing the satisfaction of the constraint
-     * @return a DomainFilter that ensures the ArcConsistency of the given checker for some
-     *         variable domain.
+     * @return a DomainFilter that ensures the ArcConsistency of the given
+     * checker for some variable domain.
      */
     public static DomainFilter domainFilter(final Checker checker) {
         return (var, context) ->
                 context.get(var)
                     .stream()
                     .filter(value ->
-                        exists(support(context)).satisfying(checker).forVariable(var).assignedTo(value) )
+                        exists(support(context))
+                           .satisfying(checker)
+                           .forVariable(var)
+                           .assignedTo(value))
                     .collect(Domain.collector());
     }
 }

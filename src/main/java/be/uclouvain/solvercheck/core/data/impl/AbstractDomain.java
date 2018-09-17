@@ -11,7 +11,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * The base class of all Domains. It provides some facility wrt iterators and spliterators.
+ * The base class of all Domains. It provides some facility wrt iterators and
+ * spliterators.
  */
 abstract class AbstractDomain extends AbstractSet<Integer> implements Domain {
     /** {@inheritDoc} */
@@ -32,12 +33,20 @@ abstract class AbstractDomain extends AbstractSet<Integer> implements Domain {
         return StreamSupport.stream(from(this::decreasing), true);
     }
 
-    /** @return a spliterator for the given iterator supplier. assuming all characteristics of an abstract domain */
+    /**
+     * @param supplier a function that yields the iterator when called w/o
+     *                 arguments.
+     * @return a spliterator for the given iterator supplier. assuming all
+     * characteristics of an abstract domain
+     */
     private Spliterator<Integer> from(final Supplier<Iterator<Integer>> supplier) {
         return Spliterators.spliterator(supplier.get(), size(), characteristics());
     }
 
-    /** @return the characteristics describing how spliterators can be used by Stream */
+    /**
+     * @return the characteristics describing how spliterators can be used
+     * by Stream
+     */
     private int characteristics() {
         return Spliterator.ORDERED
                 | Spliterator.DISTINCT

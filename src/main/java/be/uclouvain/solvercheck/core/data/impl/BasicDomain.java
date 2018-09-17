@@ -3,7 +3,12 @@ package be.uclouvain.solvercheck.core.data.impl;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.RandomAccess;
 import java.util.stream.Collectors;
 
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
@@ -16,16 +21,29 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARA
  * {@see Domain}
  */
 final class BasicDomain extends AbstractDomain implements Domain, RandomAccess {
-    /** The wrapped collection */
+    /** The wrapped collection. */
     private final List<Integer> values;
 
-    /** Creates a new (immutable !) value from the given set */
-    public BasicDomain(final int...values) {
-        this.values = Arrays.stream(values).sorted().boxed().collect(Collectors.toList());
+    /**
+     * Creates a new (immutable !) domain from the given set of possible values.
+     *
+     * @param values the values that can possibly be assigned to the variable to
+     *               whom, this domain relates.
+     */
+    BasicDomain(final int...values) {
+        this.values = Arrays.stream(values)
+                            .sorted()
+                            .boxed()
+                            .collect(Collectors.toList());
     }
 
-    /** Creates a new (immutable !) value from the given set */
-    public BasicDomain(final Collection<Integer> values) {
+    /**
+     * Creates a new (immutable !) domain from the given set of possible values.
+     *
+     * @param values the values that can possibly be assigned to the variable to
+     *               whom, this domain relates.
+     */
+    BasicDomain(final Collection<Integer> values) {
         this.values = values
                 .stream()
                 .sorted()
@@ -53,10 +71,9 @@ final class BasicDomain extends AbstractDomain implements Domain, RandomAccess {
     /** {@inheritDoc} */
     @Override
     public Integer minimum() {
-        if( isEmpty() ) {
+        if (isEmpty()) {
             throw new NoSuchElementException("The domain is empty");
-        }
-        else {
+        } else {
             return values.get(0);
         }
     }
@@ -64,11 +81,10 @@ final class BasicDomain extends AbstractDomain implements Domain, RandomAccess {
     /** {@inheritDoc} */
     @Override
     public Integer maximum() {
-        if( isEmpty() ) {
+        if (isEmpty()) {
             throw new NoSuchElementException("The domain is empty");
-        }
-        else {
-            return values.get(size()-1);
+        } else {
+            return values.get(size() - 1);
         }
     }
 
@@ -76,11 +92,25 @@ final class BasicDomain extends AbstractDomain implements Domain, RandomAccess {
     @Override
     public PartialOrdering compareWith(final Domain that) {
         if (this.size() < that.size()) {
-            return that.containsAll(this.values) ? STRONGER : INCOMPARABLE;
+            if (that.containsAll(this.values)) {
+                return STRONGER;
+            } else {
+                return INCOMPARABLE;
+            }
+
         } else if (this.size() > that.size()) {
-            return this.containsAll(that) ? WEAKER : INCOMPARABLE;
+            if (this.containsAll(that)) {
+                return WEAKER;
+            } else {
+                return INCOMPARABLE;
+            }
+
         } else {
-            return this.equals(that) ? EQUIVALENT : INCOMPARABLE;
+            if (this.equals(that)) {
+                return EQUIVALENT;
+            } else {
+                return INCOMPARABLE;
+            }
         }
     }
 
@@ -95,13 +125,16 @@ final class BasicDomain extends AbstractDomain implements Domain, RandomAccess {
         return (other instanceof Domain) && super.equals(other);
     }
 
-    /** An iterator to iterate on the values of the current domain in **decreasing** order */
+    /**
+     * An iterator to iterate on the values of the current domain in
+     * **decreasing** orders.
+     */
     private class DecreasingIterator implements Iterator<Integer> {
-        /** The current position in the iteration */
+        /** The current position in the iteration. */
         private int currentPos;
 
-        /** creates a new instance of the iterator */
-        public DecreasingIterator() {
+        /** creates a new instance of the iterator. */
+        DecreasingIterator() {
             currentPos = size();
         }
 

@@ -5,12 +5,15 @@ package be.uclouvain.solvercheck.utils.relations;
  * partially orderable objects.
  */
 public enum PartialOrdering {
-    /** Current object is higher up in the partial order lattice */
+    /** Current object is higher up in the partial order lattice. */
     STRONGER,
-    /** Current object is lower down in the partial order lattice */
+    /** Current object is lower down in the partial order lattice. */
     WEAKER,
-    /** Current object denotes the same node from the partial order lattice */
+    /** Current object denotes the same node from the partial order lattice. */
     EQUIVALENT,
-    /** Current object cannot be compared with the other according to the given partial order */
+    /**
+     * Current object cannot be compared with the other according to the given
+     * partial order.
+     */
     INCOMPARABLE
 }

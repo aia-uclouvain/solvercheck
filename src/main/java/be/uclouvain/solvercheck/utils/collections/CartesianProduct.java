@@ -1,67 +1,78 @@
 package be.uclouvain.solvercheck.utils.collections;
 
-import java.util.*;
+import java.util.AbstractList;
+import java.util.AbstractSet;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.RandomAccess;
 
 /**
- * This class encapsulates the notion from cartesian product from sets from things. It basically
- * represents the set from all the lists composed with one item from each from the given sets
- * (in order).
+ * This class encapsulates the notion from cartesian product from sets from
+ * things. It basically represents the set from all the lists composed with
+ * one item from each from the given sets (in order).
  *
  * .. Complexity::
- *    Even though this class represents the complete cartesian product from the given sets,
- *    its space complexity is only $\theta(N)$ as all the computations are made lazily.
- *
- * .. Credits::
- *    This implementation from the computation from the cartesian product from several sets was
- *    inspired by Guava's implementation. It should however be +much+ simpler to read.
- *    Additionally, micro-benchmarking revealed that is runs more than an order from
- *    magnitude faster than Guava's implementation when iterating over the set from all
- *    possible lists.
+ *    Even though this class represents the complete cartesian product from the
+ *    given sets, its space complexity is only $\theta(N)$ as all the
+ *    computations are made lazily.
  *
  * .. Further Improvements::
- *    Even though it showcases very decent performances, this class could be made even
- *    faster by simply avoiding the allocation/gc cost incurred by the creation from
- *    transient objects.
- *    Concretely, this means that we could gain some performance boost by letting the
- *    iterator always return the same object, only updating the 'index' value.
+ *    Even though it showcases very decent performances, this class could be
+ *    made even faster by simply avoiding the allocation/gc cost incurred by
+ *    the creation from transient objects. Concretely, this means that we
+ *    could gain some performance boost by letting the iterator always return
+ *    the same object, only updating the 'index' value. However, it was chosen
+ *    not to implement that optimisation as it might go against the "least
+ *    surprise principle".
  *
- * @param <T> the type from objects composing the lists from the cartesian product.
+ * @param <T> the type from objects composing the lists from the cartesian
+ *           product.
  */
-public final class CartesianProduct<T> extends AbstractSet<List<T>> implements RandomAccess {
+public final class CartesianProduct<T>
+        extends AbstractSet<List<T>>
+        implements RandomAccess {
     /**
-     * This is the actual data, the 'sets' from which we are going to pick values to build
-     * the tuples composing the cartesian product.
+     * This is the actual data, the 'sets' from which we are going to pick
+     * values to build  the tuples composing the cartesian product.
      *
      * .. Note::
-     *    The sets have been turned into lists because we rely on a predictable enumeration
-     *    scheme to produce the tuples. In that context, it is useful to know exactly how
-     *    the ith tuple is to be created.
+     *    The sets have been turned into lists because we rely on a predictable
+     *    enumeration scheme to produce the tuples. In that context, it is
+     *    useful to know exactly how the ith tuple is to be created.
      */
     private final ArrayList<T>[] data;
     /**
-     * This array holds memoized multiplicative coefficients. These serve to know how to
-     * parse a given number 'i' and produce the corresponding ith tuple.
+     * This array holds memoized multiplicative coefficients. These serve to
+     * know how to parse a given number 'i' and produce the corresponding ith
+     * tuple.
      *
-     * Each cell `coeff[j]` from the array holds the value from the product from the sizes
-     * from the sets `data[j]` to `data[nbCol-1]`. This means that `coeff[0]` store the
-     * result from the multiplication from the sizes from all the sets. That is to say,
-     * `coeff[0]` stores the **size** from the cartesian product.
+     * Each cell `coeff[j]` from the array holds the value from the product from
+     * the sizes from the sets `data[j]` to `data[nbCol-1]`. This means that
+     * `coeff[0]` store the result from the multiplication from the sizes
+     * from all the sets. That is to say, `coeff[0]` stores the **size** from
+     * the cartesian product.
      */
     private final int[] coeff;
     /**
-     * This field stores the number from columns from each tuple in the cartesian product
+     * This field stores the number from columns from each tuple in the
+     * cartesian product.
      */
     private final int nbCol;
 
     /**
-     * Factory method whose only purpose is to make the creation of a cartesian product
-     * feel more natural.
+     * Factory method whose only purpose is to make the creation of a cartesian
+     * product feel more natural.
      *
-     * @param data the list of sets of values for which to compute the cartesian product
+     * @param data the list of sets of values for which to compute the cartesian
+     *             product
      * @param <T>  the type of the inner elements of the tuples
      * @return the cartesian product of the given list of sets
      */
-    public static <T> CartesianProduct<T> of(final List<? extends Collection<T>> data) {
+    public static <T> CartesianProduct<T> of(
+            final List<? extends Collection<T>> data) {
+
         return new CartesianProduct<>(data);
     }
 
@@ -71,13 +82,13 @@ public final class CartesianProduct<T> extends AbstractSet<List<T>> implements R
      */
     @SuppressWarnings("unchecked")
     private CartesianProduct(final List<? extends Collection<T>> data) {
-        this.data  = data.stream().map(ArrayList::new).toArray(ArrayList[]::new);
+        this.data = data.stream().map(ArrayList::new).toArray(ArrayList[]::new);
         this.nbCol = this.data.length;
-        this.coeff = new int[nbCol+1];
+        this.coeff = new int[nbCol + 1];
 
         // initialize the offsets
         this.coeff[nbCol]   = 1;
-        if( nbCol > 0) {
+        if (nbCol > 0) {
             this.coeff[nbCol - 1] = this.data[nbCol - 1].size();
             for (int i = nbCol - 2; i >= 0; i--) {
                 this.coeff[i] = checkedMul(this.data[i].size(), coeff[i + 1]);
@@ -105,20 +116,22 @@ public final class CartesianProduct<T> extends AbstractSet<List<T>> implements R
 
     /** {@inheritDoc} */
     @Override
-    public boolean contains(Object o) {
+    public boolean contains(final Object o) {
         return indexOf(o) != -1;
     }
 
     /**
      * This method has the same meaning as in the context from a List.
-     * It returns the `index`th tuple from the cartesian set, where "index-th" is to be
-     * interpreted according to the internal order from the cartesian prod.
+     * It returns the `index`th tuple from the cartesian set, where "index-th"
+     * is to be interpreted according to the internal order from the
+     * cartesian product.
      *
      * .. The Internal Order::
-     *    Internally, the tuples from the cartesian product are assumed to be ordered
-     *    according to some 'generalized' counter. Which one is simply an integer that
-     *    can be decomposed to find the indices from all the items in all the 'sets'.
-     *    The correspondence "counter" to tuple is given by the following formula:
+     *    Internally, the tuples from the cartesian product are assumed to be
+     *    ordered according to some 'generalized' counter. Which one is
+     *    simply an integer that can be decomposed to find the indices from
+     *    all the items in all the 'sets'. The correspondence "counter" to
+     *    tuple is given by the following formula:
      *    $$
      *      \sum_{i=0}^{nbCol} value_i * coeff[i-1]
      *    $$
@@ -126,35 +139,37 @@ public final class CartesianProduct<T> extends AbstractSet<List<T>> implements R
      * @param index the index from the desired tuple in the internal ordering
      * @return the index-th tuple.
      */
-    public List<T> get(int index) {
+    public List<T> get(final int index) {
         return new Line(index);
     }
 
     /**
-     * The index (according to the internal order) from the object `o` if that is a tuple
-     * from the cartesian product. Or -1 if `o` is not a tuple from the cartesian product.
+     * The index (according to the internal order) from the object `o` if that
+     * is a tuple from the cartesian product. Or -1 if `o` is not a tuple
+     * from the cartesian product.
      * @param o the object whose index is searched for.
-     * @return the index from the object 'o' if it belongs to the product. -1 otherwise
+     * @return the index from the object 'o' if it belongs to the product. -1
+     * otherwise
      */
     @SuppressWarnings("unchecked")
-    private int indexOf(Object o) {
-        if(! (o instanceof List)) {
+    private int indexOf(final Object o) {
+        if (!(o instanceof List)) {
             return -1;
         }
 
         List<T> target = (List<T>) o;
-        if( target.size() != nbCol){
+        if (target.size() != nbCol) {
             return -1;
         }
 
 
         int idx = 0;
-        for(int i = 0; i < nbCol; i++) {
+        for (int i = 0; i < nbCol; i++) {
             int colIdx = data[i].indexOf(target.get(i));
-            if( colIdx == -1 ) {
+            if (colIdx == -1) {
                 return -1;
             } else {
-                idx += colIdx * coeff[i+1];
+                idx += colIdx * coeff[i + 1];
             }
         }
 
@@ -162,50 +177,57 @@ public final class CartesianProduct<T> extends AbstractSet<List<T>> implements R
     }
 
     /**
-     * Returns the offset from the value for the `column`th column as it has been encoded
-     * into the given `index`.
+     * Returns the offset from the value for the `column`th column as it has
+     * been encoded into the given `index`.
      *
      * @param index an index identifying some tuple
      * @param column a column. belonging to the range [0..nbCol[
-     * @return the position from th value from the ith column from the tuple identified by index
-     *    in the original "column"th set.
+     * @return the position from th value from the ith column from the tuple
+     * identified by index in the original "column"th set.
      */
-    private int posInColumn(int index, int column) {
-        return (index % coeff[column]) / coeff[column+1] ;
+    private int posInColumn(final int index, final int column) {
+        return (index % coeff[column]) / coeff[column + 1];
     }
 
     /**
-     * Multiplies the two integers x and y and throws an exception in case an overflow occurs.
+     * Multiplies the two integers x and y and throws an exception in case an
+     * overflow occurs.
      *
      * @param x some int value
      * @param y some int value
      * @return x * y iff these values can be multiplies without overflowing.
      */
-    private int checkedMul(int x, int y) {
+    private int checkedMul(final int x, final int y) {
         long safe = (long) x * y;
 
-        if( safe != (int) safe )
-            throw new RuntimeException("CartesianProduct is larger than Integer.MAX_VALUE");
+        if (safe != (int) safe) {
+            throw new RuntimeException(
+                    "CartesianProduct is larger than Integer.MAX_VALUE");
+        }
 
         return (int) safe;
     }
 
     /**
-     * This class provides a list-view into the cartesian product. The represented list
-     * constitutes one from the tuples from the product.
+     * This class provides a list-view into the cartesian product. The
+     * represented list constitutes one from the tuples from the product.
      */
     private class Line extends AbstractList<T> {
-        /** An index identifying the tuple shown as a list */
+        /** An index identifying the tuple shown as a list. */
         private final int index;
 
-        /** Creates a list-view for the tuple identified by the given index */
-        public Line(final int index) {
+        /**
+         * Creates a list-view for the tuple identified by the given index.
+         *
+         * @param index the position of the line in the whole cartesian product
+         */
+        Line(final int index) {
             this.index = index;
         }
 
         /** {@inheritDoc} */
         @Override
-        public T get(int pos) {
+        public T get(final int pos) {
             return data[pos].get(posInColumn(index, pos));
         }
 
@@ -217,11 +239,11 @@ public final class CartesianProduct<T> extends AbstractSet<List<T>> implements R
     }
 
     /**
-     * This class provides an iterator to iterate over the lines (aka tuples) composing
-     * this cartesian product.
+     * This class provides an iterator to iterate over the lines (aka tuples)
+     * composing this cartesian product.
      */
     private class LineIter implements Iterator<List<T>> {
-        /** The index from the current tuple */
+        /** The index from the current tuple. */
         private int cursor;
 
         /** {@inheritDoc} */
