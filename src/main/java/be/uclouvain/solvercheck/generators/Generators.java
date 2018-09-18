@@ -5,6 +5,7 @@ import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import org.quicktheories.core.Gen;
+import org.quicktheories.core.RandomnessSource;
 
 import java.util.HashSet;
 import java.util.List;
@@ -211,9 +212,40 @@ public final class Generators {
     // --------- BUILDERS -----------------------------------------------------
 
     /**
+     * This abstract class serves as a basis for the implementation of
+     * fluent generator builders. It makes the API much more fluent, by letting
+     * any generator builder be an adapter to some actual generator. This
+     * way, the builders can be used in lieu of the generator they are meant
+     * to create. Hence, an user api never has to explicitly call the `build`
+     * method.
+     *
+     * @param <T> the type of the objects to generate.
+     */
+    private abstract static class GenBuilder<T> implements Gen<T> {
+        /** The actual generator used to produce some values of type T. */
+        private Gen<T> generator = null;
+
+        /** {@inheritDoc} */
+        public final T generate(final RandomnessSource in) {
+            if (generator == null) {
+                generator = build();
+            }
+            return generator.generate(in);
+        }
+
+        /**
+         * Returns the actual generator instance, based on the current
+         * configuration state.
+         *
+         * @return the actual generator.
+         */
+        protected abstract Gen<T> build();
+    }
+
+    /**
      * A builder which acts as a micro DSL to produce generators of domains.
      */
-    public static final class GenDomainBuilder {
+    public static final class GenDomainBuilder extends GenBuilder<Domain> {
         /** the minimum number of different values a domain should contain. */
         private int nbValMin = DEFAULT_NB_VAL_MIN;
         /** the maximum number of different values a domain should contain. */
@@ -268,9 +300,12 @@ public final class Generators {
         }
 
         /**
+         * {@inheritDoc}
+         *
          * @return a domain generator that corresponds to the configuration
          * specified with the other methods.
          */
+        @Override
         public Gen<Domain> build() {
             return setsOf(
                     nbValMin, nbValMax,
@@ -283,7 +318,9 @@ public final class Generators {
      * A builder which acts as a micro DSL to produce generators of partial
      * assignments.
      */
-    public static final class GenPartialAssignmentBuilder {
+    public static final class GenPartialAssignmentBuilder
+            extends GenBuilder<PartialAssignment> {
+
         /**
          * The builder to produce the domains of the various variables in
          * the partial assignment.
@@ -388,9 +425,12 @@ public final class Generators {
         }
 
         /**
+         * {@inheritDoc}
+         *
          * @return a partial assignment generator that corresponds to the
          * configuration specified with the other methods.
          */
+        @Override
         public Gen<PartialAssignment> build() {
             return lists().of(domainBuilder.build())
                     .ofSizeBetween(nbVarsMin, nbVarsMax)
@@ -402,7 +442,9 @@ public final class Generators {
      * A builder which acts as a micro DSL to produce generators of partial
      * assignments.
      */
-    public static final class GenAssignmentBuilder {
+    public static final class GenAssignmentBuilder
+            extends GenBuilder<Assignment> {
+
         /**
          * The minimum number of variables in the assignment. (default: 0)
          */
@@ -480,9 +522,12 @@ public final class Generators {
         }
 
         /**
+         * {@inheritDoc}
+         *
          * @return an assignment generator that corresponds to the
          * configuration specified with the other methods
          */
+        @Override
         public Gen<Assignment> build() {
             return lists().of(integers().between(valueMin, valueMax))
                     .ofSizeBetween(nbVarsMin, nbVarsMax)
@@ -494,7 +539,9 @@ public final class Generators {
      * A builder which acts as a micro DSL to produce generators of table
      * constraints.
      */
-    public static final class GenTableBuilder {
+    public static final class GenTableBuilder
+            extends GenBuilder<List<Assignment>> {
+
         /** the minimum number of lines in the generated tables. */
         private int nbLinesMin = DEFAULT_NB_LINES_MIN;
         /** the maximum number of lines in the generated tables. */
@@ -602,9 +649,12 @@ public final class Generators {
         }
 
         /**
+         * {@inheritDoc}
+         *
          * @return an table constraints generator that corresponds to the
          * configuration specified with the other methods.
          */
+        @Override
         public Gen<List<Assignment>> build() {
             return lists()
                     .of(builder.build())
