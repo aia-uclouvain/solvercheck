@@ -39,6 +39,38 @@ public interface WithAssertions {
     }
 
     /**
+     * This method is an alias for {@see propagator}. It yields a
+     * FilterAssertion for the given filter.
+     *
+     * @param actual the actual filter (propagator) about which a property is
+     *              being expressed.
+     * @return a builder to express the assertion about some Filter
+     *
+     * FIXME: I'm not sure that I like this method. It makes the DSL flow
+     * naturally but, on the other hand, the method is poorly named to be
+     * used on its own.
+     */
+    default FilterAssertion an(final Filter actual) {
+        return propagator(actual);
+    }
+
+    /**
+     * This method is an alias for {@see propagator}. It yields a
+     * FilterAssertion for the given filter.
+     *
+     * @param actual the actual filter (propagator) about which a property is
+     *              being expressed.
+     * @return a builder to express the assertion about some Filter
+     *
+     * FIXME: I'm not sure that I like this method. It makes the DSL flow
+     * naturally but, on the other hand, the method is poorly named to be
+     * used on its own.
+     */
+    default FilterAssertion a(final Filter actual) {
+        return propagator(actual);
+    }
+
+    /**
      * Checks the validity of the given assertion.
      *
      * @param assertion the assertion to verify.

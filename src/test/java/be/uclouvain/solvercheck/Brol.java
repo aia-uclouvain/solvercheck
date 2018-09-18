@@ -1,33 +1,25 @@
 package be.uclouvain.solvercheck;
 
-import be.uclouvain.solvercheck.assertions.WithAssertions;
-import be.uclouvain.solvercheck.checkers.Checkers;
-import be.uclouvain.solvercheck.consistencies.ArcConsitency;
-import be.uclouvain.solvercheck.consistencies.BoundDConsistency;
-import be.uclouvain.solvercheck.consistencies.BoundZConsistency;
 import org.junit.Test;
 
 public class Brol implements WithSolverCheck {
 
     @Test
     public void testDescribed() {
+        /*
+        assertThat(
+            forAll(tables()).itIsTrueThat(t ->
+                an(arcConsistent(allDiff())).isStrongerThan(boundZConsistent(table(t)))
+        ));
+        */
 
         assertThat(
-                forAll(tables().describedAs(t -> String.format("Table(%s)", t)))
-                .itIsTrueThat(t ->
-
-                    propagator(new ArcConsitency(Checkers.table(t)))
-                        .isEquivalentTo(
-                            new BoundZConsistency(Checkers.table(t))
-                        )
-                        .assuming(partialAssignment -> !partialAssignment.isError())
-                )
-
-                /*
-            propagator(new ArcConsitency(Checkers.allDiff()))
-                .isEquivalentTo(new BoundDConsistency(Checkers.allDiff()))
-                .assuming(domains -> !domains.isError())
-                */
+            given()
+            .theRandomSeed(42)
+            .examples(5)
+            .attempts(10)
+            .an(arcConsistent(allDiff())).isStrongerThan(boundZConsistent(allDiff()))
+            .assuming(partialAssignment -> !partialAssignment.isError())
         );
     }
 

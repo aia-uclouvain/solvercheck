@@ -119,6 +119,38 @@ public final class TestConfiguration implements Supplier<Strategy> {
     }
 
     /**
+     * This method is an alias for {@see propagator}. It yields a
+     * FilterAssertion for the given filter.
+     *
+     * @param actual the actual filter (propagator) about which a property is
+     *              being expressed.
+     * @return a builder to express the assertion about some Filter
+     *
+     * FIXME: I'm not sure that I like this method. It makes the DSL flow
+     * naturally but, on the other hand, the method is poorly named to be
+     * used on its own.
+     */
+    public FilterAssertion an(final Filter actual) {
+        return propagator(actual);
+    }
+
+    /**
+     * This method is an alias for {@see propagator}. It yields a
+     * FilterAssertion for the given filter.
+     *
+     * @param actual the actual filter (propagator) about which a property is
+     *              being expressed.
+     * @return a builder to express the assertion about some Filter
+     *
+     * FIXME: I'm not sure that I like this method. It makes the DSL flow
+     * naturally but, on the other hand, the method is poorly named to be
+     * used on its own.
+     */
+    public FilterAssertion a(final Filter actual) {
+        return propagator(actual);
+    }
+
+    /**
      * Creates a 1-parametric assertion using the current configuration.
      *
      * This is particularly useful to check that not only constraint behave

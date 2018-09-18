@@ -13,7 +13,7 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARA
 /**
  * A bunch of general purpose utility methods.
  *
- * FIXME: refcator this utility class to locate its method where they belong.
+ * FIXME: refactor this utility class to locate its method where they belong.
  */
 public final class Utils {
     /**
