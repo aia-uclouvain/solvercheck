@@ -21,7 +21,7 @@ public interface WithCpGenerators {
      * @return a configurable generator meant to produce random
      * `Assignment` instances
      */
-    default Gen<Assignment> assignements() {
+    default Generators.GenAssignmentBuilder assignements() {
         return Generators.assignments();
     }
 
@@ -29,7 +29,7 @@ public interface WithCpGenerators {
      * @return a configurable generator meant to produce random
      * `Domain` instances
      */
-    default Gen<Domain> domains() {
+    default Generators.GenDomainBuilder domains() {
         return Generators.domains();
     }
 
@@ -44,7 +44,7 @@ public interface WithCpGenerators {
      * @return a configurable generator meant to produce random
      * `PartialAssignment` instances
      */
-    default Gen<PartialAssignment> partialAssignments() {
+    default Generators.GenPartialAssignmentBuilder partialAssignments() {
         return Generators.partialAssignments();
     }
 
@@ -52,7 +52,7 @@ public interface WithCpGenerators {
      * @return a configurable generator meant to produce random tables. That
      * is to say, to produce random lists of `Assignment`.
      */
-    default Gen<List<Assignment>> tables() {
+    default Generators.GenTableBuilder tables() {
         return Generators.tables();
     }
 

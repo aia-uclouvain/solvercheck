@@ -61,6 +61,10 @@ public final class HybridConsistency implements Filter {
                     domainFilter.length));
         }
 
+        if (partialAssignment.isError()) {
+            return noSolution(partialAssignment);
+        }
+
         // Make a temporary, modifiable version of the partial assignment
         List<Domain> domains = new ArrayList<>(partialAssignment);
 

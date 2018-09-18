@@ -14,12 +14,11 @@ public class Brol implements WithSolverCheck {
         */
 
         assertThat(
-            given()
-            .theRandomSeed(42)
-            .examples(5)
-            .attempts(10)
-            .an(arcConsistent(allDiff())).isStrongerThan(boundZConsistent(allDiff()))
-            .assuming(partialAssignment -> !partialAssignment.isError())
+            an(arcConsistent(allDiff())).isStrongerThan(boundZConsistent(allDiff()))
+            .forAll(partialAssignments()
+                    .withUpToVariables(4)
+                    .withValuesRanging(-10, 10))
+
         );
     }
 

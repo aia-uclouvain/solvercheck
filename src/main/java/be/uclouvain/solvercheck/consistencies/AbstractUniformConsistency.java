@@ -46,6 +46,10 @@ public abstract class AbstractUniformConsistency implements Filter {
      */
     @Override
     public final PartialAssignment filter(final PartialAssignment partialAssignment) {
+        if (partialAssignment.isError()) {
+            return noSolution(partialAssignment);
+        }
+
         // Make a temporary, modifiable version of the partial assignment
         List<Domain> domains = new ArrayList<>(partialAssignment);
 
