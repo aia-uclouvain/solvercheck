@@ -117,14 +117,18 @@ public interface PartialAssignment
      * This method returns a Partial Assignment whose domains are built from
      * the values appearing in all the tuples.
      *
+     * @param arity  the arity of the resulting partial assignment
+     *               (mostly useful when tuples is empty).
      * @param tuples the tuples that need to be collapsed and union-ed in order
      *               to create a partial assignment reflecting the
      *               possibilities occurring in the given tuples.
      * @return a partial assignment creating domains from the values appearing
      * in the columns of all tuples
      */
-    static PartialAssignment unionOf(Collection<? extends List<Integer>> tuples) {
-        return PartialAssignmentFactory.unionOf(tuples);
+    static PartialAssignment unionOf(
+            final int arity,
+            final Collection<? extends List<Integer>> tuples) {
+        return PartialAssignmentFactory.unionOf(arity, tuples);
     }
 
     /**

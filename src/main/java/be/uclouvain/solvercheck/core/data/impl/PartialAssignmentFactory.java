@@ -65,6 +65,7 @@ public final class PartialAssignmentFactory {
      * This method returns a Partial Assignment whose domains are built from
      * the values appearing in all the tuples.
      *
+     * @param arity the expected arity of the resulting partial assignment.
      * @param tuples the tuples that need to be collapsed and union-ed in order
      *               to create a partial assignment reflecting the
      *               possibilities occurring in the given tuples.
@@ -72,23 +73,26 @@ public final class PartialAssignmentFactory {
      * in the columns of all tuples
      */
     public static PartialAssignment unionOf(
+            final int arity,
             final Collection<? extends List<Integer>> tuples) {
 
         if (tuples.isEmpty()) {
-            return from(List.of());
+            ArrayList<Domain> resulting = new ArrayList<>();
+            for (int i = 0; i < arity; i++) {
+                resulting.add(Domain.emptyDomain());
+            }
+            return from(resulting);
         }
-
-        int nbVars = tuples.stream().findAny().get().size();
 
         // initialize the container
         List<Set<Integer>> domains = new ArrayList<>();
-        for (int i = 0; i < nbVars; i++) {
+        for (int i = 0; i < arity; i++) {
             domains.add(new HashSet<>());
         }
 
         // actually compute the unions
         for (List<Integer> tuple : tuples) {
-            if (tuple.size() != nbVars) {
+            if (tuple.size() != arity) {
                 throw new IllegalArgumentException(
                     "Not all assignments have the same number of variables");
             }

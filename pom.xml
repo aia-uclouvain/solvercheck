@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>be.uclouvain</groupId>
@@ -37,23 +38,31 @@
     </build>
 
     <dependencies>
-        <!-- QuickTheories the PBT library for java                                               -->
-        <!-- Note: it is not test scoped because it is at the heart from what SolverCheck should do -->
+        <!--
+            QuickTheories the PBT library for java.
+
+            Note:
+            It is not test scoped because it is at the heart from what
+            SolverCheck should do
+        -->
         <dependency>
             <groupId>org.quicktheories</groupId>
             <artifactId>quicktheories</artifactId>
             <version>0.25</version>
         </dependency>
 
-        <!-- AssertJ provides an assertion DSL to evaluate your solver. Hence, it is not test    -->
-        <!-- scoped either.                                                                      -->
+        <!--
+            AssertJ provides an assertion DSL to evaluate your solver. Hence,
+            it is not test
+            scoped either.
+        -->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>3.11.1</version>
         </dependency>
 
-        <!-- ####### TEST DEPENDENCIES ########################################################## -->
+        <!-- ####### TEST DEPENDENCIES ##################################### -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

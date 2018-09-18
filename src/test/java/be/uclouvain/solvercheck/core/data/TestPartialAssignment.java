@@ -190,13 +190,14 @@ public class TestPartialAssignment implements WithQuickTheories {
     public void whenAllDomainsAreFixedAPartialAssignmentCanBeSeenAsTheCorrespondingAssignment() {
         qt().forAll(lists().of(integers().all()).ofSizeBetween(0, 20))
             .check( lst ->
-                    PartialAssignment.unionOf(List.of(lst))
+                    PartialAssignment.unionOf(lst.size(), List.of(lst))
                         .asAssignment()
                         .equals(Assignment.from(lst))
                 &&
                 // check it in both directions
                 Assignment.from(lst)
-                        .equals(PartialAssignment.unionOf(List.of(lst)).asAssignment())
+                        .equals(PartialAssignment.unionOf(lst.size(),
+                                List.of(lst)).asAssignment())
             );
     }
 

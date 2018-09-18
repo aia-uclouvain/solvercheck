@@ -116,6 +116,7 @@ public class TestCheckers implements WithQuickTheories {
         Filter gccAc  = new ArcConsitency(    gccVar(List.of(1, 3)));
         PartialAssignment actualAC = gccAc .filter(initial);
         PartialAssignment expected = PartialAssignment.unionOf(
+                5,
                 List.of(
                     List.of(1, 1, 1, 3, 0),
                     List.of(3, 3, 3, 0, 3),

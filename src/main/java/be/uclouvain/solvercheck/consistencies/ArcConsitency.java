@@ -46,6 +46,7 @@ public final class ArcConsitency implements Filter {
     @Override
     public PartialAssignment filter(final PartialAssignment partial) {
         return PartialAssignment.unionOf(
+                partial.size(),
                 CartesianProduct.of(partial).stream()
                      .map(Assignment::from)
                      .filter(checker)

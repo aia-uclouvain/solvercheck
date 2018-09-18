@@ -13,7 +13,9 @@ public class TestPartialAssignmentFactory implements WithQuickTheories {
         qt().forAll(partialAssignments().build())
             .assuming(x -> x.stream().noneMatch(Domain::isEmpty))
             .check   (x ->
-                x.equals(PartialAssignment.unionOf(CartesianProduct.of(x)))
+                x.equals(PartialAssignment.unionOf(
+                        x.size(),
+                        CartesianProduct.of(x)))
             );
     }
 
