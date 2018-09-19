@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.RandomAccess;
 
 /**
@@ -255,6 +256,10 @@ public final class CartesianProduct<T>
         /** {@inheritDoc} */
         @Override
         public List<T> next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
             return get(cursor++);
         }
     }

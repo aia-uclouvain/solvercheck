@@ -11,16 +11,16 @@ import java.util.NoSuchElementException;
 import java.util.RandomAccess;
 import java.util.stream.Collectors;
 
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARABLE;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
 
 /**
  * This class merely wraps an existing set to interpret it as a Domain.
  * {@see Domain}
  */
-final class BasicDomain extends AbstractDomain implements Domain, RandomAccess {
+final class BasicDomain extends AbstractDomain implements RandomAccess {
     /** The wrapped collection. */
     private final List<Integer> values;
 
@@ -147,6 +147,10 @@ final class BasicDomain extends AbstractDomain implements Domain, RandomAccess {
         /** {@inheritDoc} */
         @Override
         public Integer next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
             return values.get(--currentPos);
         }
     }

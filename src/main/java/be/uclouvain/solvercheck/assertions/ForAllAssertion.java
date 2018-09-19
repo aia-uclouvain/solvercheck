@@ -224,6 +224,7 @@ public final class ForAllAssertion {
         public Forall1(final TestConfiguration config, final Gen<A> genA) {
             this.config = config;
             this.genA = genA;
+            this.assumptions = a -> true;
         }
 
         /**

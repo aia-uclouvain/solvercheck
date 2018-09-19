@@ -1,6 +1,7 @@
 package be.uclouvain.solvercheck.utils.collections;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * This class implements an iterator for the the 'zip' functional programming
@@ -45,6 +46,10 @@ public final class ZipIterator<A, B> implements Iterator<ZipEntry<A, B>> {
     /** {@inheritDoc} */
     @Override
     public ZipEntry<A, B> next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+
         A nextA = getNextOrDefaultNull(first);
         B nextB = getNextOrDefaultNull(second);
 

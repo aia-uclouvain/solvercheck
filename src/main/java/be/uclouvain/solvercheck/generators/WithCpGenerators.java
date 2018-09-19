@@ -1,12 +1,7 @@
 package be.uclouvain.solvercheck.generators;
 
-import be.uclouvain.solvercheck.core.data.Assignment;
-import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
-import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import org.quicktheories.core.Gen;
-
-import java.util.List;
 
 /**
  * This interface collects all the useful methods that let you plug

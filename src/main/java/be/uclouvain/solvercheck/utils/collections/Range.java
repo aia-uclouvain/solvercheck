@@ -2,6 +2,7 @@ package be.uclouvain.solvercheck.utils.collections;
 
 import java.util.AbstractSet;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * An inclusive range of value: [lower; upper].
@@ -142,6 +143,10 @@ public final class Range extends AbstractSet<Integer> {
         /** {@inheritDoc} */
         @Override
         public Integer next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
             int result = current;
             current += step;
             return result;
