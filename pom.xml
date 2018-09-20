@@ -19,6 +19,8 @@
         <checkstyle.version>3.0.0</checkstyle.version>
         <jacoco.version>0.8.2</jacoco.version>
 
+        <pitest.version>1.4.2</pitest.version>
+
         <spotbugs.version>3.1.6</spotbugs.version>
         <spotbugs.effort>Max</spotbugs.effort>
         <spotbugs.threshold>Low</spotbugs.threshold>
@@ -29,12 +31,50 @@
             <!--
                 Generate a project site with many useful reports with the
                 `mvn site` command.
+
+                In order to get a complete site comprising all the useful
+                information, one should use the following command:
+                ```
+                mvn clean compile test org.pitest:pitest-maven:mutationCoverage
+                site
+                ```
             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>${site.version}</version>
             </plugin>
+
+
+            <!--
+                PIT :: Mutation testing to assess the quality of my test base
+
+                Run mutation tests with:
+                ```
+                mvn org.pitest:pitest-maven:mutationCoverage
+                ```
+            -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest.version}</version>
+                <configuration>
+                    <targetClasses>
+                        <targetClass>
+                            be.uclouvain.solvercheck.consistencies.*
+                        </targetClass>
+                        <targetClass>
+                            be.uclouvain.solvercheck.checkers.*
+                        </targetClass>
+                    </targetClasses>
+                    <targetTests>
+                        <targetTest>
+                            be.uclouvain.solvercheck.Brol
+                        </targetTest>
+                    </targetTests>
+                </configuration>
+            </plugin>
+
 
             <!--
                 Installs JaCoCo agent to collect coverage data.
@@ -100,6 +140,24 @@
                     <effort>${spotbugs.effort}</effort>
                     <threshold>${spotbugs.threshold}</threshold>
                 </configuration>
+            </plugin>
+
+            <!--
+                Tells to generate the mutation tests reports:
+
+                mvn clean org.pitest:pitest-maven:mutationCoverage site
+            -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
 
             <!--

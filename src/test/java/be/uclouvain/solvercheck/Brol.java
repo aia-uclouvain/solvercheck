@@ -30,7 +30,7 @@ public class Brol implements WithSolverCheck {
     public void brol() {
         assertThat(
             new DiveAssertion(new StatefulFilterAdapter(boundZConsistent(allDiff())))
-                .isEquivalentTo(new StatefulFilterAdapter(arcConsistent(allDiff())))
+                .isWeakerThan(new StatefulFilterAdapter(arcConsistent(allDiff())))
                 .forAll(partialAssignments().withValuesRanging(0, 3))
                 .assuming(pa -> !pa.isEmpty())
                 //.assuming(pa -> !pa.isError())
