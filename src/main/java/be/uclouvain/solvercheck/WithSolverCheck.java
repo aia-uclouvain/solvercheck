@@ -5,6 +5,7 @@ import be.uclouvain.solvercheck.checkers.WithCheckers;
 import be.uclouvain.solvercheck.consistencies.WithConsistencies;
 import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import be.uclouvain.solvercheck.generators.WithJavaGenerators;
+import be.uclouvain.solvercheck.stateful.WithStateful;
 
 /**
  * This interface collects all the useful methods that have been defined in
@@ -23,5 +24,6 @@ public interface WithSolverCheck
         WithAssertions,
         WithCpGenerators, WithJavaGenerators,
         WithCheckers,
-        WithConsistencies {
+        WithConsistencies,
+        WithStateful {
 }

@@ -1,6 +1,8 @@
 package be.uclouvain.solvercheck.assertions;
 
+import be.uclouvain.solvercheck.assertions.stateful.DiveAssertion;
 import be.uclouvain.solvercheck.core.task.Filter;
+import be.uclouvain.solvercheck.core.task.StatefulFilter;
 import org.quicktheories.core.Gen;
 
 /**
@@ -68,6 +70,48 @@ public interface WithAssertions {
      */
     default FilterAssertion a(final Filter actual) {
         return propagator(actual);
+    }
+
+    /**
+     * Returns a DiveAssertion (builder) that uses the current configuration
+     * to assess the correctness of the property.
+     *
+     * @param actual the actual StatefulFilter (propagator) whose property is
+     *               to be verified.
+     * @return DiveAssertion (builder) that uses the current configuration.
+     */
+    default DiveAssertion statefulPropagator(final StatefulFilter actual) {
+        return given().statefulPropagator(actual);
+    }
+    /**
+     * This method is an alias for {@see statefulPropagator}. It yields a
+     * DiveAssertion for the given SatefulFilter.
+     *
+     * @param actual the actual filter (stateful propagator) about which a
+     *               property is being expressed.
+     * @return a builder to express the assertion about some Filter
+     *
+     * FIXME: I'm not sure that I like this method. It makes the DSL flow
+     * naturally but, on the other hand, the method is poorly named to be
+     * used on its own.
+     */
+    default DiveAssertion a(final StatefulFilter actual) {
+        return statefulPropagator(actual);
+    }
+    /**
+     * This method is an alias for {@see statefulPropagator}. It yields a
+     * DiveAssertion for the given SatefulFilter.
+     *
+     * @param actual the actual filter (stateful propagator) about which a
+     *               property is being expressed.
+     * @return a builder to express the assertion about some Filter
+     *
+     * FIXME: I'm not sure that I like this method. It makes the DSL flow
+     * naturally but, on the other hand, the method is poorly named to be
+     * used on its own.
+     */
+    default DiveAssertion an(final StatefulFilter actual) {
+        return statefulPropagator(actual);
     }
 
     /**

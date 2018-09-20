@@ -1,4 +1,4 @@
-package be.uclouvain.solvercheck.core.task.impl;
+package be.uclouvain.solvercheck.stateful;
 
 import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
@@ -26,7 +26,7 @@ public final class StatefulFilterAdapter implements StatefulFilter {
     /**
      * Creates a new stateful filter adapting of some existing filter.
      *
-     * @param filter the filter being adapter to a stateful filter.
+     * @param filter the filter being adapted to a stateful filter.
      */
     public StatefulFilterAdapter(final Filter filter) {
         this.filter = filter;

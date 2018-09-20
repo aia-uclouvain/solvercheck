@@ -1,6 +1,8 @@
 package be.uclouvain.solvercheck.assertions;
 
+import be.uclouvain.solvercheck.assertions.stateful.DiveAssertion;
 import be.uclouvain.solvercheck.core.task.Filter;
+import be.uclouvain.solvercheck.core.task.StatefulFilter;
 import org.quicktheories.core.ExceptionReporter;
 import org.quicktheories.core.Gen;
 import org.quicktheories.core.Guidance;
@@ -32,6 +34,11 @@ public final class TestConfiguration implements Supplier<Strategy> {
      * a test case that was shown to falsify the tested property.
      */
     private static final int DEFAULT_NB_SHRINK_CYLES = 1000000;
+    /**
+     * The number of 'dives' (branches that are explored until a leaf is
+     * reached) explored by default when testing a stateful property.
+     */
+    private static final int DEFAULT_NB_DIVES = 1000;
 
 
     /** The random seed used to initialize the randomness source. */
@@ -51,6 +58,11 @@ public final class TestConfiguration implements Supplier<Strategy> {
      * falsifying a checked property.
      */
     private int nbShrinkCycles = DEFAULT_NB_SHRINK_CYLES;
+    /**
+     * The number of 'dives' (branches that are explored until a leaf is
+     * reached) explored when performing the stateful check of some property.
+     */
+    private int nbDives = DEFAULT_NB_DIVES;
 
     /**
      * Configures the dependent tests to use the given random seed to
@@ -107,6 +119,26 @@ public final class TestConfiguration implements Supplier<Strategy> {
     }
 
     /**
+     * Configures the dependent stateful tests to execute `n` dives when
+     * trying to invalidate some property.
+     *
+     * @param n the number of branches to explore until a leaf is reached.
+     * @return this
+     */
+    public TestConfiguration dives(final int n) {
+        this.nbDives = n;
+        return this;
+    }
+    /**
+     * Return the current value of the number of dives that was configured.
+     *
+     * @return the configured number of dives.
+     */
+    public int getNbDives() {
+        return this.nbDives;
+    }
+
+    /**
      * Returns a FilterAssertion (builder) that uses the current configuration
      * to assess the correctness of the property.
      *
@@ -148,6 +180,48 @@ public final class TestConfiguration implements Supplier<Strategy> {
      */
     public FilterAssertion a(final Filter actual) {
         return propagator(actual);
+    }
+
+    /**
+     * Returns a DiveAssertion (builder) that uses the current configuration
+     * to assess the correctness of the property.
+     *
+     * @param actual the actual StatefulFilter (propagator) whose property is
+     *               to be verified.
+     * @return DiveAssertion (builder) that uses the current configuration.
+     */
+    public DiveAssertion statefulPropagator(final StatefulFilter actual) {
+        return new DiveAssertion(this, actual);
+    }
+    /**
+     * This method is an alias for {@see statefulPropagator}. It yields a
+     * DiveAssertion for the given SatefulFilter.
+     *
+     * @param actual the actual filter (stateful propagator) about which a
+     *               property is being expressed.
+     * @return a builder to express the assertion about some Filter
+     *
+     * FIXME: I'm not sure that I like this method. It makes the DSL flow
+     * naturally but, on the other hand, the method is poorly named to be
+     * used on its own.
+     */
+    public DiveAssertion a(final StatefulFilter actual) {
+        return statefulPropagator(actual);
+    }
+    /**
+     * This method is an alias for {@see statefulPropagator}. It yields a
+     * DiveAssertion for the given SatefulFilter.
+     *
+     * @param actual the actual filter (stateful propagator) about which a
+     *               property is being expressed.
+     * @return a builder to express the assertion about some Filter
+     *
+     * FIXME: I'm not sure that I like this method. It makes the DSL flow
+     * naturally but, on the other hand, the method is poorly named to be
+     * used on its own.
+     */
+    public DiveAssertion an(final StatefulFilter actual) {
+        return statefulPropagator(actual);
     }
 
     /**

@@ -1,39 +1,55 @@
 package be.uclouvain.solvercheck;
 
-import be.uclouvain.solvercheck.assertions.stateful.DiveAssertion;
-import be.uclouvain.solvercheck.core.task.impl.StatefulFilterAdapter;
+import be.uclouvain.solvercheck.stateful.StatefulFilterAdapter;
 import org.junit.Test;
 
 public class Brol implements WithSolverCheck {
 
+    /*
     @Test
-    public void testDescribed() {
-        /*
+    public void testTables() {
         assertThat(
             forAll(tables()).itIsTrueThat(t ->
-                an(arcConsistent(allDiff())).isStrongerThan(boundZConsistent(table(t)))
-        ));
-        */
-/*
+                    an(arcConsistent(allDiff())).isStrongerThan(boundZConsistent(table(t)))
+            )
+        );
+    }
+    */
+
+    @Test
+    public void arcConsistentIsStrongerThanBoundZ() {
         assertThat(
-            an(arcConsistent(allDiff())).isWeakerThan(boundZConsistent(allDiff()))
+            an(arcConsistent(allDiff())).isStrongerThan(boundZConsistent(allDiff()))
             .forAll(partialAssignments()
                     .withUpToVariables(4)
                     .withValuesRanging(-10, 10))
 
         );
-*/
     }
 
 
     @Test
-    public void brol() {
+    public void statefulBoundZisWeakerThanArc() {
         assertThat(
-            new DiveAssertion(new StatefulFilterAdapter(boundZConsistent(allDiff())))
-                .isWeakerThan(new StatefulFilterAdapter(arcConsistent(allDiff())))
+            a(stateful(boundZConsistent(allDiff())))
+                .isWeakerThan(stateful(arcConsistent(allDiff())))
                 .forAll(partialAssignments().withValuesRanging(0, 3))
-                .assuming(pa -> !pa.isEmpty())
-                //.assuming(pa -> !pa.isError())
+        );
+    }
+    @Test
+    public void statefulBoundDisWeakerThanArc() {
+        assertThat(
+                a(stateful(boundDConsistent(allDiff())))
+                        .isWeakerThan(stateful(arcConsistent(allDiff())))
+                        .forAll(partialAssignments().withValuesRanging(0, 3))
+        );
+    }
+    @Test
+    public void statefulArcIStrongerThanRange() {
+        assertThat(
+                a(stateful(arcConsistent(allDiff())))
+                        .isStrongerThan(stateful(rangeConsistent(allDiff())))
+                        .forAll(partialAssignments().withValuesRanging(0, 3))
         );
     }
 

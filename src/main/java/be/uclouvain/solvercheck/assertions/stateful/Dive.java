@@ -11,6 +11,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Dive {
+    /** The number of branches to explore until a leaf is reached */
+    private final int nbDives;
+
     /** The actual StatefulFilter being tested. */
     private final StatefulFilter actual;
 
@@ -35,6 +38,7 @@ public class Dive {
 
 
     public Dive(
+            final int nbDives,
             final StatefulFilter actual,
             final StatefulFilter other,
             final Supplier<Boolean> check,
@@ -44,6 +48,7 @@ public class Dive {
             final Supplier<Boolean>  backtracks,
             final PartialAssignment  root) {
 
+        this.nbDives    = nbDives;
         this.actual     = actual;
         this.other      = other;
         this.check      = check;
@@ -60,7 +65,7 @@ public class Dive {
         actual.setup(root);
         other .setup(root);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < nbDives; i++) {
             exploreOneBranch();
             doBacktrack();
         }
