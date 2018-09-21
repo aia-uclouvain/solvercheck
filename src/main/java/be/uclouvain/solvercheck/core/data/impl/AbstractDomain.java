@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -34,6 +35,14 @@ import java.util.stream.StreamSupport;
     @Override
     public Stream<Integer> decreasingStream() {
         return StreamSupport.stream(from(this::decreasing), true);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return String.format("{%s}",
+                stream().map(Object::toString)
+                        .collect(Collectors.joining(",")));
     }
 
     /**

@@ -50,4 +50,20 @@ import java.util.RandomAccess;
     public boolean equals(final Object other) {
         return other instanceof Assignment && super.equals(other);
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < size(); i++) {
+            sb.append("x").append(i).append("=").append(get(i));
+
+            if (i < size() - 1) {
+                sb.append(", ");
+            }
+        }
+
+        return sb.toString();
+    }
 }

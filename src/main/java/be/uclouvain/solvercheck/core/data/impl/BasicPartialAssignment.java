@@ -95,6 +95,22 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARA
         return other instanceof PartialAssignment && super.equals(other);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < size(); i++) {
+            sb.append("x").append(i).append("=").append(get(i));
+
+            if (i < size() - 1) {
+                sb.append(", ");
+            }
+        }
+
+        return sb.toString();
+    }
+
     /**
      * @param that an other partial assignment
      * @return true iff this and that have domains which are incomparable
