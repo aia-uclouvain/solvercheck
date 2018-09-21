@@ -20,7 +20,8 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARA
  * This class merely decorates an existing list type to interpret it as a
  * partial assignment {@see PartialAssignment}.
  */
-final class BasicPartialAssignment extends AbstractList<Domain>
+/* package */ final class BasicPartialAssignment
+        extends AbstractList<Domain>
         implements PartialAssignment, RandomAccess {
 
     /** The wrapped collection. */
@@ -33,7 +34,7 @@ final class BasicPartialAssignment extends AbstractList<Domain>
      *                partial assignment. (ith item in the list corresponds to
      *                the domain of variable x_i)
      */
-    BasicPartialAssignment(final List<Domain> domains) {
+    /* package */ BasicPartialAssignment(final List<Domain> domains) {
         this.domains = List.copyOf(domains);
     }
 

@@ -15,7 +15,7 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARA
  * This class implements the particular case from a domain having one single
  * value.
  */
-final class FixedDomain extends AbstractDomain {
+/* package */ final class FixedDomain extends AbstractDomain {
     /** The single value held by the domain. */
     private final Integer value;
 
@@ -24,7 +24,7 @@ final class FixedDomain extends AbstractDomain {
      *
      * @param value the single value wrapped in the new domain
      */
-    FixedDomain(final int value) {
+    /* package */ FixedDomain(final int value) {
         this.value = value;
     }
 

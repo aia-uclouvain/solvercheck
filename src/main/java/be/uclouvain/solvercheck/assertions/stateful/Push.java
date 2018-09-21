@@ -6,7 +6,7 @@ package be.uclouvain.solvercheck.assertions.stateful;
  *
  * Technical note: This class is implemented as a singleton.
  */
-final class Push implements DiveOperation {
+/* package */ final class Push implements DiveOperation {
     /** The only instance of the class. */
     private static final Push INSTANCE = new Push();
 

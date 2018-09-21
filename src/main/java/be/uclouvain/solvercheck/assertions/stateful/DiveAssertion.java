@@ -4,20 +4,15 @@ import be.uclouvain.solvercheck.assertions.Assertion;
 import be.uclouvain.solvercheck.assertions.TestConfiguration;
 import be.uclouvain.solvercheck.checkers.Checkers;
 import be.uclouvain.solvercheck.consistencies.ArcConsitency;
-import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
-import be.uclouvain.solvercheck.stateful.StatefulFilterAdapter;
 import be.uclouvain.solvercheck.generators.Generators;
+import be.uclouvain.solvercheck.stateful.StatefulFilterAdapter;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 import org.quicktheories.core.Gen;
 import org.quicktheories.core.Strategy;
-import org.quicktheories.generators.SourceDSL;
-import org.quicktheories.impl.Distribution;
-import org.quicktheories.impl.Distributions;
 
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -40,8 +35,8 @@ public final class DiveAssertion implements Assertion {
     private final StatefulFilter actual;
 
     /**
-     * The condition effectively being checked when testing some partial
-     * assignment.
+     * The condition effectively being checked at each node of the dive
+     * search tree.
      */
     private Supplier<Boolean> check;
 
@@ -287,113 +282,7 @@ public final class DiveAssertion implements Assertion {
      * @return a new Dive rooted at the given `root`.
      */
     private Dive dive(final Strategy strategy, final PartialAssignment root) {
-        return new Dive(
-                config.getNbDives(),
-                actual,
-                other,
-                check,
-                variablesSupplier(strategy, root),
-                valuesSupplier(strategy, root),
-                operatorSupplier(strategy),
-                backtrackSupplier(strategy),
-                root
-        );
-    }
-
-    /**
-     * Instanciates a supplier to pick variable identifiers from a boundary
-     * skewed distribution.
-     *
-     * @param strategy the configuration of the underlying QuickTheories
-     *                 layer. It is used to configure the data distributions
-     *                 from which values are chosen.
-     * @param forDomains the value of the variables domains at the root of the
-     *                  search tree explored by the dive.
-     * @return a supplier to pick variable identifiers from a boundary skewed
-     * distribution.
-     */
-    private Supplier<Integer> variablesSupplier(
-            final Strategy strategy,
-            final PartialAssignment forDomains) {
-
-        final Distribution<Integer> distrib =
-                Distributions.boundarySkewed(
-                        strategy,
-                        SourceDSL.integers().between(0, forDomains.size() - 1));
-
-        return () -> Distributions.nextValue(distrib);
-    }
-    /**
-     * Instanciates a function to pick variable value from a
-     * random distribution, given the identifier of some variable.
-     *
-     * @param strategy the configuration of the underlying QuickTheories
-     *                 layer. It is used to configure the data distributions
-     *                 from which values are chosen.
-     * @param forDomains the value of the variables domains at the root of the
-     *                  search tree explored by the dive.
-     * @return a supplier to pick variable identifiers from a random
-     * distribution.
-     */
-    private Function<Integer, Integer> valuesSupplier(
-            final Strategy strategy,
-            final PartialAssignment forDomains) {
-
-        return xi -> Distributions.nextValue(
-                        valuesDistrib(strategy, forDomains, xi));
-    }
-
-    /**
-     * Creates the value distribution relative to some identified vaiable `xi`.
-     *
-     * @param strategy the configuration of the underlying QuickTheories
-     *                 layer. It is used to configure the data distributions
-     *                 from which values are chosen.
-     * @param inDomains the value of the variables domains at the root of the
-     *                  search tree explored by the dive.
-     * @param xi the identifier of the variable for wchich to create a value
-     *           distribution.
-     * @return a function that maps a variable identifier with a random
-     * distribution of the values in the domain of that variable.
-     */
-    private Distribution<Integer> valuesDistrib(
-            final Strategy strategy,
-            final PartialAssignment inDomains,
-            final int xi) {
-
-        Domain dxi = inDomains.get(xi);
-        return Distributions.random(
-                strategy,
-                SourceDSL.integers().between(dxi.minimum(), dxi.maximum()));
-    }
-    /**
-     * Instanciates a supplier to pick an operator from a random distribution.
-     *
-     * @param strategy the configuration of the underlying QuickTheories
-     *                 layer. It is used to configure the data distributions
-     *                 from which values are chosen.
-     * @return a supplier to pick an operator from a random distribution.
-     */
-    private Supplier<Operator> operatorSupplier(final Strategy strategy) {
-        final Distribution<Operator> distrib =
-                Distributions.random(strategy, Generators.operators());
-
-        return () -> Distributions.nextValue(distrib);
-    }
-    /**
-     * Instanciates a supplier that generates random booleans. These booleans
-     * are used to determine the level up to which some dive should backtrack.
-     *
-     * @param strategy the configuration of the underlying QuickTheories
-     *                 layer. It is used to configure the data distributions
-     *                 from which values are chosen.
-     * @return a supplier to pick a random boolean.
-     */
-    private Supplier<Boolean> backtrackSupplier(final Strategy strategy) {
-        final Distribution<Boolean> distrib =
-                Distributions.random(strategy, SourceDSL.booleans().all());
-
-        return () -> Distributions.nextValue(distrib);
+        return new Dive(this, strategy, root);
     }
 
     /**
@@ -404,5 +293,100 @@ public final class DiveAssertion implements Assertion {
         return new StatefulFilterAdapter(
                 new ArcConsitency(
                         Checkers.alwaysTrue()));
+    }
+
+    /**
+     * The number of branches to explore until a leaf is reached.
+     *
+     * @return the configured nbDives. That is to say the number of distinct
+     * branched explored by a dive search.
+     */
+    /* package */ int getNbDives() {
+        return config.getNbDives();
+    }
+
+    /**
+     * Initialises the state of both `actual` and `other` telling them the
+     * initial value of the variables domains.
+     *
+     * {@see StatefulFilter::setup}.
+     *
+     * @param root the initial value of the variables domains.
+     */
+    /* package */ void setup(final PartialAssignment root) {
+        actual.setup(root);
+        other .setup(root);
+    }
+
+    /**
+     * Pushes the state of both `actual` and other.
+     * {@see StatefulFilter::pushState}.
+     */
+    /* package */ void pushState() {
+        actual.pushState();
+        other .pushState();
+    }
+
+    /**
+     * Pops the state of both `actual` and other.
+     * {@see StatefulFilter::popState}.
+     */
+    /* package */ void popState() {
+        actual.popState();
+        other .popState();
+    }
+
+    /**
+     * Tells both `actual` and other to branch on the following restriction:
+     * [[ variable op value ]].
+     *
+     * {@see StatefulFilter::branchOn}.
+     *
+     * @param variable the variable on which a branching decision is made.
+     * @param op the constraint imposed on the value that can be taken by
+     *           `variable`.
+     * @param value in conjunction with `op` determines the constraint
+     *              imposed on the values that can be taken by `variable`.
+     */
+    /* package */ void branchOn(
+            final int variable,
+            final Operator op,
+            final int value) {
+
+        actual.branchOn(variable, op, value);
+        other .branchOn(variable, op, value);
+    }
+
+    /**
+     * @return iff the current state of `actual` or that of `other` is a leaf
+     * of the search tree.
+     */
+    /* package */ boolean isCurrentStateLeaf() {
+        return actual.currentState().isLeaf()
+            || other .currentState().isLeaf();
+    }
+
+    /**
+     * Evaluates the local assertion described by `this` and retruns its
+     * truth value.
+     *
+     * @return true iff the assertion is verified in the current node.
+     */
+    /* package */ boolean checkTest() {
+        return check.get();
+    }
+
+    /**
+     * @return the current state of the `actual` filter.
+     */
+    /* package */ PartialAssignment actualState() {
+        return actual.currentState();
+    }
+
+    /**
+     * @return the current state of the `other` filter.
+     */
+    /* package */ PartialAssignment otherState() {
+        return other.currentState();
     }
 }

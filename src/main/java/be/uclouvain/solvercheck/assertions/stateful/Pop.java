@@ -6,7 +6,7 @@ package be.uclouvain.solvercheck.assertions.stateful;
  *
  * Technical note: This class is implemented as a singleton.
  */
-final class Pop implements DiveOperation {
+/* package */ final class Pop implements DiveOperation {
     /** The only instance of the class. */
     private static final Pop INSTANCE = new Pop();
 

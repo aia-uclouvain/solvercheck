@@ -6,7 +6,7 @@ import be.uclouvain.solvercheck.core.data.Operator;
  * This class is meant to materialize a branching operation in the context of
  * a dive search.
  */
-final class Branching implements DiveOperation {
+/* package */ final class Branching implements DiveOperation {
     /** This is the variable affected by the branching decision. */
     private final int variable;
     /** This is the operator constraining the domain of the variable. */
@@ -25,7 +25,7 @@ final class Branching implements DiveOperation {
      * @param value the value which, in combination with `operator` defines
      *              the restriction on the domain of `variable`.
      */
-    Branching(final int variable,
+    /* package */ Branching(final int variable,
               final Operator operator,
               final int value) {
         this.variable = variable;

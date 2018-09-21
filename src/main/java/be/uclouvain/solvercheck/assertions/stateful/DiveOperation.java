@@ -7,4 +7,4 @@ package be.uclouvain.solvercheck.assertions.stateful;
  * - Pop
  * - Branching
  */
-interface DiveOperation { }
+/* package */ interface DiveOperation { }
