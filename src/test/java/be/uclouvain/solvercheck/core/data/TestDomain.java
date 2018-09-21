@@ -79,8 +79,9 @@ public class TestDomain implements WithQuickTheories {
 
     @Test
     public void subDomainsAreIncomparableWhenNoneContainsTheOther() {
-        qt().forAll(domains(5, 10)).check(domain -> {
-            if( domain.size() < 2 ) return true;
+        qt().forAll(domains())
+                .assuming(d -> d.size() > 2)
+                .check(domain -> {
 
             Iterator<Integer> it = domain.iterator();
             Domain a = Domain.restrict(domain, NE, it.next());
@@ -129,7 +130,8 @@ public class TestDomain implements WithQuickTheories {
 
     @Test
     public void minimumReturnsTheSmallestOfAllValuesInTheDomain(){
-        qt().forAll(domains(1, 20))
+        qt().forAll(domains(20))
+            .assuming(d -> d.size() >= 1)
             .check(x -> x.minimum().equals(Collections.min(x)));
     }
     @Test
@@ -138,7 +140,8 @@ public class TestDomain implements WithQuickTheories {
     }
     @Test
     public void maximimReturnsTheHighestOfAllValuesInTheDomain(){
-        qt().forAll(domains(1, 20))
+        qt().forAll(domains(20))
+                .assuming(d -> d.size() >= 1)
                 .check(x -> x.maximum().equals(Collections.max(x)));
     }
     @Test
@@ -147,9 +150,9 @@ public class TestDomain implements WithQuickTheories {
     }
 
     private Gen<Domain> domains() {
-        return domains(0, 10);
+        return domains(10);
     }
-    private Gen<Domain> domains(int from, int to) {
-        return Generators.domains().ofSizeBetween(from, to).build();
+    private Gen<Domain> domains(int to) {
+        return Generators.domains().ofSizeUpTo(to).build();
     }
 }

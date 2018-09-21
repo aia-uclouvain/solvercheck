@@ -47,10 +47,6 @@ public interface WithAssertions {
      * @param actual the actual filter (propagator) about which a property is
      *              being expressed.
      * @return a builder to express the assertion about some Filter
-     *
-     * FIXME: I'm not sure that I like this method. It makes the DSL flow
-     * naturally but, on the other hand, the method is poorly named to be
-     * used on its own.
      */
     default FilterAssertion an(final Filter actual) {
         return propagator(actual);
@@ -63,10 +59,6 @@ public interface WithAssertions {
      * @param actual the actual filter (propagator) about which a property is
      *              being expressed.
      * @return a builder to express the assertion about some Filter
-     *
-     * FIXME: I'm not sure that I like this method. It makes the DSL flow
-     * naturally but, on the other hand, the method is poorly named to be
-     * used on its own.
      */
     default FilterAssertion a(final Filter actual) {
         return propagator(actual);
@@ -90,10 +82,6 @@ public interface WithAssertions {
      * @param actual the actual filter (stateful propagator) about which a
      *               property is being expressed.
      * @return a builder to express the assertion about some Filter
-     *
-     * FIXME: I'm not sure that I like this method. It makes the DSL flow
-     * naturally but, on the other hand, the method is poorly named to be
-     * used on its own.
      */
     default DiveAssertion a(final StatefulFilter actual) {
         return statefulPropagator(actual);
@@ -105,10 +93,6 @@ public interface WithAssertions {
      * @param actual the actual filter (stateful propagator) about which a
      *               property is being expressed.
      * @return a builder to express the assertion about some Filter
-     *
-     * FIXME: I'm not sure that I like this method. It makes the DSL flow
-     * naturally but, on the other hand, the method is poorly named to be
-     * used on its own.
      */
     default DiveAssertion an(final StatefulFilter actual) {
         return statefulPropagator(actual);

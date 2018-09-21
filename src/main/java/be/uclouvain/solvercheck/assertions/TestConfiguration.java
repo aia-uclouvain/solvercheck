@@ -157,10 +157,6 @@ public final class TestConfiguration implements Supplier<Strategy> {
      * @param actual the actual filter (propagator) about which a property is
      *              being expressed.
      * @return a builder to express the assertion about some Filter
-     *
-     * FIXME: I'm not sure that I like this method. It makes the DSL flow
-     * naturally but, on the other hand, the method is poorly named to be
-     * used on its own.
      */
     public FilterAssertion an(final Filter actual) {
         return propagator(actual);
@@ -173,10 +169,6 @@ public final class TestConfiguration implements Supplier<Strategy> {
      * @param actual the actual filter (propagator) about which a property is
      *              being expressed.
      * @return a builder to express the assertion about some Filter
-     *
-     * FIXME: I'm not sure that I like this method. It makes the DSL flow
-     * naturally but, on the other hand, the method is poorly named to be
-     * used on its own.
      */
     public FilterAssertion a(final Filter actual) {
         return propagator(actual);
@@ -200,10 +192,6 @@ public final class TestConfiguration implements Supplier<Strategy> {
      * @param actual the actual filter (stateful propagator) about which a
      *               property is being expressed.
      * @return a builder to express the assertion about some Filter
-     *
-     * FIXME: I'm not sure that I like this method. It makes the DSL flow
-     * naturally but, on the other hand, the method is poorly named to be
-     * used on its own.
      */
     public DiveAssertion a(final StatefulFilter actual) {
         return statefulPropagator(actual);
@@ -215,10 +203,6 @@ public final class TestConfiguration implements Supplier<Strategy> {
      * @param actual the actual filter (stateful propagator) about which a
      *               property is being expressed.
      * @return a builder to express the assertion about some Filter
-     *
-     * FIXME: I'm not sure that I like this method. It makes the DSL flow
-     * naturally but, on the other hand, the method is poorly named to be
-     * used on its own.
      */
     public DiveAssertion an(final StatefulFilter actual) {
         return statefulPropagator(actual);

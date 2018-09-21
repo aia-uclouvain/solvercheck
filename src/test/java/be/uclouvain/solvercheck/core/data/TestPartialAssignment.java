@@ -215,15 +215,16 @@ public class TestPartialAssignment implements WithQuickTheories {
 
     private Gen<PartialAssignment> notFailedPartialAssignments() {
         return Generators.partialAssignments()
-                .withVariablesRanging(1, 10)
-                .withDomainsOfSizeBetween(1, 10)
+                .withVariablesBetween(1, 10)
+                .withDomainsOfSizeUpTo(10)
                 .withValuesRanging(-10, 10)
-                .build();
+                .build()
+                .assuming(pa -> !pa.isError());
     }
 
     private Gen<PartialAssignment> nonEmptyAssignments() {
         return Generators.partialAssignments()
-                .withVariablesRanging(1, 10)
+                .withVariablesBetween(1, 10)
                 .withDomainsOfSizeUpTo(10)
                 .withValuesRanging(-10, 10)
                 .build();
