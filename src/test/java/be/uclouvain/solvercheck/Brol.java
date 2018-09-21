@@ -43,6 +43,22 @@ public class Brol implements WithSolverCheck {
         );
     }
     @Test
+    public void statelessBoundZisWeakerThanBoundD() {
+        assertThat(
+                a(boundZConsistent(allDiff()))
+                        .isWeakerThan(boundDConsistent(allDiff()))
+                        .forAll(partialAssignments().withValuesRanging(0, 3))
+        );
+    }
+    @Test
+    public void statefulBoundZisWeakerThanBoundD() {
+        assertThat(
+                a(stateful(boundZConsistent(allDiff())))
+                        .isWeakerThan(stateful(boundDConsistent(allDiff())))
+                        .forAll(partialAssignments().withValuesRanging(0, 3))
+        );
+    }
+    @Test
     public void statefulBoundDisWeakerThanArc() {
         assertThat(
                 a(stateful(boundDConsistent(allDiff())))
