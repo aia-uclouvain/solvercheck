@@ -84,20 +84,6 @@ public final class FilterAssertion
     }
 
     /**
-     * Configure the assertion to check that `actual` and `other` have
-     * strictly incomparable propagating strengths.
-     *
-     * @param other the reference filter with which to compare the results.
-     * @return this
-     */
-    public FilterAssertion isIncomparableTo(final Filter other) {
-        this.other = other;
-        this.check = this::checkIncomparable;
-
-        return this;
-    }
-
-    /**
      * Configure the assertion to check that `actual` has propagation
      * strength which is weaker or equivalent to that of `other`.
      *
@@ -205,20 +191,6 @@ public final class FilterAssertion
         return comparison == PartialOrdering.EQUIVALENT;
     }
 
-    /**
-     * Checks that `actual` and `other` have incomparable propagating strengths
-     * for the given `domains` test case.
-     *
-     * @param domains the randomly generated test case which is to be fed to
-     *                the compared filters.
-     * @return true iff actual is incomparable to other
-     */
-    private boolean checkIncomparable(final PartialAssignment domains) {
-        final PartialOrdering comparison =
-                actual.filter(domains).compareWith(other.filter(domains));
-
-        return comparison == PartialOrdering.EQUIVALENT;
-    }
     /**
      * Checks that `actual` is weaker or equivalent to `other` for the given
      * `domains` test case.

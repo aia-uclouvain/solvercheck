@@ -16,7 +16,7 @@ public interface WithCpGenerators {
      * @return a configurable generator meant to produce random
      * `Assignment` instances
      */
-    default Generators.GenAssignmentBuilder assignements() {
+    default Generators.GenAssignmentBuilder assignments() {
         return Generators.assignments();
     }
 

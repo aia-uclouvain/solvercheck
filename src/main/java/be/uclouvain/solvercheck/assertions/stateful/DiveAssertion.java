@@ -88,20 +88,6 @@ public final class DiveAssertion implements Assertion {
     }
 
     /**
-     * Configure the assertion to check that `actual` and `other` have
-     * strictly incomparable propagating strengths.
-     *
-     * @param other the reference filter with which to compare the results.
-     * @return this
-     */
-    public DiveAssertion isIncomparableTo(final StatefulFilter other) {
-        this.other = other;
-        this.check = this::checkIncomparable;
-
-        return this;
-    }
-
-    /**
      * Configure the assertion to check that `actual` has propagation
      * strength which is weaker or equivalent to that of `other`.
      *
@@ -206,18 +192,6 @@ public final class DiveAssertion implements Assertion {
         return comparison == PartialOrdering.EQUIVALENT;
     }
 
-    /**
-     * Checks that `actual` and `other` have incomparable propagating strengths
-     * for the given `domains` test case.
-     *
-     * @return true iff actual is incomparable to other
-     */
-    private boolean checkIncomparable() {
-        final PartialOrdering comparison =
-                actual.currentState().compareWith(other.currentState());
-
-        return comparison == PartialOrdering.EQUIVALENT;
-    }
     /**
      * Checks that `actual` is weaker or equivalent to `other` for the given
      * `domains` test case.

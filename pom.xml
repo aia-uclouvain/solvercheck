@@ -61,17 +61,27 @@
                 <configuration>
                     <targetClasses>
                         <targetClass>
-                            be.uclouvain.solvercheck.consistencies.*
-                        </targetClass>
-                        <targetClass>
-                            be.uclouvain.solvercheck.checkers.*
+                            be.uclouvain.solvercheck.*
                         </targetClass>
                     </targetClasses>
                     <targetTests>
                         <targetTest>
-                            be.uclouvain.solvercheck.Brol
+                            be.uclouvain.solvercheck.*
                         </targetTest>
                     </targetTests>
+                    <excludedClasses>
+                        <excludedClass>
+                            be.uclouvain.solvercheck.generators.WithJavaGenerators
+                        </excludedClass>
+                    </excludedClasses>
+                    <excludedTestClasses>
+                        <excludedTestClass>
+                            be.uclouvain.solvercheck.core.data.TestDomain
+                        </excludedTestClass>
+                        <excludedTestClass>
+                            be.uclouvain.solvercheck.Brol
+                        </excludedTestClass>
+                    </excludedTestClasses>
                 </configuration>
             </plugin>
 
@@ -208,6 +218,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.22.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

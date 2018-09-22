@@ -134,17 +134,7 @@ public final class Generators {
     public static Gen<Operator> operators() {
         return integers()
                 .between(0, Operator.values().length - 1)
-                .map(Generators::operatorFrom);
-    }
-
-    /**
-     * Deterministically returns an operator, given some integer value `i`.
-     *
-     * @param i some random positive (or nul) integer value
-     * @return an operator associated with the number i
-     */
-    private static Operator operatorFrom(final int i) {
-        return Operator.values()[i % Operator.values().length];
+                .map(i -> Operator.values()[i]);
     }
 
     // --------- DOMAINS ------------------------------------------------------
