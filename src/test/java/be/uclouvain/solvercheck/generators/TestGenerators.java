@@ -13,14 +13,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 
 public class TestGenerators implements WithQuickTheories {
-    private static final int INTMAX   = 300;
+    private static final int INTMAX   = 100;
     private static final int EXAMPLES = 100;
 
     private QuickTheory q;
 
     @Before
     public void setUp() {
-        q = qt().withExamples(EXAMPLES);
+        q = qt().withExamples(EXAMPLES)
+                .withGenerateAttempts(10000);
     }
 
     // ----- LISTS ------------------------------------------------------------

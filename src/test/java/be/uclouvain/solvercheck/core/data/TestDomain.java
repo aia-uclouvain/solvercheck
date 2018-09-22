@@ -79,15 +79,15 @@ public class TestDomain implements WithQuickTheories {
 
     @Test
     public void subDomainsAreIncomparableWhenNoneContainsTheOther() {
-        qt().forAll(domains())
-                .assuming(d -> d.size() > 2)
-                .check(domain -> {
+        qt().withGenerateAttempts(10000)
+            .forAll(domains())
+            .assuming(d -> d.size() >= 2)
+            .check(domain -> {
+                Iterator<Integer> it = domain.iterator();
+                Domain a = Domain.restrict(domain, NE, it.next());
+                Domain b = Domain.restrict(domain, NE, it.next());
 
-            Iterator<Integer> it = domain.iterator();
-            Domain a = Domain.restrict(domain, NE, it.next());
-            Domain b = Domain.restrict(domain, NE, it.next());
-
-            return a.compareWith(b) == PartialOrdering.INCOMPARABLE;
+                return a.compareWith(b) == PartialOrdering.INCOMPARABLE;
         });
     }
 

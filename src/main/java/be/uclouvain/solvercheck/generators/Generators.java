@@ -226,7 +226,7 @@ public final class Generators {
         /** the lowest value that can be contained in the domain. */
         private int minValue = DEFAULT_VALUE_MIN;
         /** the highest value that can be contained in the domain. */
-        private int maxValue = DEFAULT_VALUE_MIN;
+        private int maxValue = DEFAULT_VALUE_MAX;
 
         /**
          * Sets the size range of the generated domains (from 0, to n).
@@ -265,7 +265,7 @@ public final class Generators {
         public Gen<Domain> build() {
             return lists().of(integers().between(minValue, maxValue))
                     .ofSizeBetween(0, nbValMax)
-                    .map(set -> Domain.from(set));
+                    .map(set -> Domain.from(new HashSet<>(set)));
         }
     }
 
