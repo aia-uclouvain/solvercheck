@@ -63,7 +63,8 @@ public class TestPartialAssignment implements WithQuickTheories {
 
     @Test
     public void restrictFailsWhenGivenAWrongVariable() {
-        qt().forAll(notFailedPartialAssignments(), integers().between(-1, 10), integers().between(-10, 10))
+        qt().withGenerateAttempts(10000)
+            .forAll(notFailedPartialAssignments(), integers().between(-1, 10), integers().between(-10, 10))
             .check((ass, var, val) ->
                     isValidVarIndex(var, ass)
                  || failsThrowing(IndexOutOfBoundsException.class,

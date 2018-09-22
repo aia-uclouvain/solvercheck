@@ -13,6 +13,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,6 +30,13 @@ public final class TestFilterAssertions implements WithSolverCheck {
                     Domain.from(0),
                     Domain.from(0)
             ));
+
+    @Test
+    public void byDefaultChecksEvaluatesTrue() {
+        Filter alpha = mockFilter(STRONG);
+        assertThat(an(alpha));
+        verify(alpha, never()).filter(any());
+    }
 
     @Test
     public void checkEquivalent() {

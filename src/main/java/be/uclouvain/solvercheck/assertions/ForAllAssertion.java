@@ -250,6 +250,7 @@ public final class ForAllAssertion {
             return () -> {
                 QuickTheory.qt(config)
                         .forAll(genA)
+                        .assuming(assumptions)
                         .checkAssert(a -> assertion.apply(a).check());
             };
         }
@@ -318,6 +319,7 @@ public final class ForAllAssertion {
             return () -> {
                 QuickTheory.qt(config)
                         .forAll(genA, genB)
+                        .assuming(assumptions)
                         .checkAssert(
                                 (a, b) -> assertion.apply(a, b).check()
                         );
@@ -394,6 +396,7 @@ public final class ForAllAssertion {
             return () -> {
                 QuickTheory.qt(config)
                         .forAll(genA, genB, genC)
+                        .assuming(assumptions)
                         .checkAssert(
                                 (a, b, c) -> assertion.apply(a, b, c).check()
                         );
@@ -477,6 +480,7 @@ public final class ForAllAssertion {
             return () -> {
                 QuickTheory.qt(config)
                         .forAll(genA, genB, genC, genD)
+                        .assuming(assumptions)
                         .checkAssert(
                                 (a, b, c, d) -> assertion.apply(a, b, c, d).check()
                         );
