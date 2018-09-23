@@ -1,16 +1,7 @@
 package be.uclouvain.solvercheck.checkers;
 
-import be.uclouvain.solvercheck.consistencies.ArcConsitency;
-import be.uclouvain.solvercheck.consistencies.BoundDConsistency;
-import be.uclouvain.solvercheck.consistencies.BoundZConsistency;
-import be.uclouvain.solvercheck.consistencies.HybridConsistency;
-import be.uclouvain.solvercheck.consistencies.RangeConsistency;
 import be.uclouvain.solvercheck.core.data.Assignment;
-import be.uclouvain.solvercheck.core.data.Domain;
-import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.generators.Generators;
-import be.uclouvain.solvercheck.utils.collections.Range;
 import org.junit.Assert;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
@@ -26,8 +17,6 @@ import static be.uclouvain.solvercheck.core.data.Operator.LT;
 import static be.uclouvain.solvercheck.core.data.Operator.NE;
 import static be.uclouvain.solvercheck.generators.Generators.tables;
 import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
 
 public class TestCheckers implements WithQuickTheories, WithCheckers {
 
