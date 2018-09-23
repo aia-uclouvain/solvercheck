@@ -266,8 +266,11 @@ public final class Checkers {
             final List<Integer> cardinalities,
             final List<Integer> values) {
 
-        // short circuit: assess infeasibility in O(1)
-        if (variables.size() < cardinalities.size()) {
+        // short circuit: assess infeasibility in O(|Card|)
+        int sumOfCardinalities =
+                cardinalities.stream().mapToInt(Integer::intValue).sum();
+
+        if (variables.size() < sumOfCardinalities) {
             return false;
         }
 

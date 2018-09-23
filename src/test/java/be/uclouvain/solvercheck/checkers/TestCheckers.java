@@ -3,9 +3,8 @@ package be.uclouvain.solvercheck.checkers;
 import be.uclouvain.solvercheck.consistencies.ArcConsitency;
 import be.uclouvain.solvercheck.consistencies.BoundDConsistency;
 import be.uclouvain.solvercheck.consistencies.BoundZConsistency;
-import be.uclouvain.solvercheck.consistencies.RangeConsistency;
 import be.uclouvain.solvercheck.consistencies.HybridConsistency;
-
+import be.uclouvain.solvercheck.consistencies.RangeConsistency;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
@@ -19,31 +18,127 @@ import org.quicktheories.core.Gen;
 
 import java.util.List;
 
-import static be.uclouvain.solvercheck.checkers.Checkers.allDiff;
-import static be.uclouvain.solvercheck.checkers.Checkers.sum;
-import static be.uclouvain.solvercheck.checkers.Checkers.element;
-import static be.uclouvain.solvercheck.checkers.Checkers.gccVar;
-import static be.uclouvain.solvercheck.checkers.Checkers.table;
-
-import static be.uclouvain.solvercheck.core.data.Operator.GT;
-import static be.uclouvain.solvercheck.core.data.Operator.GE;
 import static be.uclouvain.solvercheck.core.data.Operator.EQ;
-import static be.uclouvain.solvercheck.core.data.Operator.NE;
+import static be.uclouvain.solvercheck.core.data.Operator.GE;
+import static be.uclouvain.solvercheck.core.data.Operator.GT;
 import static be.uclouvain.solvercheck.core.data.Operator.LE;
 import static be.uclouvain.solvercheck.core.data.Operator.LT;
-
+import static be.uclouvain.solvercheck.core.data.Operator.NE;
+import static be.uclouvain.solvercheck.generators.Generators.tables;
+import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
 
-import static be.uclouvain.solvercheck.generators.Generators.tables;
-import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
-
-public class TestCheckers implements WithQuickTheories {
+public class TestCheckers implements WithQuickTheories, WithCheckers {
 
     @Test
     public void testAllDiff(){
         qt().forAll(assignments())
             .check(a -> allDiff().test(a) == (a.stream().distinct().count() == a.size()));
+    }
+
+    @Test
+    public void testAlwaysFalse(){
+        qt().forAll(assignments())
+            .check(a -> !alwaysFalse().test(a));
+    }
+    @Test
+    public void testAlwaysTrue(){
+        qt().forAll(assignments())
+            .check(a -> alwaysTrue().test(a));
+    }
+
+    @Test
+    public void testElementIsFalseWhenGivenAnInfeasibleIndex(){
+        qt().withGenerateAttempts(10000)
+            .forAll(assignmentWithAtLeast(3))
+            .assuming(a -> !isValidIndex(a.get(a.size()-2), a.size()-2))
+            .check   (a -> !element().test(a));
+    }
+
+    @Test
+    public void testElementChecksValueOfIthElement(){
+        qt().withGenerateAttempts(10000)
+            .forAll(assignmentWithAtLeast(3))
+            .assuming(a -> isValidIndex(a.get(a.size()-2), a.size()-2))
+            .check   (a -> element().test(a) == (a.get(a.get(a.size()-2)).equals(a.get(a.size()-1))));
+    }
+
+    @Test
+    public void testGccIsTrueIffAllValuesOccurWithGivenCardinality() {
+        qt().forAll(integers().between(0, 10)) // size
+            .checkAssert(S ->
+                qt().forAll(
+                    lists().of(integers().between(0, 10)).ofSize(S),  // cards
+                    lists().of(integers().between(-10, 10)).ofSize(S))// values
+                    .checkAssert((cards, values) ->
+                        qt().forAll(assignmentWithAtLeast(S))
+                            .check(ass -> {
+                                boolean isGcc = gcc(cards, values).test(ass);
+
+                                boolean verif = true;
+                                for(int i = 0; i < S; i++) {
+                                    final int idx = i;
+
+                                    int expectedCount = cards.get(i);
+                                    long counted = ass.stream()
+                                                   .filter(x -> x.equals(values.get(idx)))
+                                                   .count();
+
+                                    verif &= (counted == expectedCount);
+                                }
+
+                                return isGcc == verif;
+                            })
+                    )
+            );
+    }
+
+    @Test
+    public void testOtherValuesPlayNoRoleInGcc() {
+        Assignment ass = Assignment.from(List.of(-1, -2, -3));
+
+        Assert.assertTrue(gcc(List.of(0,0,0), List.of(1, 2, 3)).test(ass));
+    }
+
+    @Test
+    public void testGccVarIsTrueIffAllValuesOccurWithGivenCardinality() {
+      qt().forAll(lists().of(integers().between(-10, 10)).ofSizeBetween(0, 10))
+          .checkAssert(values -> {
+              int nbVarsMin = values.size();
+              qt().forAll(
+                      Generators.assignments()
+                                .withVariablesBetween(nbVarsMin,3*(1+nbVarsMin))
+                                .withValuesRanging(0, 10)
+                    )
+                  .check(ass -> {
+                      boolean isGcc = gccVar(values).test(ass);
+
+                      List<Integer> vars =
+                              ass.subList(0, ass.size()-values.size());
+
+                      List<Integer> cards =
+                              ass.subList(ass.size()-values.size(), ass.size());
+
+                      int sumOfCards=
+                              cards.stream().mapToInt(Integer::intValue).sum();
+
+                      boolean verif = vars.size() >= sumOfCards;
+
+                      for(int i = 0; i < values.size(); i++) {
+                          final int idx = i;
+
+                          int expectedCount = cards.get(i);
+                          long counted = vars.stream()
+                                  .filter(x -> x.equals(values.get(idx)))
+                                  .count();
+
+                          verif &= (counted == expectedCount);
+                      }
+
+                      return isGcc == verif;
+                  });
+          });
     }
 
     @Test
@@ -78,91 +173,9 @@ public class TestCheckers implements WithQuickTheories {
     }
 
     @Test
-    public void testElementIsFalseWhenGivenAnInfeasibleIndex(){
-        qt().withGenerateAttempts(10000)
-            .forAll(assignmentWithAtLeast(3))
-            .assuming(a -> !isValidIndex(a.get(a.size()-2), a.size()-2))
-            .check   (a -> !element().test(a));
-    }
-
-    @Test
-    public void testElementChecksValueOfIthElement(){
-        qt().withGenerateAttempts(10000)
-            .forAll(assignmentWithAtLeast(3))
-            .assuming(a -> isValidIndex(a.get(a.size()-2), a.size()-2))
-            .check   (a -> element().test(a) == (a.get(a.get(a.size()-2)).equals(a.get(a.size()-1))));
-    }
-
-    @Test
     public void testTable() {
         qt().forAll(tables().build(), assignments())
             .check((t, a) -> table(t).test(a) == t.contains(a));
-    }
-
-    @Test
-    public void dbgGccVar() {
-        PartialAssignment initial = PartialAssignment.from(
-            List.of(
-                // variables
-                Domain.from(1, 2, 3),
-                Domain.from(1, 2, 3),
-                Domain.from(1, 2, 3),
-                // Cardinalities
-                Domain.from(0, 3),
-                Domain.from(0, 3)
-            )
-        );
-
-        Filter gccAc  = new ArcConsitency(    gccVar(List.of(1, 3)));
-        PartialAssignment actualAC = gccAc .filter(initial);
-        PartialAssignment expected = PartialAssignment.unionOf(
-                5,
-                List.of(
-                    List.of(1, 1, 1, 3, 0),
-                    List.of(3, 3, 3, 0, 3),
-                    List.of(2, 2, 2, 0, 0)
-                )
-        );
-
-        Assert.assertEquals(expected, actualAC);
-    }
-
-    @Test
-    public void foireux(){
-        Domain.from(Range.between(4, 10));
-    }
-
-    @Test
-    public void dbgSum() {
-        PartialAssignment initial = PartialAssignment.from(
-                List.of(
-                        // variables
-                        Domain.from(List.of(1, 2, 4)),
-                        Domain.from(List.of(1, 4))
-                ));
-
-        Filter sumAc  = new ArcConsitency(sum(EQ, 5));
-        Filter sumBcD = new BoundDConsistency(sum(EQ, 5));
-        Filter sumBcZ = new BoundZConsistency(sum(EQ, 5));
-        Filter sumRng = new RangeConsistency(sum(EQ, 5));
-
-        Filter sumHyb = new HybridConsistency(
-                sum(EQ, 5),
-                ArcConsitency::domainFilter,
-                ArcConsitency::domainFilter);
-
-        PartialAssignment actualAc  = sumAc.filter(initial);
-        PartialAssignment actualBcD = sumBcD.filter(initial);
-        PartialAssignment actualBcZ = sumBcZ.filter(initial);
-        PartialAssignment actualRng = sumRng.filter(initial);
-        PartialAssignment actualHyb = sumHyb.filter(initial);
-
-
-        Assert.assertEquals(WEAKER, actualBcD.compareWith(actualAc));
-        Assert.assertEquals(WEAKER, actualBcZ.compareWith(actualAc));
-        Assert.assertEquals(WEAKER, actualRng.compareWith(actualAc));
-
-        Assert.assertEquals(EQUIVALENT, actualHyb.compareWith(actualAc));
     }
 
     private Gen<Assignment> assignments() {
