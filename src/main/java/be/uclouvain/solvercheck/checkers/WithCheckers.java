@@ -21,7 +21,7 @@ public interface WithCheckers {
     }
     /** @return a fake checker evaluates any given assignment to false. */
     default Checker alwaysFalse() {
-        return Checkers.alwaysTrue();
+        return Checkers.alwaysFalse();
     }
     /**
      * A checker that tells whether all variables of the given assignment
