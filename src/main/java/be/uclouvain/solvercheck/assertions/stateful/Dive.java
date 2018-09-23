@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 /**
  * The purpose of this class is to actually run a 'dive' exploration of the
- * search tree rooted by some given partial assignment. It will explore
+ * search tree rooted by some given partial assignment. It will explore nbDives
  * branches of a partial assignment until a leaf of the search tree is reached
  * or an error is encountered.
  */
