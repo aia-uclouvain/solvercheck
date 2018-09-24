@@ -257,7 +257,7 @@
                     In order to get a complete site comprising all the useful
                     information, one should use the following command:
                     ```
-                    mvn clean compile test org.pitest:pitest-maven:mutationCoverage
+                    mvn clean verify site -P QA
                     site
                     ```
                     -->
@@ -265,15 +265,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-site-plugin</artifactId>
                         <version>${site.version}</version>
-                        <executions>
-                            <execution>
-                                <id>GenerateSite</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>site</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
 
 
