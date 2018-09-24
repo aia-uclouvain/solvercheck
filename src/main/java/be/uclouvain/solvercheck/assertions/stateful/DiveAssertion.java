@@ -21,8 +21,10 @@ import static org.quicktheories.QuickTheory.qt;
 /**
  * This is the class that implements the assertions relative to the stateful
  * testing of the StatefulFilter algorithms. Its purpose is mostly to
- * configure and run `Dive`s {@see Dive} which in turn validate the property
+ * configure and run `Dive`s (see Dive) which in turn validate the property
  * on some execution subtree.
+ *
+ * @see Dive
  */
 @SuppressWarnings("checkstyle:hiddenfield")
 public final class DiveAssertion implements Assertion {
@@ -283,7 +285,7 @@ public final class DiveAssertion implements Assertion {
      * Initialises the state of both `actual` and `other` telling them the
      * initial value of the variables domains.
      *
-     * {@see StatefulFilter::setup}.
+     * @see StatefulFilter::setup
      *
      * @param root the initial value of the variables domains.
      */

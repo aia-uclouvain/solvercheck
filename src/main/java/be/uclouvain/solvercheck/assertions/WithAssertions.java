@@ -30,7 +30,8 @@ public interface WithAssertions {
      *
      * .. Note::
      *    The assertion returned by this method uses the default configuration
-     *    as if it were produced by the sequence ```given().propagator(x)```.
+     *    as if it were produced by the sequence <pre>given().propagator(x)
+     *    </pre>.
      *
      * @param actual the actual filter (propagator) about which a property is
      *              being expressed.
@@ -41,7 +42,7 @@ public interface WithAssertions {
     }
 
     /**
-     * This method is an alias for {@see propagator}. It yields a
+     * This method is an alias for (see propagator). It yields a
      * FilterAssertion for the given filter.
      *
      * @param actual the actual filter (propagator) about which a property is
@@ -53,7 +54,7 @@ public interface WithAssertions {
     }
 
     /**
-     * This method is an alias for {@see propagator}. It yields a
+     * This method is an alias for (see propagator). It yields a
      * FilterAssertion for the given filter.
      *
      * @param actual the actual filter (propagator) about which a property is
@@ -76,7 +77,7 @@ public interface WithAssertions {
         return given().statefulPropagator(actual);
     }
     /**
-     * This method is an alias for {@see statefulPropagator}. It yields a
+     * This method is an alias for (see statefulPropagator). It yields a
      * DiveAssertion for the given SatefulFilter.
      *
      * @param actual the actual filter (stateful propagator) about which a
@@ -87,7 +88,7 @@ public interface WithAssertions {
         return statefulPropagator(actual);
     }
     /**
-     * This method is an alias for {@see statefulPropagator}. It yields a
+     * This method is an alias for (see statefulPropagator). It yields a
      * DiveAssertion for the given SatefulFilter.
      *
      * @param actual the actual filter (stateful propagator) about which a
@@ -120,16 +121,16 @@ public interface WithAssertions {
      *   **virtually all** partial assignments and **virtually all** possble
      *   table extensions.
      *
-     *   ```
+     *   <pre>
      *    assertThat(
      *       forAll(tables())
-     *         .itIsTrueThat(table ->
+     *         .itIsTrueThat(table -&gt;
      *              propagator(arcConsistent(table(t))
      *             .isStrongerThan(boundZConsistent(table(t)))
      *         )
      *       )
      *    )
-     *    ```
+     *    </pre>
      *
      *
      * @param a the generator creating the generated 1-parameter
@@ -153,13 +154,13 @@ public interface WithAssertions {
      *   **virtually all** partial assignments and **virtually all** possble
      *   table extensions.
      *
-     *   ```
+     *   <pre>
      *    assertThat(
      *       forAll(booleans(), integers.between(0, 10))
-     *         .itIsTrueThat((b, i) -> ... ) )
+     *         .itIsTrueThat((b, i) -&gt; ... ) )
      *       )
      *    )
-     *    ```
+     *    </pre>
      *
      *
      * @param a the generator creating the generated 1st argument.
@@ -188,13 +189,13 @@ public interface WithAssertions {
      *   **virtually all** partial assignments and **virtually all** possble
      *   table extensions.
      *
-     *   ```
+     *   <pre>
      *    assertThat(
      *       forAll(xs(), ys(), zs())
-     *         .itIsTrueThat((x, y, z) -> ... ) )
+     *         .itIsTrueThat((x, y, z) -&gt; ... ) )
      *       )
      *    )
-     *    ```
+     *    </pre>
      *
      *
      * @param a the generator creating the generated 1st argument.
@@ -225,13 +226,13 @@ public interface WithAssertions {
      *   **virtually all** partial assignments and **virtually all** possble
      *   table extensions.
      *
-     *   ```
+     *   <pre>
      *    assertThat(
      *       forAll(ws(), xs(), ys(), zs())
-     *         .itIsTrueThat((w, x, y, z) -> ... ) )
+     *         .itIsTrueThat((w, x, y, z) -&gt; ... ) )
      *       )
      *    )
-     *    ```
+     *    </pre>
      *
      *
      * @param a the generator creating the generated 1st argument.

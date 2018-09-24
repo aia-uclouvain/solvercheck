@@ -28,7 +28,8 @@ public final class Utils {
      *             an index.
      *
      * @return true iff index is a valid position inside a collection of size
-     * `size`. In other words: this method returns true iff 0 <= index < size.
+     * `size`. In other words: this method returns true iff
+     * 0 &lt;= index &lt; size.
      */
     public static boolean isValidIndex(final int index, final int size) {
         return 0 <= index && index < size;
@@ -145,7 +146,7 @@ public final class Utils {
     /**
      * Implements the 'zip' functional programming idiom. It takes two
      * iterable as input and produces a new iterable object which delivers
-     * 2-tuples ({@see }ZipEntry}) at each iteration.
+     * 2-tuples (see ZipEntry) at each iteration.
      *
      * .. Note::
      *    In the event where the two iterables do not have the same size,

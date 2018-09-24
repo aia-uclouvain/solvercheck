@@ -8,13 +8,13 @@ public enum Operator {
     EQ,
     /** NE means **different from** operator. */
     NE,
-    /** LE means lesser or equal (<=) operator. */
+    /** LE means lesser or equal (&lt;=) operator. */
     LE,
-    /** LT means strictly lesser than (<) operator. */
+    /** LT means strictly lesser than (&lt;) operator. */
     LT,
-    /** GE means greater or equal to (>=) operator. */
+    /** GE means greater or equal to (&gt;=) operator. */
     GE,
-    /** GT means strictly greater than (>) operator. */
+    /** GT means strictly greater than (&gt;) operator. */
     GT;
 
     /** @return the operator that is the negation from 'this' relation. */

@@ -4,6 +4,9 @@
  * rather than encapsulating some data.
  *
  * The most prominent example of the kind of task interface defined in this
- * package comprise {@see Filter} and {@see Checker}.
+ * package comprise Filter and Checker.
+ *
+ * @see be.uclouvain.solvercheck.core.task.Filter
+ * @see be.uclouvain.solvercheck.core.task.Checker
  */
 package be.uclouvain.solvercheck.core.task;

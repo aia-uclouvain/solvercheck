@@ -354,6 +354,17 @@
             <reporting>
                 <plugins>
                     <!--
+                        JAVADOC::
+                        The documentation of the project should be readily
+                        available on the project's site.
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${maven.javadoc.version}</version>
+                    </plugin>
+
+                    <!--
                         CHECKSTYLE::
                         To ensure that the code follows some well established
                         coding guidelines.

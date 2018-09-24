@@ -1,6 +1,6 @@
 /**
  * This package contains implementation of the core interfaces data objects.
- * For the interfaces, refer to {@see be.uclouvain.core.data}.
+ * For the interfaces, refer to (see be.uclouvain.core.data.*).
  *
  * .. Note::
  *    In addition to the plain implementation of the objects (all

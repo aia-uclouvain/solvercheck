@@ -94,7 +94,7 @@ public interface PartialAssignment
     /**
      * This method returns a copy of the given `partial` assignment in which
      * the domain of `variable` has been restricted according to
-     * [`op`, `value`]. {@see DomainFactory.restrict}.
+     * [`op`, `value`]. (see DomainFactory.restrict).
      *
      * @param partial the partial assignment for which one of the variables
      *                domain must be restricted

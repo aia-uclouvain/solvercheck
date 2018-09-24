@@ -14,10 +14,14 @@ import java.util.List;
  * implement a consistency filter; filtering the domains of **all** variables
  * according to one same variable filtering policy.
  *
- * Notable examples extending this class: {@see BoundDConsistency},
- * {@see BoundZConsistency} and {@see RangeConsistency}. For efficiency
+ * Notable examples extending this class: (see BoundDConsistency),
+ * (see BoundZConsistency) and (see RangeConsistency). For efficiency
  * reasons, the `ArcConsistency` was **not** implemented as a subclass of
  * `AbstractUniformConsistency`.
+ *
+ * @see BoundDConsistency
+ * @see BoundZConsistency
+ * @see RangeConsistency
  */
 public abstract class AbstractUniformConsistency implements Filter {
     /**

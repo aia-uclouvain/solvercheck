@@ -9,8 +9,10 @@ import java.util.stream.Collector;
 
 /**
  * The point of this factory is to create assignments. Note, this class is
- * mostly present to ensure the style-consistency with other classes
- * {@see DomainFactory, PartialAssignmentFactory}.
+ * mostly present to ensure the style-consistency with other classes.
+ *
+ * @see DomainFactory
+ * @see PartialAssignmentFactory
  */
 public final class AssignmentFactory {
 

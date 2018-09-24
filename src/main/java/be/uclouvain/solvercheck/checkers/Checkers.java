@@ -17,10 +17,11 @@ import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
  * This class is meant to be used as a factory to instantiate checkers for the
  * most common constraints. Namely, it lets you create checkers for the
  * following constraints:
+ * <pre>
  *   - true, false               :: Not real constraints: they always return the
  *                               :: same value
  *   - allDiff(x_1, ..., x_n),   ::
- *   - sum(op, var)              :: ==> sumEq, sumNe, sumLe, sumGe, sumLt, sumGt
+ *   - sum(op, var)              :: sumEq, sumNe, sumLe, sumGe, sumLt, sumGt
  *   - element(xs, index, value) ::
  *   - table,                    ::
  *   - gcc, gccVar               :: The nuance between the two being that gcc
@@ -30,7 +31,7 @@ import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
  *                               :: cardinalities being interpreted as the last
  *                               :: |values| variables of the given partial
  *                               :: assignment.
- *
+ * </pre>
  * FIXME: Question, veut-on garder les checkers comme une série de fonctions
  *        statiques ? ou veut-on en faire des classes ? (Elles seraient
  *        simples, cohésives, pas couplées + ca serait sans doute plus
@@ -78,7 +79,8 @@ public final class Checkers {
      *    \sum_{i = 0}^{|assignment|} assignment[i] \otimes constant
      *    $$
      *    where
-     *    $\otimes$ is one of the following operators: $<, \le, =, \ne, \ge, >$
+     *    $\otimes$ is one of the following operators: $&lt;, \le, =, \ne,
+     *    \ge, &gt;$
      *
      * @param op the operator determining the condition that applies to the
      *           total of the sum

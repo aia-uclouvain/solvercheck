@@ -50,7 +50,8 @@ public interface WithCheckers {
      *    \sum_{i = 0}^{|assignment|} assignment[i] \otimes constant
      *    $$
      *    where
-     *    $\otimes$ is one of the following operators: $<, \le, =, \ne, \ge, >$
+     *    $\otimes$ is one of the following operators: $&lt;, \le, =, \ne,
+     *    \ge, &gt;$
      *
      * @param operator the operator determining the condition that applies to
      *                 the total of the sum

@@ -151,7 +151,7 @@ public final class TestConfiguration implements Supplier<Strategy> {
     }
 
     /**
-     * This method is an alias for {@see propagator}. It yields a
+     * This method is an alias for (see propagator). It yields a
      * FilterAssertion for the given filter.
      *
      * @param actual the actual filter (propagator) about which a property is
@@ -163,7 +163,7 @@ public final class TestConfiguration implements Supplier<Strategy> {
     }
 
     /**
-     * This method is an alias for {@see propagator}. It yields a
+     * This method is an alias for (see propagator). It yields a
      * FilterAssertion for the given filter.
      *
      * @param actual the actual filter (propagator) about which a property is
@@ -186,7 +186,7 @@ public final class TestConfiguration implements Supplier<Strategy> {
         return new DiveAssertion(this, actual);
     }
     /**
-     * This method is an alias for {@see statefulPropagator}. It yields a
+     * This method is an alias for (see statefulPropagator). It yields a
      * DiveAssertion for the given SatefulFilter.
      *
      * @param actual the actual filter (stateful propagator) about which a
@@ -197,7 +197,7 @@ public final class TestConfiguration implements Supplier<Strategy> {
         return statefulPropagator(actual);
     }
     /**
-     * This method is an alias for {@see statefulPropagator}. It yields a
+     * This method is an alias for (see statefulPropagator). It yields a
      * DiveAssertion for the given SatefulFilter.
      *
      * @param actual the actual filter (stateful propagator) about which a
@@ -221,13 +221,13 @@ public final class TestConfiguration implements Supplier<Strategy> {
      *   **virtually all** partial assignments and **virtually all** possble
      *   table extensions.
      *
-     *    ```
+     *    <pre>
      *    assertThat(
      *       given()
      *        .theRandomSeed(1234)
      *        .forAll(booleans())
-     *            .itIsTrueThat(b -> ... ) )))
-     *    ```
+     *            .itIsTrueThat(b -&gt; ... ) )))
+     *    </pre>
      *
      *
      * @param a the generator creating the generated 1-parameter
@@ -251,13 +251,13 @@ public final class TestConfiguration implements Supplier<Strategy> {
      *   **virtually all** partial assignments and **virtually all** possble
      *   table extensions.
      *
-     *   ```
+     *   <pre>
      *    assertThat(
      *       given()
      *        .theRandomSeed(1234)
      *        .forAll(booleans(), integers.between(0, 10))
-     *            .itIsTrueThat((b, i) -> ... ) )))
-     *    ```
+     *            .itIsTrueThat((b, i) -&gt; ... ) )))
+     *    </pre>
      *
      *
      * @param a the generator creating the generated 1st argument.
@@ -286,13 +286,13 @@ public final class TestConfiguration implements Supplier<Strategy> {
      *   **virtually all** partial assignments and **virtually all** possble
      *   table extensions.
      *
-     *   ```
+     *   <pre>
      *    assertThat(
      *       given()
      *        .theRandomSeed(1234)
      *        .forAll(xs(), ys(), zs())
-     *            .itIsTrueThat((x, y, z) -> ... ) )))
-     *    ```
+     *            .itIsTrueThat((x, y, z) -&gt; ... ) )))
+     *    </pre>
      *
      *
      * @param a the generator creating the generated 1st argument.
@@ -323,13 +323,13 @@ public final class TestConfiguration implements Supplier<Strategy> {
      *   **virtually all** partial assignments and **virtually all** possble
      *   table extensions.
      *
-     *   ```
+     *   <pre>
      *    assertThat(
      *       given()
      *        .theRandomSeed(1234)
      *        .forAll(ws(), xs(), ys(), zs())
-     *            .itIsTrueThat((w, x, y, z) -> ... ) )))
-     *    ```
+     *            .itIsTrueThat((w, x, y, z) -&gt; ... ) )))
+     *    </pre>
      *
      *
      * @param a the generator creating the generated 1st argument.

@@ -7,7 +7,7 @@ import java.util.stream.StreamSupport;
 /**
  * This class implements the 'zip' functional programming idiom.
  * It takes two iterable as input and produces a new iterable object
- * which delivers 2-tuples ({@see }ZipEntry}) at each iteration.
+ * which delivers 2-tuples (@see ZipEntry) at each iteration.
  *
  * .. Note::
  *    In the event where the two iterables do not have the same size,
@@ -17,6 +17,8 @@ import java.util.stream.StreamSupport;
  *           2-tuples iterated upon.
  * @param <B> the type of the elements held in the second component of the
  *           2-tuples iterated upon.
+ *
+ * @see ZipEntry
  */
 public final class Zip<A, B> implements Iterable<ZipEntry<A, B>> {
     /** The items that will make the first member from the returned tuples. */
