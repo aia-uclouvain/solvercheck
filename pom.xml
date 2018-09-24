@@ -5,15 +5,70 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>be.uclouvain</groupId>
+    <!-- IDENTIFICATION **************************************************** -->
+    <groupId>org.bitbucket.xaviergillard</groupId>
     <artifactId>SolverCheck</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-RC01-SNAPSHOT</version>
 
+    <!-- DESCRIPTION ******************************************************* -->
+    <name>be.uclouvain:SolverCheck</name>
+    <description>
+        Efficient testing of constraints in JVM-based CP solvers.
+    </description>
+    <url>https://bitbucket.org/xaviergillard/solvercheck/</url>
+
+    <!-- LICENSING INFORMATION ********************************************* -->
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+
+    <!-- DEV. TEAM ********************************************************* -->
+    <developers>
+        <developer>
+            <name>Xavier Gillard</name>
+            <email>xavier.gillard@uclouvain.be</email>
+            <organization>UCLouvain</organization>
+            <organizationUrl>http://www.uclouvain.be</organizationUrl>
+        </developer>
+    </developers>
+
+    <!-- SCM *************************************************************** -->
+    <scm>
+        <connection>
+            scm:git:git://bitbucket.org/xaviergillard/solvercheck.git
+        </connection>
+        <developerConnection>
+            scm:git:ssh://bitbucket.org:/xaviergillard/solvercheck.git
+        </developerConnection>
+        <url>
+            https://bitbucket.org/xaviergillard/solvercheck/src
+        </url>
+    </scm>
+
+    <!-- Releases are to be published on Maven Central through Sonatype OSS  -->
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <!-- ACTUAL PROJECT CONFIGURATION ************************************** -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <maven.compiler.version>3.5.1</maven.compiler.version>
         <maven.compiler.source>1.10</maven.compiler.source>
         <maven.compiler.target>1.10</maven.compiler.target>
+
+        <maven.source.version>2.2.1</maven.source.version>
+        <maven.javadoc.version>2.9.1</maven.javadoc.version>
+
+        <nexus.version>1.6.7</nexus.version>
+        <gpg.version>1.6</gpg.version>
 
         <site.version>3.7.1</site.version>
         <checkstyle.version>3.0.0</checkstyle.version>
@@ -25,165 +80,6 @@
         <spotbugs.effort>Max</spotbugs.effort>
         <spotbugs.threshold>Low</spotbugs.threshold>
     </properties>
-
-    <build>
-        <plugins>
-            <!--
-                Generate a project site with many useful reports with the
-                `mvn site` command.
-
-                In order to get a complete site comprising all the useful
-                information, one should use the following command:
-                ```
-                mvn clean compile test org.pitest:pitest-maven:mutationCoverage
-                site
-                ```
-            -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>${site.version}</version>
-            </plugin>
-
-
-            <!--
-                PIT :: Mutation testing to assess the quality of my test base
-
-                Run mutation tests with:
-                ```
-                mvn org.pitest:pitest-maven:mutationCoverage
-                ```
-            -->
-            <plugin>
-                <groupId>org.pitest</groupId>
-                <artifactId>pitest-maven</artifactId>
-                <version>${pitest.version}</version>
-                <configuration>
-                    <targetClasses>
-                        <targetClass>
-                            be.uclouvain.solvercheck.*
-                        </targetClass>
-                    </targetClasses>
-                    <targetTests>
-                        <targetTest>
-                            be.uclouvain.solvercheck.*
-                        </targetTest>
-                    </targetTests>
-                    <excludedClasses>
-                        <excludedClass>
-                            be.uclouvain.solvercheck.generators.WithJavaGenerators
-                        </excludedClass>
-                    </excludedClasses>
-                    <excludedTestClasses>
-                        <excludedTestClass>
-                            be.uclouvain.solvercheck.core.data.TestDomain
-                        </excludedTestClass>
-                        <excludedTestClass>
-                            be.uclouvain.solvercheck.Brol
-                        </excludedTestClass>
-                    </excludedTestClasses>
-                </configuration>
-            </plugin>
-
-
-            <!--
-                Installs JaCoCo agent to collect coverage data.
-            -->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
-    <reporting>
-        <plugins>
-            <!--
-                CHECKSTYLE::
-                To ensure that the code follows some well established coding
-                guidelines.
-            -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${checkstyle.version}</version>
-                <configuration>
-                    <!--
-                        Use my own checkstyle configuration which adapts SUN
-                        rules set to allow:
-                        1. shadowing by constructor parameters
-                        2. targetted warning suppression through annotations
-                    -->
-                    <configLocation>./checkstyle.xml</configLocation>
-                    <!-- Ignore the style of tests source code -->
-                    <sourceDirectories>
-                        ${project.build.sourceDirectory}
-                    </sourceDirectories>
-                </configuration>
-            </plugin>
-
-            <!--
-                SPOTBUGS::
-                To preemptively identify some potential bugs in the code of
-                the project.
-            -->
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>${spotbugs.version}</version>
-                <configuration>
-                    <effort>${spotbugs.effort}</effort>
-                    <threshold>${spotbugs.threshold}</threshold>
-                </configuration>
-            </plugin>
-
-            <!--
-                Tells to generate the mutation tests reports:
-
-                mvn clean org.pitest:pitest-maven:mutationCoverage site
-            -->
-            <plugin>
-                <groupId>org.pitest</groupId>
-                <artifactId>pitest-maven</artifactId>
-                <version>${pitest.version}</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>report</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-
-            <!--
-                JACOCO::
-                To measure the fraction of the code which has been covered by
-                tests.
-            -->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
-            </plugin>
-        </plugins>
-    </reporting>
-
-
 
     <dependencies>
         <!--
@@ -225,5 +121,309 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+
+    <!-- =================================================================== -->
+    <!-- So far, this POM provides three distinct profiles, each aiming at   -->
+    <!-- a specific goal:                                                    -->
+    <!--    * The `default` profile, targets fast completion times. This is  -->
+    <!--      the profile that should be used while developing.              -->
+    <!--    * The `QA` profile, generates all the QA artifacts (site etc..)  -->
+    <!--      during its `verify` phase. It should be used every once in a   -->
+    <!--      while. And it should definitely be used before pushing a       -->
+    <!--      series of commits.                                             -->
+    <!--    * The `release` profile is the one that should be used to        -->
+    <!--      publish releases on maven central (through sonatype oss)       -->
+    <!-- =================================================================== -->
+    <profiles>
+        <!-- USE THIS PROFILE FOR DEVELOPMENT ****************************** -->
+        <profile>
+            <id>default</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>${maven.compiler.version}</version>
+                        <configuration>
+                            <target>${maven.compiler.target}</target>
+                            <source>${maven.compiler.source}</source>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- USE THIS PROFILE FOR DEPLOYMENT ******************************* -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!-- PLUGINS REQUIRED FOR PUBLICATION ON MAVEN CENTRAL   -->
+                    <!--                                                     -->
+                    <!-- Note:                                               -->
+                    <!-- A SNAPSHOT is published with the following command: -->
+                    <!-- `mvn clean deploy -P release`                       -->
+                    <!--                                                     -->
+                    <!-- A RELEASE is published with the following commands: -->
+                    <!-- `mvn clean deploy -P release`                       -->
+
+                    <!--
+                        Perform a reproductible build and attach the sources
+                        and javadoc of the compiled code to the produced
+                        artifacts.
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>${maven.compiler.version}</version>
+                        <configuration>
+                            <target>${maven.compiler.target}</target>
+                            <source>${maven.compiler.source}</source>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${maven.source.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${maven.javadoc.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!--
+                        The Nexus Staging Maven Plugin is the recommended way
+                        to deploy your components to OSSRH and release them
+                        to the Central Repository.
+                    -->
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>${nexus.version}</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+
+                    <!-- The GPG plugin, used to sign published artifacts.   -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${gpg.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- USE THIS PROFILE FOR QUALITY ASSURANCE ************************ -->
+        <profile>
+            <id>QA</id>
+            <build>
+                <plugins>
+                    <!--
+                    Generate a project site with many useful reports with the
+                    `mvn site` command.
+
+                    In order to get a complete site comprising all the useful
+                    information, one should use the following command:
+                    ```
+                    mvn clean compile test org.pitest:pitest-maven:mutationCoverage
+                    site
+                    ```
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-site-plugin</artifactId>
+                        <version>${site.version}</version>
+                        <executions>
+                            <execution>
+                                <id>GenerateSite</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>site</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+
+                    <!--
+                        PIT ::
+                        Mutation testing to assess the quality of my test base
+
+                        Run mutation tests with:
+                        ```
+                        mvn org.pitest:pitest-maven:mutationCoverage
+                        ```
+                    -->
+                    <plugin>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-maven</artifactId>
+                        <version>${pitest.version}</version>
+                        <executions>
+                            <execution>
+                                <id>MutationsCoverage</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>mutationCoverage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <targetClasses>
+                                <targetClass>
+                                    be.uclouvain.solvercheck.*
+                                </targetClass>
+                            </targetClasses>
+                            <targetTests>
+                                <targetTest>
+                                    be.uclouvain.solvercheck.*
+                                </targetTest>
+                            </targetTests>
+                            <excludedClasses>
+                                <excludedClass>
+                                    be.uclouvain.solvercheck.generators.WithJavaGenerators
+                                </excludedClass>
+                            </excludedClasses>
+                            <excludedTestClasses>
+                                <excludedTestClass>
+                                    be.uclouvain.solvercheck.core.data.TestDomain
+                                </excludedTestClass>
+                                <excludedTestClass>
+                                    be.uclouvain.solvercheck.Brol
+                                </excludedTestClass>
+                            </excludedTestClasses>
+                        </configuration>
+                    </plugin>
+
+
+                    <!--
+                        Installs JaCoCo agent to collect coverage data.
+                    -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco.version}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <reporting>
+                <plugins>
+                    <!--
+                        CHECKSTYLE::
+                        To ensure that the code follows some well established
+                        coding guidelines.
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>${checkstyle.version}</version>
+                        <configuration>
+                            <!--
+                                Use my own checkstyle configuration which adapts
+                                SUN rules set to allow:
+                                1. shadowing by constructor parameters
+                                2. targetted warning suppression through
+                                   annotations
+                            -->
+                            <configLocation>./checkstyle.xml</configLocation>
+                            <!-- Ignore the style of tests source code -->
+                            <sourceDirectories>
+                                ${project.build.sourceDirectory}
+                            </sourceDirectories>
+                        </configuration>
+                    </plugin>
+
+                    <!--
+                        SPOTBUGS::
+                        To preemptively identify some potential bugs in the
+                        code of the project.
+                    -->
+                    <plugin>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
+                        <version>${spotbugs.version}</version>
+                        <configuration>
+                            <effort>${spotbugs.effort}</effort>
+                            <threshold>${spotbugs.threshold}</threshold>
+                        </configuration>
+                    </plugin>
+
+                    <!--
+                        Tells to generate the mutation tests reports:
+
+                        mvn clean org.pitest:pitest-maven:mutationCoverage site
+                    -->
+                    <plugin>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-maven</artifactId>
+                        <version>${pitest.version}</version>
+                        <reportSets>
+                            <reportSet>
+                                <reports>
+                                    <report>report</report>
+                                </reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+
+                    <!--
+                        JACOCO::
+                        To measure the fraction of the code which has been
+                        covered by tests.
+                    -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco.version}</version>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+    </profiles>
 
 </project>

@@ -3,7 +3,9 @@ package be.uclouvain.solvercheck.checkers;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.generators.Generators;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.quicktheories.QuickTheory;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
@@ -23,26 +25,33 @@ import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
 
 public class TestCheckers implements WithQuickTheories, WithCheckers {
 
+    private QuickTheory qt;
+
+    @Before
+    public void setUp() {
+        qt = qt().withGenerateAttempts(10000);
+    }
+
     @Test
     public void testAllDiff(){
-        qt().forAll(assignments())
+        qt.forAll(assignments())
             .check(a -> allDiff().test(a) == (a.stream().distinct().count() == a.size()));
     }
 
     @Test
     public void testAlwaysFalse(){
-        qt().forAll(assignments())
+        qt.forAll(assignments())
             .check(a -> !alwaysFalse().test(a));
     }
     @Test
     public void testAlwaysTrue(){
-        qt().forAll(assignments())
+        qt.forAll(assignments())
             .check(a -> alwaysTrue().test(a));
     }
 
     @Test
     public void testElementIsFalseWhenGivenAnInfeasibleIndex(){
-        qt().withGenerateAttempts(10000)
+        qt.withGenerateAttempts(10000)
             .forAll(assignmentWithAtLeast(3))
             .assuming(a -> !isValidIndex(a.get(a.size()-2), a.size()-2))
             .check   (a -> !element().test(a));
@@ -50,7 +59,7 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
 
     @Test
     public void testElementChecksValueOfIthElement(){
-        qt().withGenerateAttempts(10000)
+        qt.withGenerateAttempts(10000)
             .forAll(assignmentWithAtLeast(3))
             .assuming(a -> isValidIndex(a.get(a.size()-2), a.size()-2))
             .check   (a -> element().test(a) == (a.get(a.get(a.size()-2)).equals(a.get(a.size()-1))));
@@ -58,18 +67,18 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
 
     @Test
     public void testGccIsTrueIffAllValuesOccurWithGivenCardinality() {
-        qt().withExamples(100)
+        qt.withExamples(100)
             .forAll(integers().between(0, 10).describedAs(s -> "SIZE("+s+")"))
             .checkAssert(S ->
                 // FIXME: Questionnable ? Can it make sense to have
                 //        multiple occurrences of the same value ?
-                qt().withExamples(100)
+                qt.withExamples(100)
                     .forAll(Generators.setsOfUpTo(S,integers().between(-10,10)).describedAs(s -> "VALUES("+s+")"))
                     .checkAssert(values ->
-                        qt().withExamples(100)
+                        qt.withExamples(100)
                             .forAll(lists().of(integers().between(0, 10)).ofSize(values.size()).describedAs(s -> "CARDS("+s+")"))
                             .checkAssert(cards ->
-                                qt().withExamples(100)
+                                qt.withExamples(100)
                                     .forAll(Generators.assignments().withValuesRanging(-10, 10).describedAs(a -> "ASSIGNMENT("+a+")"))
                                     .check(ass -> {
 
@@ -104,13 +113,13 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
 
     @Test
     public void testGccVarIsTrueIffAllValuesOccurWithGivenCardinality() {
-      qt().forAll(lists().of(integers().between(-10, 10)).ofSizeBetween(0, 10))
+      qt.forAll(lists().of(integers().between(-10, 10)).ofSizeBetween(0, 10))
           // FIXME: Questionnable ? Can it make sense to have
           //        multiple occurrences of the same value ?
           .assuming(vals -> vals.size() == new HashSet<>(vals).size())
           .checkAssert(values -> {
               int nbVarsMin = values.size();
-              qt().forAll(
+              qt.forAll(
                       Generators.assignments()
                                 .withVariablesBetween(nbVarsMin,3*(1+nbVarsMin))
                                 .withValuesRanging(0, 10)
@@ -147,9 +156,9 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
 
     @Test
     public void gccShouldFailWheneverTheValuesCannotDirectlyBeMappedOntoASet() {
-        qt().forAll(integers().between(2, 100).describedAs(s -> "SIZE("+s+")"))
+        qt.forAll(integers().between(2, 100).describedAs(s -> "SIZE("+s+")"))
             .checkAssert(S ->
-              qt().withGenerateAttempts(10000)
+              qt.withGenerateAttempts(10000)
                   .forAll(
                       lists()
                           .of(integers().between(0, 10))
@@ -169,7 +178,7 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
 
     @Test
     public void gccVarShouldFailWheneverTheValuesCannotDirectlyBeMappedOntoASet() {
-        qt().forAll(
+        qt.forAll(
             lists()
                 .of(integers().between(0, 100))
                 .ofSizeBetween(2, 100)
@@ -183,7 +192,7 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
 
     @Test
     public void gccShouldFailWhenValuesAndCardinalitieDontHaveTheSameSize() {
-        qt().withGenerateAttempts(10000)
+        qt.withGenerateAttempts(10000)
             .forAll(
                 lists()
                     .of(integers().between(0, 10))
@@ -202,7 +211,7 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
 
     @Test
     public void gccVardShouldFailWhenCardinalitiesCantCoverValues() {
-        qt().withGenerateAttempts(10000)
+        qt.withGenerateAttempts(10000)
                 .forAll(
                         lists()
                                 .of(integers().between(0, 10))
@@ -220,38 +229,38 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
 
     @Test
     public void testSumEQ(){
-        qt().forAll(assignments(), integers().all())
+        qt.forAll(assignments(), integers().all())
             .check((a, c) -> sum(EQ, c).test(a) == (a.stream().mapToInt(Integer::intValue).sum() == c) );
     }
     @Test
     public void testSumNE(){
-        qt().forAll(assignments(), integers().all())
+        qt.forAll(assignments(), integers().all())
                 .check((a, c) -> sum(NE, c).test(a) == (a.stream().mapToInt(Integer::intValue).sum() != c) );
     }
     @Test
     public void testSumLT(){
-        qt().forAll(assignments(), integers().all())
+        qt.forAll(assignments(), integers().all())
                 .check((a, c) -> sum(LT, c).test(a) == (a.stream().mapToInt(Integer::intValue).sum() < c) );
     }
     @Test
     public void testSumLE(){
-        qt().forAll(assignments(), integers().all())
+        qt.forAll(assignments(), integers().all())
                 .check((a, c) -> sum(LE, c).test(a) == (a.stream().mapToInt(Integer::intValue).sum() <= c) );
     }
     @Test
     public void testSumGT(){
-        qt().forAll(assignments(), integers().all())
+        qt.forAll(assignments(), integers().all())
                 .check((a, c) -> sum(GT, c).test(a) == (a.stream().mapToInt(Integer::intValue).sum() > c) );
     }
     @Test
     public void testSumGE(){
-        qt().forAll(assignments(), integers().all())
+        qt.forAll(assignments(), integers().all())
                 .check((a, c) -> sum(GE, c).test(a) == (a.stream().mapToInt(Integer::intValue).sum() >= c) );
     }
 
     @Test
     public void testTable() {
-        qt().forAll(tables().build(), assignments())
+        qt.forAll(tables().build(), assignments())
             .check((t, a) -> table(t).test(a) == t.contains(a));
     }
 
