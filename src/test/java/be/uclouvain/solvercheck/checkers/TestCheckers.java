@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static be.uclouvain.solvercheck.core.data.Operator.EQ;
@@ -16,6 +18,7 @@ import static be.uclouvain.solvercheck.core.data.Operator.LE;
 import static be.uclouvain.solvercheck.core.data.Operator.LT;
 import static be.uclouvain.solvercheck.core.data.Operator.NE;
 import static be.uclouvain.solvercheck.generators.Generators.tables;
+import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
 
 public class TestCheckers implements WithQuickTheories, WithCheckers {
@@ -55,32 +58,41 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
 
     @Test
     public void testGccIsTrueIffAllValuesOccurWithGivenCardinality() {
-        qt().forAll(integers().between(0, 10)) // size
+        qt().withExamples(100)
+            .forAll(integers().between(0, 10).describedAs(s -> "SIZE("+s+")"))
             .checkAssert(S ->
-                qt().forAll(
-                    lists().of(integers().between(0, 10)).ofSize(S),  // cards
-                    lists().of(integers().between(-10, 10)).ofSize(S))// values
-                    .checkAssert((cards, values) ->
-                        qt().forAll(assignmentWithAtLeast(S))
-                            .check(ass -> {
-                                boolean isGcc = gcc(cards, values).test(ass);
+                // FIXME: Questionnable ? Can it make sense to have
+                //        multiple occurrences of the same value ?
+                qt().withExamples(100)
+                    .forAll(Generators.setsOfUpTo(S,integers().between(-10,10)).describedAs(s -> "VALUES("+s+")"))
+                    .checkAssert(values ->
+                        qt().withExamples(100)
+                            .forAll(lists().of(integers().between(0, 10)).ofSize(values.size()).describedAs(s -> "CARDS("+s+")"))
+                            .checkAssert(cards ->
+                                qt().withExamples(100)
+                                    .forAll(Generators.assignments().withValuesRanging(-10, 10).describedAs(a -> "ASSIGNMENT("+a+")"))
+                                    .check(ass -> {
 
-                                boolean verif = true;
-                                for(int i = 0; i < S; i++) {
-                                    final int idx = i;
+                     List<Integer> vals = new ArrayList<>(values);
+                     boolean isGcc = gcc(cards, vals).test(ass);
 
-                                    int expectedCount = cards.get(i);
-                                    long counted = ass.stream()
-                                                   .filter(x -> x.equals(values.get(idx)))
-                                                   .count();
+                     boolean verif = true;
+                     for(int i = 0; i < vals.size(); i++) {
+                         final int idx = i;
 
-                                    verif &= (counted == expectedCount);
-                                }
+                         int expectedCount = cards.get(i);
+                         long counted = ass.stream()
+                                        .filter(x -> x.equals(vals.get(idx)))
+                                        .count();
 
-                                return isGcc == verif;
+                         verif &= (counted == expectedCount);
+                     }
+
+                     return isGcc == verif;
+
                             })
                     )
-            );
+            ));
     }
 
     @Test
@@ -93,6 +105,9 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
     @Test
     public void testGccVarIsTrueIffAllValuesOccurWithGivenCardinality() {
       qt().forAll(lists().of(integers().between(-10, 10)).ofSizeBetween(0, 10))
+          // FIXME: Questionnable ? Can it make sense to have
+          //        multiple occurrences of the same value ?
+          .assuming(vals -> vals.size() == new HashSet<>(vals).size())
           .checkAssert(values -> {
               int nbVarsMin = values.size();
               qt().forAll(
@@ -128,6 +143,79 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
                       return isGcc == verif;
                   });
           });
+    }
+
+    @Test
+    public void gccShouldFailWheneverTheValuesCannotDirectlyBeMappedOntoASet() {
+        qt().forAll(integers().between(2, 100).describedAs(s -> "SIZE("+s+")"))
+            .checkAssert(S ->
+              qt().withGenerateAttempts(10000)
+                  .forAll(
+                      lists()
+                          .of(integers().between(0, 10))
+                          .ofSize(S)
+                          .describedAs(v ->"VALS("+v+")"),
+                      lists()
+                          .of(integers().between(0, 10))
+                          .ofSize(S)
+                          .describedAs(c ->"CARDS("+c+")"))
+                  .assuming((vals, cards) -> vals.size() != new HashSet<>(vals).size())
+                  .check((vals, cards) ->
+                    failsThrowing(
+                        IllegalArgumentException.class,
+                        () -> gcc(cards, vals)))
+            );
+    }
+
+    @Test
+    public void gccVarShouldFailWheneverTheValuesCannotDirectlyBeMappedOntoASet() {
+        qt().forAll(
+            lists()
+                .of(integers().between(0, 100))
+                .ofSizeBetween(2, 100)
+                .describedAs(v ->"VALS("+v+")"))
+            .assuming(vals -> vals.size() != new HashSet<>(vals).size())
+            .check(vals ->
+                failsThrowing(
+                    IllegalArgumentException.class,
+                    () -> gccVar(vals)));
+    }
+
+    @Test
+    public void gccShouldFailWhenValuesAndCardinalitieDontHaveTheSameSize() {
+        qt().withGenerateAttempts(10000)
+            .forAll(
+                lists()
+                    .of(integers().between(0, 10))
+                    .ofSizeBetween(0, 100)
+                    .describedAs(v ->"VALS("+v+")"),
+                lists()
+                    .of(integers().between(0, 10))
+                    .ofSizeBetween(0, 100)
+                    .describedAs(c ->"CARDS("+c+")"))
+            .assuming((vals, cards) -> vals.size() != cards.size())
+            .check((vals, cards) ->
+                    failsThrowing(
+                            IllegalArgumentException.class,
+                            () -> gcc(cards, vals)));
+    }
+
+    @Test
+    public void gccVardShouldFailWhenCardinalitiesCantCoverValues() {
+        qt().withGenerateAttempts(10000)
+                .forAll(
+                        lists()
+                                .of(integers().between(0, 10))
+                                .ofSizeBetween(0, 100)
+                                .describedAs(v ->"VALS("+v+")"),
+                        Generators.assignments()
+                                .withUpToVariables(100)
+                                .describedAs(a -> "ASSIGNMENT("+a+")"))
+                .assuming((vals, ass) -> vals.size() > ass.size())
+                .check((vals, ass) ->
+                        failsThrowing(
+                                IllegalArgumentException.class,
+                                () -> gccVar(vals).test(ass)));
     }
 
     @Test

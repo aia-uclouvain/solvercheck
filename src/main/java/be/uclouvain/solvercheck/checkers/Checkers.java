@@ -1,10 +1,11 @@
 package be.uclouvain.solvercheck.checkers;
 
 import be.uclouvain.solvercheck.core.data.Assignment;
-import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.data.Operator;
+import be.uclouvain.solvercheck.core.task.Checker;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -194,6 +195,12 @@ public final class Checkers {
                   + "number of given values");
         }
 
+        if (new HashSet<>(values).size() != values.size()) {
+            throw new IllegalArgumentException(
+                    "All the values specified in the `values` list must be "
+                  + "different");
+        }
+
         return x -> uncheckedGcc(x, cardinalities, values);
     }
 
@@ -216,6 +223,13 @@ public final class Checkers {
      *         constraint.
      */
     public static Checker gccVar(final List<Integer> values) {
+
+        if (new HashSet<>(values).size() != values.size()) {
+            throw new IllegalArgumentException(
+                    "All the values specified in the `values` list must be "
+                            + "different");
+        }
+
         return x -> gcc(x.subList(0, x.size() - values.size()),        // vars.
                         x.subList(x.size() - values.size(), x.size()), // cardin
                         values);                                       // values
@@ -244,6 +258,12 @@ public final class Checkers {
             throw new IllegalArgumentException(
                     "The number of given cardinalities does not match the "
                   + "number of given values");
+        }
+
+        if (new HashSet<>(values).size() != values.size()) {
+            throw new IllegalArgumentException(
+                    "All the values specified in the `values` list must be "
+                            + "different");
         }
 
         return uncheckedGcc(variables, cardinalities, values);
