@@ -2,7 +2,9 @@ package be.uclouvain.solvercheck.core.data;
 
 import be.uclouvain.solvercheck.generators.Generators;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
+import org.junit.Before;
 import org.junit.Test;
+import org.quicktheories.QuickTheory;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
@@ -21,16 +23,23 @@ import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 
 public class TestDomain implements WithQuickTheories {
 
+    private QuickTheory qt;
+
+    @Before
+    public void setUp() {
+        qt = qt().withGenerateAttempts(10000);
+    }
+
     @Test
     public void restrictReturnsTheSameInstanceWhenItemDoesNotBelongToDomain(){
-        qt().forAll(domains(), integers().all())
+        qt.forAll(domains(), integers().all())
                 .assuming((domain, value) -> !domain.contains(value))
                 .check   ((domain, value) -> Domain.restrict(domain, NE, value) == domain );
     }
 
     @Test
     public void restrictCreatesAProperSubdomainUponRemoval(){
-        qt().forAll(domains()).check(dom ->
+        qt.forAll(domains()).check(dom ->
             dom.stream().allMatch(value -> {
                 Domain modified = Domain.restrict(dom, NE, value);
                 return !modified.contains(value)
@@ -41,7 +50,7 @@ public class TestDomain implements WithQuickTheories {
 
     @Test
     public void twoDomainsWithSameValuesAreEquivalent() {
-        qt().forAll(domains()).check(d -> {
+        qt.forAll(domains()).check(d -> {
             boolean isReflexive  = d.compareWith(d) == EQUIVALENT;
             boolean isSymmetric  = d.stream().allMatch(v -> {
                 Domain a = Domain.restrict(d, NE, v);
@@ -65,23 +74,22 @@ public class TestDomain implements WithQuickTheories {
 
     @Test
     public void aSubDomainMustBeStrongerThanItsParent(){
-        qt().forAll(domains()).check(d ->
+        qt.forAll(domains()).check(d ->
                 d.stream().allMatch(v -> Domain.restrict(d, NE, v).compareWith(d) == STRONGER)
         );
     }
 
     @Test
     public void aSuperDomainMustBeWeakerThanItsChild(){
-        qt().forAll(domains()).check(d ->
+        qt.forAll(domains()).check(d ->
             d.stream().allMatch(v -> d.compareWith(Domain.restrict(d, NE, v)) == WEAKER)
         );
     }
 
     @Test
     public void subDomainsAreIncomparableWhenNoneContainsTheOther() {
-        qt().withGenerateAttempts(10000)
-            .forAll(domains())
-            .assuming(d -> d.size() >= 2)
+        qt.forAll(domains())
+          .assuming(d -> d.size() >= 2)
             .check(domain -> {
                 Iterator<Integer> it = domain.iterator();
                 Domain a = Domain.restrict(domain, NE, it.next());
@@ -93,12 +101,12 @@ public class TestDomain implements WithQuickTheories {
 
     @Test
     public void testEqualsIffEquivalent() {
-        qt().forAll(domains(), domains())
+        qt.forAll(domains(), domains())
             .check ((a, b) -> a.equals(b) == (a.compareWith(b) == EQUIVALENT));
     }
     @Test
     public void testEquals() {
-        qt().forAll(domains()).check(d -> {
+        qt.forAll(domains()).check(d -> {
             boolean isReflexive  = d.equals(d);
             boolean isSymmetric  = d.stream().allMatch(v -> {
                 Domain a = Domain.restrict(d, NE, v);
@@ -119,7 +127,7 @@ public class TestDomain implements WithQuickTheories {
     }
     @Test
     public void testHashCode() {
-        qt().forAll(domains()).check(d ->
+        qt.forAll(domains()).check(d ->
             d.stream().allMatch(v -> {
                 Domain a = Domain.restrict(d, NE, v);
                 Domain b = Domain.restrict(d, NE, v);
@@ -130,9 +138,11 @@ public class TestDomain implements WithQuickTheories {
 
     @Test
     public void minimumReturnsTheSmallestOfAllValuesInTheDomain(){
-        qt().forAll(domains(20))
-            .assuming(d -> d.size() >= 1)
-            .check(x -> x.minimum().equals(Collections.min(x)));
+        qt.forAll(domains(1000))
+                .assuming(d -> !d.isEmpty())
+                .check(x ->
+                        x.minimum().equals(Collections.min(x))
+                );
     }
     @Test
     public void minimumFailsWhenDomainIsEmpty(){
@@ -140,7 +150,7 @@ public class TestDomain implements WithQuickTheories {
     }
     @Test
     public void maximimReturnsTheHighestOfAllValuesInTheDomain(){
-        qt().forAll(domains(20))
+        qt.forAll(domains(1000))
                 .assuming(d -> d.size() >= 1)
                 .check(x -> x.maximum().equals(Collections.max(x)));
     }
