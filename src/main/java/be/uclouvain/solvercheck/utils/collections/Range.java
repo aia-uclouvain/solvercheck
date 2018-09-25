@@ -5,87 +5,60 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * An inclusive range of value: [lower; upper].
+ * An inclusive range of value: [lower; upper[.
  *
- * FIXME: il faut être capable de creer un range vide !
+ * <div>
+ *     <h3>Note</h3>
+ *     Even though this implementation assumes that a range is a set of
+ *     integers, it is encoded using <b>long</b>. This is because we do want to
+ *     be able to represent all ranges from Integer.MIN_VALUE to
+ *     Integer.MAX_VALUE. This range can obviously not be represented using an
+ *     int encoded range as its size would be bounded by Integer.MAX_VALUE.
+ * </div>
  */
 public final class Range extends AbstractSet<Integer> {
-    /** The lower bound of the range. */
-    private final int from;
-    /** The upper bound of the range. */
-    private final int to;
-    /** The step size between two consecutive elements. */
-    private final int step;
+    /** The lower bound (included) of the range. */
+    private final long from;
+    /** The upper bound (excluded) of the range. */
+    private final long to;
 
     /**
      * Creates the given range of values spanning from `from` (inclusive)
-     * until `to` (inclusive) stepping by one.
+     * until `to` (exclusive) stepping by one.
      *
      * .. Note::
      *    This factory method is a mere wrapper to the constructor. Its
      *    only purpose is to improve the readability of client code
      *
      * @param from the lower bound (incl.) of the set
-     * @param to the upper bound (incl.) of the set
-     * @return a new range of values representing the interval [from; to]
+     * @param to the upper bound (excl.) of the set
+     * @return a new range of values representing the interval [from; to[
      */
-    public static Range between(final int from, final int to) {
+    public static Range between(final long from, final long to) {
         return new Range(from, to);
     }
 
     /**
      * Creates the given range of values spanning from `from` (inclusive)
-     * until `to` (inclusive) stepping by `step` items.
-     *
-     * .. Note::
-     *    This factory method is a mere wrapper to the constructor. Its
-     *    only purpose is to improve the readability of client code
+     * until `to` (exclusive) stepping by one.
      *
      * @param from the lower bound (incl.) of the set
-     * @param to the upper bound (incl.) of the set
-     * @param step the step size between any two elements of the set
-     *
-     * @return a new range of values representing the interval [from; to] in
-     * which all values are separated by `step`.
+     * @param to the upper bound (excl.) of the set
      */
-    public static Range between(final int from, final int to, final int step) {
-        return new Range(from, to, step);
-    }
-
-    /**
-     * Creates the given range of values spanning from `from` (inclusive)
-     * until `to` (inclusive) stepping by one.
-     *
-     * @param from the lower bound (incl.) of the set
-     * @param to the upper bound (incl.) of the set
-     */
-    private Range(final int from, final int to) {
-        this(from, to, 1);
-    }
-
-    /**
-     * Creates the given range of values spanning from `from` (inclusive)
-     * until `to` (inclusive) stepping by `step` items.
-     *
-     * @param from the lower bound (incl.) of the set
-     * @param to the upper bound (incl.) of the set
-     * @param step the step size between any two elements of the set
-     */
-    private Range(final int from, final int to, final int step) {
-        if (!isFeasible(from, to, step)) {
-            throw new IllegalArgumentException(String.format(
-                "The range [%d; %d :: %d] has an infinite size",
-                 from, to, step));
+    private Range(final long from, final long to) {
+        if (to < from) {
+            throw new IllegalArgumentException(
+               "Impossible to create the range [" + from + ";" + to + "["
+             + "It would have a negative size.");
         }
         this.from = from;
         this.to   = to;
-        this.step = step;
     }
 
     /** {@inheritDoc} */
     @Override
     public int size() {
-        return 1 + (to - from) / step;
+        return (int) (to - from);
     }
 
     /**
@@ -102,28 +75,11 @@ public final class Range extends AbstractSet<Integer> {
     }
 
     /**
-     * Tells whether or not a range specified with the given parameters is
-     * closed. That is to say, it has a finite size.
-     *
-     * @param from the lower bound of the interval
-     * @param to the upper bound of the interval
-     * @param step the step size separating the values in the interval
-     * @return true iff the interval [from; to :: step] is closed.
-     */
-    private static boolean isFeasible(
-            final int from,
-            final int to,
-            final int step) {
-
-        return ((from <= to && step > 0) || (from >= to && step < 0));
-    }
-
-    /**
      * An iterator that efficiently goes through all the values in the range.
      */
     private class RangeIterator implements Iterator<Integer> {
         /** The current value of the iterator. */
-        private int current;
+        private long current;
 
         /** Creates a new iterator to go over the current range. */
         RangeIterator() {
@@ -133,11 +89,7 @@ public final class Range extends AbstractSet<Integer> {
         /** {@inheritDoc} */
         @Override
         public boolean hasNext() {
-            if (step > 0) {
-                return current <= to;
-            } else {
-                return current >= to;
-            }
+            return current < to;
         }
 
         /** {@inheritDoc} */
@@ -147,9 +99,7 @@ public final class Range extends AbstractSet<Integer> {
                 throw new NoSuchElementException();
             }
 
-            int result = current;
-            current += step;
-            return result;
+            return (int) current++;
         }
     }
 }

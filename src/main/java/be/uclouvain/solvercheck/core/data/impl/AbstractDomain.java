@@ -28,7 +28,7 @@ import java.util.stream.StreamSupport;
     /** {@inheritDoc} */
     @Override
     public Stream<Integer> increasingStream() {
-        return StreamSupport.stream(from(this::decreasing), true);
+        return StreamSupport.stream(from(this::increasing), true);
     }
 
     /** {@inheritDoc} */

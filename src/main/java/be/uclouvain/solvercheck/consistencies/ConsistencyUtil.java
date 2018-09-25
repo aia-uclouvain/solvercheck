@@ -44,7 +44,9 @@ public final class ConsistencyUtil {
     public static Set<List<Integer>> boundSupport(final List<Domain> domains) {
         return CartesianProduct.of(
                 domains.stream()
-                    .map(dom -> Range.between(dom.minimum(), dom.maximum()))
+                    .map(dom -> Range.between(
+                            (long) dom.minimum(),
+                            (long) dom.maximum() + 1))
                     .collect(Collectors.toList())
         );
     }
