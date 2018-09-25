@@ -1,7 +1,6 @@
 package be.uclouvain.solvercheck.consistencies.boundZ;
 
 import be.uclouvain.solvercheck.checkers.WithCheckers;
-import be.uclouvain.solvercheck.consistencies.BoundZConsistency;
 import be.uclouvain.solvercheck.consistencies.WithConsistencies;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
@@ -37,7 +36,7 @@ public class TestBoundZConsistencyDomainFilter
     public void setUp() {
         qt = qt().withGenerateAttempts(10000);
         checker= allDiff();
-        filter = BoundZConsistency.domainFilter(checker);
+        filter = bcZDomain().apply(checker);
     }
 
     /**

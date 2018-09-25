@@ -1,14 +1,12 @@
 package be.uclouvain.solvercheck.consistencies.arc;
 
 import be.uclouvain.solvercheck.checkers.WithCheckers;
-import be.uclouvain.solvercheck.consistencies.ArcConsitency;
 import be.uclouvain.solvercheck.consistencies.WithConsistencies;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.task.DomainFilter;
-import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Assert;
@@ -37,7 +35,7 @@ public class TestArcConsistencyDomainFilter
     public void setUp() {
         qt = qt().withGenerateAttempts(10000);
         checker= allDiff();
-        filter = ArcConsitency.domainFilter(checker);
+        filter = acDomain().apply(checker);
     }
 
     /**

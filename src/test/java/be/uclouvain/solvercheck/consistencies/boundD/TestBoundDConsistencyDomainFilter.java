@@ -1,8 +1,6 @@
 package be.uclouvain.solvercheck.consistencies.boundD;
 
 import be.uclouvain.solvercheck.checkers.WithCheckers;
-import be.uclouvain.solvercheck.consistencies.ArcConsitency;
-import be.uclouvain.solvercheck.consistencies.BoundDConsistency;
 import be.uclouvain.solvercheck.consistencies.WithConsistencies;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
@@ -37,7 +35,7 @@ public class TestBoundDConsistencyDomainFilter
     public void setUp() {
         qt = qt().withGenerateAttempts(10000);
         checker= allDiff();
-        filter = BoundDConsistency.domainFilter(checker);
+        filter = bcDDomain().apply(checker);
     }
 
     /**
