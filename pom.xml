@@ -11,7 +11,7 @@
     <version>1.0-RC01-SNAPSHOT</version>
 
     <!-- DESCRIPTION ******************************************************* -->
-    <name>be.uclouvain:SolverCheck</name>
+    <name>org.bitbucket.xaviergillard:SolverCheck</name>
     <description>
         Efficient testing of constraints in JVM-based CP solvers.
     </description>
