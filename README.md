@@ -1,5 +1,12 @@
-# SolverCheck
+# SolverCheck 
 
+Efficient testing of constraints in JVM-based CP solvers
+
+---
+
+[![CircleCI](https://circleci.com/bb/xaviergillard/solvercheck/tree/master.svg?style=svg)](https://circleci.com/bb/xaviergillard/solvercheck/tree/master)
+
+---
 SolverCheck is a library to assess test the implementation of constraints in CP
 solvers. 
 
