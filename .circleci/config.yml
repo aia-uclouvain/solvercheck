@@ -32,4 +32,11 @@ jobs:
         
       # run tests!
       - run: mvn verify site -P QA
-
+      
+      # make a tarball with the sites report
+      - run: 
+          name: Package site tarball
+          command: tar -cvf ./target/solvercheck-qa.tgz ./target/site
+              
+      - store_artifacts:
+          path: ./target/solvercheck-qa.tgz
