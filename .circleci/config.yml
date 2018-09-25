@@ -31,5 +31,5 @@ jobs:
           key: v1-dependencies-{{ checksum "pom.xml" }}
         
       # run tests!
-      - run: mvn test org.pitest:pitest-maven:mutationCoverage
+      - run: mvn verify site -P QA
 
