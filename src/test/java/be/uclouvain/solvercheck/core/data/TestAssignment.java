@@ -1,5 +1,6 @@
 package be.uclouvain.solvercheck.core.data;
 
+import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
 import be.uclouvain.solvercheck.generators.Generators;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
+import static org.junit.Assert.assertEquals;
 
 public class TestAssignment implements WithQuickTheories {
     @Test
@@ -44,6 +46,14 @@ public class TestAssignment implements WithQuickTheories {
     public void testHashCode() {
         qt().forAll(assignments(), assignments())
                 .check ((a, b) -> a.equals(b) == (a.hashCode() == b.hashCode()));
+    }
+
+    @Test
+    public void testToString() {
+        assertEquals(
+            AssignmentFactory.from(List.of(1, 2, 3, 4)).toString(),
+            "x0=1, x1=2, x2=3, x3=4"
+        );
     }
 
     private Gen<Assignment> assignments() {

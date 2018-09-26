@@ -35,6 +35,7 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
      */
     /* package */ BasicDomain(final int...values) {
         this.values = Arrays.stream(values)
+                            .distinct()
                             .sorted()
                             .boxed()
                             .collect(Collectors.toList());
@@ -47,8 +48,8 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
      *               whom, this domain relates.
      */
     /* package */ BasicDomain(final Collection<Integer> values) {
-        this.values = values
-                .stream()
+        this.values = values.stream()
+                .distinct()
                 .sorted()
                 .collect(Collectors.toList());
     }

@@ -72,6 +72,10 @@ public final class DomainFactory {
             final Operator op,
             final int value) {
 
+        if (dom.isEmpty()) {
+            return dom;
+        }
+
         switch (op) {
             case EQ:
                 return filterEq(dom, value);
@@ -84,7 +88,7 @@ public final class DomainFactory {
             case GE:
                 return filterGe(dom, value);
             case GT:
-                return filterLt(dom, value);
+                return filterGt(dom, value);
             default:
                 throw new RuntimeException("Unreachable code");
         }
