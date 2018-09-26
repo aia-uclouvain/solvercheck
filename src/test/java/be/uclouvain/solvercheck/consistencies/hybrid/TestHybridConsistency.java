@@ -7,6 +7,7 @@ import be.uclouvain.solvercheck.consistencies.BoundZConsistency;
 import be.uclouvain.solvercheck.consistencies.RangeConsistency;
 import be.uclouvain.solvercheck.consistencies.WithConsistencies;
 import be.uclouvain.solvercheck.core.data.Assignment;
+import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.task.DomainFilter;
@@ -21,6 +22,7 @@ import org.quicktheories.core.Gen;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
@@ -130,7 +132,38 @@ public class TestHybridConsistency
         });
     }
 
+    /**
+     * 5. Whenever it is passed a failed partial assignment, it should return
+     * an empty one (of the right arity).
+     */
+    @Test
+    public void wheneverItIsPassedAFailedPAItShouldReturnEmptySolution() {
+        testHCForErrors((domainFilters, partialAssignment) -> {
+            Filter filter = hybrid(checker, domainFilters);
+            PartialAssignment filtered = filter.filter(partialAssignment);
+
+            assertEquals(filtered.size(), partialAssignment.size());
+            assertTrue(filtered.stream().allMatch(Domain::isEmpty));
+        });
+    }
+
     private void testHybridConsistency(final HybridConsistencyCheck actual) {
+        testHCWithAssumptions(
+            partialAssignment -> !partialAssignment.isError(),
+            actual
+        );
+    }
+
+    private void testHCForErrors(final HybridConsistencyCheck actual) {
+        testHCWithAssumptions(
+            partialAssignment -> partialAssignment.isError(),
+            actual
+        );
+    }
+
+    private void testHCWithAssumptions(
+            final Predicate<PartialAssignment> assumptions,
+            final HybridConsistencyCheck actual) {
         qt//.withFixedSeed(23314469440147L)
           .withExamples(10)
           .forAll(integers().between(MIN_VALUE+5, MAX_VALUE-4))
@@ -138,21 +171,21 @@ public class TestHybridConsistency
              qt//.withFixedSeed(23684206156302L)
                .withExamples(10)
                .forAll(
-                   partialAssignments()
-                     .withUpToVariables(5)
-                     .withValuesRanging(anchor-5, anchor+4))
-               .assuming(partialAssignment -> !partialAssignment.isError())
+                  partialAssignments()
+                    .withUpToVariables(5)
+                    .withValuesRanging(anchor-5, anchor+4))
+               .assuming(assumptions)
                .checkAssert(partialAssignment ->
                   qt//.withFixedSeed(23691073021520L)
                     .withExamples(10)
                     .forAll(
                        lists()
-                           .of(domainFilters())
-                           .ofSize(partialAssignment.size()))
+                         .of(domainFilters())
+                         .ofSize(partialAssignment.size()))
                     .checkAssert(domainFilters ->
-                        actual.test(
-                            domainFilters.toArray(new DomainFilterProducer[0]),
-                            partialAssignment)
+                       actual.test(
+                         domainFilters.toArray(new DomainFilterProducer[0]),
+                         partialAssignment)
                     )
                )
           );
