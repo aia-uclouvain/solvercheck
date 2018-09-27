@@ -1,5 +1,7 @@
 package be.uclouvain.solvercheck.core.data;
 
+import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
+import be.uclouvain.solvercheck.core.data.impl.DomainFactory;
 import be.uclouvain.solvercheck.generators.Generators;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 import org.junit.Before;
@@ -9,17 +11,22 @@ import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import static be.uclouvain.solvercheck.core.data.Operator.NE;
-
+import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
-
+import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 public class TestDomain implements WithQuickTheories {
 
@@ -28,6 +35,165 @@ public class TestDomain implements WithQuickTheories {
     @Before
     public void setUp() {
         qt = qt().withGenerateAttempts(10000);
+    }
+
+    @Test
+    public void minimumReturnsTheSmallestOfAllValuesInTheDomain(){
+        qt.forAll(domains(1000))
+                .assuming(d -> !d.isEmpty())
+                .check(x ->
+                        x.minimum().equals(Collections.min(x))
+                );
+    }
+    @Test
+    public void minimumFailsWhenDomainIsEmpty(){
+        assertThat(catchThrowable(() -> Domain.from().minimum())).isInstanceOf(NoSuchElementException.class);
+    }
+    @Test
+    public void maximumReturnsTheHighestOfAllValuesInTheDomain(){
+        qt.forAll(domains(1000))
+                .assuming(d -> d.size() >= 1)
+                .check(x -> x.maximum().equals(Collections.max(x)));
+    }
+    @Test
+    public void maximumFailsWhenDomainIsEmpty(){
+        assertThat(catchThrowable(() -> Domain.from().maximum())).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    public void testIncreasing() {
+        qt.forAll(domains(1000)).checkAssert(dom -> {
+            long prev = Long.MIN_VALUE;
+
+            Iterator<Integer> it = dom.increasing();
+            while (it.hasNext()) {
+                int value = it.next();
+                assertTrue(prev < value);
+                prev = value;
+            }
+        });
+    }
+
+    @Test
+    public void testDecreasing() {
+        qt.forAll(domains(1000)).checkAssert(dom -> {
+            long prev = Long.MAX_VALUE;
+
+            Iterator<Integer> it = dom.decreasing();
+            while (it.hasNext()) {
+                int value = it.next();
+                assertTrue(prev > value);
+                prev = value;
+            }
+        });
+    }
+
+    @Test
+    public void testIncreasingStream() {
+        qt.forAll(domains(1000)).checkAssert(dom -> {
+            long prev = Long.MIN_VALUE;
+
+            final List<Integer> lst = dom.increasingStream()
+                    .collect(Collectors.toList());
+
+            for (int value : lst) {
+                assertTrue(prev < value);
+                prev = value;
+            };
+        });
+    }
+
+    @Test
+    public void testDecreasingStream() {
+        qt.forAll(domains(1000)).checkAssert(dom -> {
+            long prev = Long.MAX_VALUE;
+
+            final List<Integer> lst = dom.decreasingStream()
+                    .collect(Collectors.toList());
+
+            for (int value : lst) {
+                assertTrue(prev > value);
+                prev = value;
+            };
+        });
+    }
+
+    @Test
+    public void itIsFixedIffItHasOnlyOnePossibleValue() {
+        qt.forAll(domains())
+          .check(dom -> dom.isFixed() == (dom.size() == 1));
+    }
+
+    @Test
+    public void emptyDomainProducesAnEmptyDomain() {
+        assertTrue(Domain.emptyDomain().isEmpty());
+        assertEquals(Domain.emptyDomain(), Domain.emptyDomain());
+        assertSame(Domain.emptyDomain(), Domain.emptyDomain());
+
+        assertTrue(failsThrowing(
+                NoSuchElementException.class,
+                () -> Domain.emptyDomain().minimum()
+        ));
+        assertTrue(failsThrowing(
+                NoSuchElementException.class,
+                () -> Domain.emptyDomain().maximum()
+        ));
+    }
+
+    @Test
+    public void singletonProducesAFixedDomain() {
+        qt.forAll(integers().all())
+          .checkAssert(value -> {
+              Domain singleton = Domain.singleton(value);
+              assertTrue(singleton.isFixed());
+              assertEquals(singleton, Domain.singleton(value));
+              assertEquals(value, singleton.minimum());
+              assertEquals(value, singleton.maximum());
+          });
+    }
+
+    @Test
+    public void testFromExtension() {
+        qt().forAll(
+            lists()
+                .of(integers().all())
+                .ofSizeBetween(0, 1000))
+            .check(lst -> {
+                int[] array = lst
+                        .stream()
+                        .mapToInt(Integer::intValue)
+                        .toArray();
+
+                List<Integer> distinct = lst
+                        .stream()
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                Domain domain = DomainFactory.from(array);
+
+                return distinct.containsAll(domain)
+                        && domain.containsAll(distinct);
+            });
+    }
+
+    @Test
+    public void testFromCollectionExtension() {
+        qt().forAll(
+               lists()
+                .of(integers().all())
+                .ofSizeBetween(0, 1000))
+            .check(lst -> {
+                HashSet<Integer> set = new HashSet<>(lst);
+                return set.equals(Domain.from(lst));
+            });
+    }
+
+    @Test
+    public void domainFromAnOtherDomainIsIdentity() {
+        qt().forAll(domains())
+            .check(dom ->
+                dom.equals(Domain.from(dom)) && dom == Domain.from(dom)
+            );
     }
 
     @Test
@@ -46,6 +212,14 @@ public class TestDomain implements WithQuickTheories {
                      && modified.stream().allMatch(vy -> value.equals(vy) || modified.contains(vy));
             })
         );
+    }
+
+    @Test
+    public void testCollector() {
+        qt().forAll(lists().of(integers().all()).ofSizeBetween(0, 1000))
+            .check(lst ->
+                new HashSet<>(lst).equals(lst.stream().collect(Domain.collector()))
+            );
     }
 
     @Test
@@ -137,26 +311,11 @@ public class TestDomain implements WithQuickTheories {
     }
 
     @Test
-    public void minimumReturnsTheSmallestOfAllValuesInTheDomain(){
-        qt.forAll(domains(1000))
-                .assuming(d -> !d.isEmpty())
-                .check(x ->
-                        x.minimum().equals(Collections.min(x))
-                );
-    }
-    @Test
-    public void minimumFailsWhenDomainIsEmpty(){
-        assertThat(catchThrowable(() -> Domain.from().minimum())).isInstanceOf(NoSuchElementException.class);
-    }
-    @Test
-    public void maximimReturnsTheHighestOfAllValuesInTheDomain(){
-        qt.forAll(domains(1000))
-                .assuming(d -> d.size() >= 1)
-                .check(x -> x.maximum().equals(Collections.max(x)));
-    }
-    @Test
-    public void maximumFailsWhenDomainIsEmpty(){
-        assertThat(catchThrowable(() -> Domain.from().maximum())).isInstanceOf(NoSuchElementException.class);
+    public void testToString() {
+        assertEquals(
+                Domain.from(1, 2, 3, 4).toString(),
+                "{1,2,3,4}"
+        );
     }
 
     private Gen<Domain> domains() {

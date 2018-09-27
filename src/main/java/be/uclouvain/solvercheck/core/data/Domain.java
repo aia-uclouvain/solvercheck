@@ -42,15 +42,34 @@ public interface Domain extends Set<Integer>, PartiallyOrderable<Domain> {
     Iterator<Integer> decreasing();
 
     /**
-     * @return a stream to process the values of the domain in *increasing*
+     * Returns a stream to process the values of the domain in *increasing*
      * order. (underlying spliterators must have the ORDERED, DISTINCT,
-     * IMMUTABLE, SIZED and SUBSIZED characteristics)
+     * IMMUTABLE, SIZED and SUBSIZED characteristics).
+     *
+     * <div>
+     *     <h4>Note</h4>
+     *     The returned stream may be parallel. Hence any consumer using
+     *     these streams should be thread-safe.
+     * </div>
+     *
+     * @return a stream to process the values of the domain in *increasing*
+     * order.
      */
     Stream<Integer> increasingStream();
+
     /**
-     * @return a stream to process the values of the domain in *decreasing*
+     * Returns a stream to process the values of the domain in *decreasing*
      * order. (underlying spliterators must have the ORDERED, DISTINCT,
-     * IMMUTABLE, SIZED and SUBSIZED characteristics)
+     * IMMUTABLE, SIZED and SUBSIZED characteristics).
+     *
+     * <div>
+     *     <h4>Note</h4>
+     *     The returned stream may be parallel. Hence any consumer using
+     *     these streams should be thread-safe.
+     * </div>
+     *
+     * @return a stream to process the values of the domain in *decreasing*
+     * order.
      */
     Stream<Integer> decreasingStream();
 
