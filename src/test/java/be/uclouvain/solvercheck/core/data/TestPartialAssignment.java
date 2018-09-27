@@ -1,31 +1,80 @@
 package be.uclouvain.solvercheck.core.data;
 
 import be.uclouvain.solvercheck.generators.Generators;
+import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import be.uclouvain.solvercheck.utils.Utils;
+import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Test;
+import org.quicktheories.QuickTheory;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
 import java.util.Collection;
 import java.util.List;
-
-import static be.uclouvain.solvercheck.generators.Generators.domains;
+import java.util.function.Predicate;
 
 import static be.uclouvain.solvercheck.core.data.Operator.NE;
-
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARABLE;
-
-import static be.uclouvain.solvercheck.utils.Utils.domainsAreEquivalent;
 import static be.uclouvain.solvercheck.utils.Utils.domainIsStronger;
 import static be.uclouvain.solvercheck.utils.Utils.domainIsWeaker;
-import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
+import static be.uclouvain.solvercheck.utils.Utils.domainsAreEquivalent;
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
+import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
 import static be.uclouvain.solvercheck.utils.Utils.zip;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARABLE;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.MIN_VALUE;
 
-public class TestPartialAssignment implements WithQuickTheories {
+public class TestPartialAssignment
+        implements WithQuickTheories, WithCpGenerators {
+
+    @Test
+    public void testIsComplete() {
+        forAnyPartialAssignment(
+                a -> true,
+                a -> a.isComplete() == a.stream().allMatch(Domain::isFixed)
+        );
+    }
+    @Test
+    public void testIsError() {
+        forAnyPartialAssignment(
+                a -> true,
+                a -> a.isError() == a.stream().anyMatch(Domain::isEmpty)
+        );
+    }
+    @Test
+    public void testIsLeaf() {
+        forAnyPartialAssignment(
+                a -> true,
+                a -> a.isLeaf() == (a.stream().allMatch(Domain::isFixed)
+                  || a.stream().anyMatch(Domain::isEmpty))
+        );
+    }
+
+    @Test
+    public void whenAllDomainsAreFixedAPartialAssignmentCanBeSeenAsTheCorrespondingAssignment() {
+        qt().forAll(lists().of(integers().all()).ofSizeBetween(0, 20))
+                .check( lst ->
+                        PartialAssignment.unionOf(lst.size(), List.of(lst))
+                                .asAssignment()
+                                .equals(Assignment.from(lst))
+                                &&
+                                // check it in both directions
+                                Assignment.from(lst)
+                                        .equals(PartialAssignment.unionOf(lst.size(),
+                                                List.of(lst)).asAssignment())
+                );
+    }
+
+    @Test
+    public void oneCannotCallAsAssignmentWhenNotAllDomainsAreFixed() {
+        qt().withGenerateAttempts(10000)
+                .forAll(partialAssignments())
+                .assuming(x -> x.stream().anyMatch(dom -> !dom.isFixed()))
+                .check(x -> failsThrowing(IllegalStateException.class, ()->x.asAssignment()));
+    }
 
     @Test
     public void testSize() {
@@ -60,6 +109,13 @@ public class TestPartialAssignment implements WithQuickTheories {
                                         () -> PartialAssignment.from(domains).get(index))
                         ));
     }
+
+    @Test
+    public void testFromList() {
+        qt().forAll(lists().of(domains()).ofSizeBetween(0, 1000))
+            .check(lst -> lst.equals(PartialAssignment.from(lst)));
+    }
+
 
     @Test
     public void restrictFailsWhenGivenAWrongVariable() {
@@ -98,6 +154,68 @@ public class TestPartialAssignment implements WithQuickTheories {
                         return isProper;
                     })
             );
+    }
+
+    // COLLECTOR
+    @Test
+    public void testCollector() {
+        qt().forAll(lists().of(domains()).ofSizeBetween(0, 1000))
+            .check(lst -> {
+                PartialAssignment d = lst.stream().collect(PartialAssignment.collector());
+
+                return d.containsAll(lst) && lst.containsAll(d);
+            });
+    }
+
+    // UNION OF
+    @Test
+    public void unionOfTheCartesianProductMustEqualOriginalPartialAssignmentWhenNoDomainIsEmpty() {
+        forAnyPartialAssignment(
+            pa -> pa.stream().noneMatch(Domain::isEmpty),
+            pa -> pa.equals(PartialAssignment.unionOf(
+                        pa.size(),
+                        CartesianProduct.of(pa)))
+        );
+    }
+    @Test
+    public void unionOfTheCartesianProductMustYieldAnEmptyPartialAssignmentOfTheGivenAriry() {
+        forAnyPartialAssignment(
+                PartialAssignment::isError,
+                partialAssignment -> {
+                    CartesianProduct<Integer> cp =
+                            CartesianProduct.of(partialAssignment);
+
+                    PartialAssignment pa =
+                            PartialAssignment.unionOf(partialAssignment.size(), cp);
+
+                    boolean sameSize = pa.size() == partialAssignment.size();
+                    boolean allEmpty = pa.stream().allMatch(Domain::isEmpty);
+
+                    return sameSize && allEmpty;
+                }
+        );
+    }
+
+
+    private void forAnyPartialAssignment(
+            final Predicate<PartialAssignment> assumptions,
+            final Predicate<PartialAssignment> actual) {
+
+        final QuickTheory qt = qt()
+                .withGenerateAttempts(10000)
+                .withFixedSeed(1234567890);
+
+        qt.withExamples(100)
+                .forAll(integers().between(MIN_VALUE+5, MAX_VALUE-4))
+                .checkAssert(anchor ->
+                        qt.withExamples(10)
+                                .forAll(
+                                        partialAssignments()
+                                                .withUpToVariables(5)
+                                                .withValuesRanging(anchor-5, anchor+4))
+                                .assuming(assumptions)
+                                .check(actual)
+                );
     }
 
     @Test
@@ -162,18 +280,6 @@ public class TestPartialAssignment implements WithQuickTheories {
             });
     }
 
-    @Test
-    public void testIsComplete() {
-        qt().forAll(partialAssignments()).check(a ->
-                a.isComplete() == a.stream().allMatch(Domain::isFixed)
-        );
-    }
-    @Test
-    public void testIsLeaf() {
-        qt().forAll(partialAssignments()).check(a ->
-                a.isLeaf() == (a.stream().allMatch(Domain::isFixed) || a.stream().anyMatch(Domain::isEmpty))
-        );
-    }
 
     @Test
     public void testEqualsIffEquivalent() {
@@ -185,29 +291,6 @@ public class TestPartialAssignment implements WithQuickTheories {
     public void testHashCode() {
         qt().forAll(partialAssignments(), partialAssignments())
             .check ((a, b) -> !a.equals(b) || (a.hashCode() == b.hashCode()));
-    }
-
-    @Test
-    public void whenAllDomainsAreFixedAPartialAssignmentCanBeSeenAsTheCorrespondingAssignment() {
-        qt().forAll(lists().of(integers().all()).ofSizeBetween(0, 20))
-            .check( lst ->
-                    PartialAssignment.unionOf(lst.size(), List.of(lst))
-                        .asAssignment()
-                        .equals(Assignment.from(lst))
-                &&
-                // check it in both directions
-                Assignment.from(lst)
-                        .equals(PartialAssignment.unionOf(lst.size(),
-                                List.of(lst)).asAssignment())
-            );
-    }
-
-    @Test
-    public void oneCannotCallAsAssignmentWhenNotAllDomainsAreFixed() {
-        qt().withGenerateAttempts(10000)
-            .forAll(partialAssignments())
-            .assuming(x -> x.stream().anyMatch(dom -> !dom.isFixed()))
-            .check(x -> failsThrowing(IllegalStateException.class, ()->x.asAssignment()));
     }
 
     private boolean isValidVarIndex(int i, Collection<?> a) {
@@ -226,13 +309,6 @@ public class TestPartialAssignment implements WithQuickTheories {
     private Gen<PartialAssignment> nonEmptyAssignments() {
         return Generators.partialAssignments()
                 .withVariablesBetween(1, 10)
-                .withDomainsOfSizeUpTo(10)
-                .withValuesRanging(-10, 10)
-                .build();
-    }
-    private Gen<PartialAssignment> partialAssignments() {
-        return Generators.partialAssignments()
-                .withUpToVariables(5)
                 .withDomainsOfSizeUpTo(10)
                 .withValuesRanging(-10, 10)
                 .build();

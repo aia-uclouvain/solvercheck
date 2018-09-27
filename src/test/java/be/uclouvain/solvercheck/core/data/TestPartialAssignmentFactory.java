@@ -1,13 +1,95 @@
 package be.uclouvain.solvercheck.core.data;
 
+import be.uclouvain.solvercheck.core.data.impl.PartialAssignmentFactory;
+import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Test;
+import org.quicktheories.QuickTheory;
 import org.quicktheories.WithQuickTheories;
 
-import static be.uclouvain.solvercheck.generators.Generators.partialAssignments;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
-public class TestPartialAssignmentFactory implements WithQuickTheories {
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.MIN_VALUE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
+public class TestPartialAssignmentFactory
+        implements WithQuickTheories, WithCpGenerators {
+
+    // FROM
+    @Test
+    public void testFromList() {
+        qt().forAll(lists().of(domains()).ofSizeBetween(0, 1000))
+            .check(lst ->
+                lst.equals(PartialAssignmentFactory.from(lst))
+            );
+    }
+
+    // RESTRICT
+    @Test
+    public void testRestrict() {
+        qt().forAll(operators(), integers().all()).checkAssert((op, value) ->
+          forAnyPartialAssignment(
+              partialAssignment -> true,
+              partialAssignment -> {
+
+             int arity = partialAssignment.size();
+
+             boolean ok = true;
+             for (int var = 0; ok && var < arity; var++) {
+                 PartialAssignment restricted = PartialAssignmentFactory.restrict(
+                               partialAssignment, var, op, value);
+
+                 List<Domain> computed =
+                         new ArrayList<>(partialAssignment);
+
+                 computed.set(
+                         var,
+                         Domain.restrict(partialAssignment.get(var), op, value));
+
+                 ok &= computed.equals(restricted);
+             }
+
+             return ok;
+          })
+        );
+    }
+
+    private boolean satisfiesRestriction(
+            final Operator op, final int limit, final int value) {
+        switch (op) {
+            case GT:
+                return value > limit;
+            case GE:
+                return value >= limit;
+            case LT:
+                return value < limit;
+            case LE:
+                return value <= limit;
+            case EQ:
+                return value == limit;
+            case NE:
+                return value != limit;
+            default:
+                throw new RuntimeException("Unreachable code");
+        }
+    }
+
+    // COLLECTOR
+    @Test
+    public void testCollector() {
+        qt().forAll(lists().of(domains()).ofSizeBetween(0, 1000))
+            .check(lst -> {
+                PartialAssignment d = lst.stream().collect(PartialAssignmentFactory.collector());
+
+                return d.containsAll(lst) && lst.containsAll(d);
+            });
+    }
+
+    // UNION OF
     @Test
     public void unionOfTheCartesianProductMustEqualOriginalPartialAssignmentWhenNoDomainIsEmpty() {
         qt().forAll(partialAssignments().build())
@@ -18,5 +100,44 @@ public class TestPartialAssignmentFactory implements WithQuickTheories {
                         CartesianProduct.of(x)))
             );
     }
+    @Test
+    public void unionOfTheCartesianProductMustYieldAnEmptyPartialAssignmentOfTheGivenAriry() {
+        forAnyPartialAssignment(
+                PartialAssignment::isError,
+                partialAssignment -> {
+                    CartesianProduct<Integer> cp =
+                        CartesianProduct.of(partialAssignment);
 
+                    PartialAssignment pa =
+                        PartialAssignmentFactory.unionOf(partialAssignment.size(), cp);
+
+                    boolean sameSize = pa.size() == partialAssignment.size();
+                    boolean allEmpty = pa.stream().allMatch(Domain::isEmpty);
+
+                    return sameSize && allEmpty;
+                }
+        );
+    }
+
+
+    private void forAnyPartialAssignment(
+            final Predicate<PartialAssignment> assumptions,
+            final Predicate<PartialAssignment> actual) {
+
+        final QuickTheory qt = qt()
+                .withGenerateAttempts(10000)
+                .withFixedSeed(1234567890);
+
+        qt.withExamples(100)
+          .forAll(integers().between(MIN_VALUE+5, MAX_VALUE-4))
+          .checkAssert(anchor ->
+             qt.withExamples(10)
+               .forAll(
+                  partialAssignments()
+                    .withUpToVariables(5)
+                    .withValuesRanging(anchor-5, anchor+4))
+               .assuming(assumptions)
+               .check(actual)
+          );
+    }
 }
