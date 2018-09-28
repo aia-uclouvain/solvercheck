@@ -141,6 +141,9 @@ public final class CartesianProduct<T>
      * @return the index-th tuple.
      */
     public List<T> get(final int index) {
+        if (index < 0 || index >= size()) {
+            throw new IndexOutOfBoundsException();
+        }
         return new Line(index);
     }
 
