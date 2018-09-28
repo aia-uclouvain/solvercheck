@@ -22,7 +22,7 @@ public final class ZipEntry<A, B> {
      * @param a the first component of the 2-tuple.
      * @param b the second component of the 2-tuple.
      */
-    ZipEntry(final A a, final B b) {
+    /* package */ ZipEntry(final A a, final B b) {
         first = a;
         second = b;
     }
