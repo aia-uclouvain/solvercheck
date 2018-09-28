@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
+import static java.lang.Integer.MIN_VALUE;
 
 public class TestCartesianProduct implements WithQuickTheories {
 
@@ -191,15 +192,26 @@ public class TestCartesianProduct implements WithQuickTheories {
 
     // GET (i out bounds)
     @Test
-    public void getFailsWhenIIsOutOfRange() {
+    public void getFailsWhenIIsLessThanZero() {
         qt().withGenerateAttempts(10000)
-            .forAll(listsOfSets(), integers().all())
-            .assuming((sets, i) -> i < 0 || i >= CartesianProduct.of(sets).size())
+            .forAll(listsOfSets(), integers().between(MIN_VALUE, 0))
+            .assuming((sets, i) -> i < 0)
             .check((sets, i) ->
                 failsThrowing(
                     IndexOutOfBoundsException.class,
                     () -> CartesianProduct.of(sets).get(i))
             );
+    }
+    @Test
+    public void getFailsWhenIIsLessBiggerThanSize() {
+        qt().withGenerateAttempts(10000)
+                .forAll(listsOfSets(), integers().allPositive())
+                .assuming((sets, i) -> i >= CartesianProduct.of(sets).size())
+                .check((sets, i) ->
+                        failsThrowing(
+                                IndexOutOfBoundsException.class,
+                                () -> CartesianProduct.of(sets).get(i))
+                );
     }
 
     public Gen<List<Set<Integer>>> listsOfSets(){
