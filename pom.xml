@@ -306,14 +306,6 @@
                                     be.uclouvain.solvercheck.generators.WithJavaGenerators
                                 </excludedClass>
                             </excludedClasses>
-                            <excludedTestClasses>
-                                <excludedTestClass>
-                                    be.uclouvain.solvercheck.core.data.TestDomain
-                                </excludedTestClass>
-                                <excludedTestClass>
-                                    be.uclouvain.solvercheck.Brol
-                                </excludedTestClass>
-                            </excludedTestClasses>
                         </configuration>
                     </plugin>
 
