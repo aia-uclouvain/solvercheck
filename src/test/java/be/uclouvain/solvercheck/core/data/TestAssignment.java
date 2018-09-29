@@ -1,18 +1,15 @@
 package be.uclouvain.solvercheck.core.data;
 
+import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.MIN_VALUE;
 import static org.junit.Assert.assertEquals;
 
 public class TestAssignment
@@ -71,23 +68,23 @@ public class TestAssignment
 
     @Test
     public void testFromPartialAssignmentEqualsAsAssignmentWhenCompete() {
-        forAnyPartialAssignment(
-            partialAssignment -> partialAssignment.isComplete(),
-            partialAssignment ->
-                    partialAssignment.asAssignment()
-                            .equals(Assignment.from(partialAssignment))
-        );
+        new ForAnyPartialAssignment()
+            .assuming(PartialAssignment::isComplete)
+            .check(partialAssignment ->
+                partialAssignment.asAssignment()
+                    .equals(Assignment.from(partialAssignment))
+            );
     }
 
     @Test
     public void testFromPartialAssignmentFailsWhenNotCompete() {
-        forAnyPartialAssignment(
-                partialAssignment -> !partialAssignment.isComplete(),
-                partialAssignment ->
-                        failsThrowing(
-                                IllegalStateException.class,
-                                () -> Assignment.from(partialAssignment))
-        );
+        new ForAnyPartialAssignment()
+            .assuming(partialAssignment -> !partialAssignment.isComplete())
+            .check(partialAssignment ->
+                failsThrowing(
+                        IllegalStateException.class,
+                        () -> Assignment.from(partialAssignment))
+            );
     }
 
     @Test
@@ -102,25 +99,4 @@ public class TestAssignment
         return lists().of(integers().all()).ofSizeBetween(0, 100);
     }
 
-
-    private void forAnyPartialAssignment(
-            final Predicate<PartialAssignment> assumptions,
-            final Predicate<PartialAssignment> actual) {
-
-        final QuickTheory qt = qt()
-                .withGenerateAttempts(10000)
-                .withFixedSeed(1234567890);
-
-        qt.withExamples(100)
-                .forAll(integers().between(MIN_VALUE+5, MAX_VALUE-4))
-                .checkAssert(anchor ->
-                        qt.withExamples(10)
-                                .forAll(
-                                        partialAssignments()
-                                                .withUpToVariables(5)
-                                                .withValuesRanging(anchor-5, anchor+4))
-                                .assuming(assumptions)
-                                .check(actual)
-                );
-    }
 }

@@ -1,17 +1,16 @@
 package be.uclouvain.solvercheck.core.data;
 
+import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.generators.Generators;
 import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import be.uclouvain.solvercheck.utils.Utils;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
 
 import static be.uclouvain.solvercheck.core.data.Operator.NE;
 import static be.uclouvain.solvercheck.utils.Utils.domainIsStronger;
@@ -24,33 +23,31 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALEN
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARABLE;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.MIN_VALUE;
 
 public class TestPartialAssignment
         implements WithQuickTheories, WithCpGenerators {
 
     @Test
     public void testIsComplete() {
-        forAnyPartialAssignment(
-                a -> true,
+        new ForAnyPartialAssignment()
+            .check(
                 a -> a.isComplete() == a.stream().allMatch(Domain::isFixed)
-        );
+            );
     }
     @Test
     public void testIsError() {
-        forAnyPartialAssignment(
-                a -> true,
+        new ForAnyPartialAssignment()
+            .check(
                 a -> a.isError() == a.stream().anyMatch(Domain::isEmpty)
-        );
+            );
     }
     @Test
     public void testIsLeaf() {
-        forAnyPartialAssignment(
-                a -> true,
+        new ForAnyPartialAssignment()
+            .check(
                 a -> a.isLeaf() == (a.stream().allMatch(Domain::isFixed)
                   || a.stream().anyMatch(Domain::isEmpty))
-        );
+            );
     }
 
     @Test
@@ -159,7 +156,7 @@ public class TestPartialAssignment
     // COLLECTOR
     @Test
     public void testCollector() {
-        qt().forAll(lists().of(domains()).ofSizeBetween(0, 1000))
+        qt().forAll(lists().of(domains()).ofSizeBetween(0, 100))
             .check(lst -> {
                 PartialAssignment d = lst.stream().collect(PartialAssignment.collector());
 
@@ -170,17 +167,19 @@ public class TestPartialAssignment
     // UNION OF
     @Test
     public void unionOfTheCartesianProductMustEqualOriginalPartialAssignmentWhenNoDomainIsEmpty() {
-        forAnyPartialAssignment(
-            pa -> pa.stream().noneMatch(Domain::isEmpty),
-            pa -> pa.equals(PartialAssignment.unionOf(
+        new ForAnyPartialAssignment()
+            .assuming(pa -> pa.stream().noneMatch(Domain::isEmpty))
+            .check(
+                pa -> pa.equals(PartialAssignment.unionOf(
                         pa.size(),
                         CartesianProduct.of(pa)))
-        );
+            );
     }
     @Test
     public void unionOfTheCartesianProductMustYieldAnEmptyPartialAssignmentOfTheGivenAriry() {
-        forAnyPartialAssignment(
-                PartialAssignment::isError,
+        new ForAnyPartialAssignment()
+            .assuming(PartialAssignment::isError)
+            .check(
                 partialAssignment -> {
                     CartesianProduct<Integer> cp =
                             CartesianProduct.of(partialAssignment);
@@ -193,29 +192,7 @@ public class TestPartialAssignment
 
                     return sameSize && allEmpty;
                 }
-        );
-    }
-
-
-    private void forAnyPartialAssignment(
-            final Predicate<PartialAssignment> assumptions,
-            final Predicate<PartialAssignment> actual) {
-
-        final QuickTheory qt = qt()
-                .withGenerateAttempts(10000)
-                .withFixedSeed(1234567890);
-
-        qt.withExamples(100)
-                .forAll(integers().between(MIN_VALUE+5, MAX_VALUE-4))
-                .checkAssert(anchor ->
-                        qt.withExamples(10)
-                                .forAll(
-                                        partialAssignments()
-                                                .withUpToVariables(5)
-                                                .withValuesRanging(anchor-5, anchor+4))
-                                .assuming(assumptions)
-                                .check(actual)
-                );
+            );
     }
 
     @Test

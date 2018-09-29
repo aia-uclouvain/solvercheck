@@ -1,20 +1,14 @@
 package be.uclouvain.solvercheck.core.data;
 
+import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.core.data.impl.PartialAssignmentFactory;
 import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
 import org.quicktheories.WithQuickTheories;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
-
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.MIN_VALUE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 public class TestPartialAssignmentFactory
         implements WithQuickTheories, WithCpGenerators {
@@ -32,9 +26,7 @@ public class TestPartialAssignmentFactory
     @Test
     public void testRestrict() {
         qt().forAll(operators(), integers().all()).checkAssert((op, value) ->
-          forAnyPartialAssignment(
-              partialAssignment -> true,
-              partialAssignment -> {
+          new ForAnyPartialAssignment().check(partialAssignment -> {
 
              int arity = partialAssignment.size();
 
@@ -81,7 +73,7 @@ public class TestPartialAssignmentFactory
     // COLLECTOR
     @Test
     public void testCollector() {
-        qt().forAll(lists().of(domains()).ofSizeBetween(0, 1000))
+        qt().forAll(lists().of(domains()).ofSizeBetween(0, 100))
             .check(lst -> {
                 PartialAssignment d = lst.stream().collect(PartialAssignmentFactory.collector());
 
@@ -102,9 +94,9 @@ public class TestPartialAssignmentFactory
     }
     @Test
     public void unionOfTheCartesianProductMustYieldAnEmptyPartialAssignmentOfTheGivenAriry() {
-        forAnyPartialAssignment(
-                PartialAssignment::isError,
-                partialAssignment -> {
+        new ForAnyPartialAssignment()
+            .assuming(PartialAssignment::isError)
+            .check(partialAssignment -> {
                     CartesianProduct<Integer> cp =
                         CartesianProduct.of(partialAssignment);
 
@@ -116,28 +108,6 @@ public class TestPartialAssignmentFactory
 
                     return sameSize && allEmpty;
                 }
-        );
-    }
-
-
-    private void forAnyPartialAssignment(
-            final Predicate<PartialAssignment> assumptions,
-            final Predicate<PartialAssignment> actual) {
-
-        final QuickTheory qt = qt()
-                .withGenerateAttempts(10000)
-                .withFixedSeed(1234567890);
-
-        qt.withExamples(100)
-          .forAll(integers().between(MIN_VALUE+5, MAX_VALUE-4))
-          .checkAssert(anchor ->
-             qt.withExamples(10)
-               .forAll(
-                  partialAssignments()
-                    .withUpToVariables(5)
-                    .withValuesRanging(anchor-5, anchor+4))
-               .assuming(assumptions)
-               .check(actual)
-          );
+            );
     }
 }
