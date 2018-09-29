@@ -1,5 +1,6 @@
 package be.uclouvain.solvercheck;
 
+import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.consistencies.ArcConsitency;
 import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.task.DomainFilter;
@@ -8,6 +9,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.function.Function;
+
+import static org.quicktheories.QuickTheory.qt;
 
 public class Brol implements WithSolverCheck {
 
@@ -22,15 +25,36 @@ public class Brol implements WithSolverCheck {
     }
     */
 
+    class Counter {
+        int i = 0;
+    }
+    @Test
+    public void count() {
+        final Counter c = new Counter();
+
+        new ForAnyPartialAssignment()
+                .withFixedSeed(123456L)
+                .check(pa -> {
+                    c.i++;
+                    return true;
+                });
+
+        System.out.println(c.i);
+        c.i = 0;
+        qt().forAll(integers().all())
+                .checkAssert(i -> c.i ++);
+
+        System.out.println(c.i);
+    }
+
     @Test
     public void arcConsistentIsStrongerThanBoundZ() {
-        assertThat(
-            an(arcConsistent(allDiff())).isStrongerThan(boundZConsistent(allDiff()))
-            .forAll(partialAssignments()
-                    .withUpToVariables(4)
-                    .withValuesRanging(-10, 10))
-
-        );
+        new ForAnyPartialAssignment()
+            .ofSizeBetween(0, 4)
+            .withValuesBetween(-10, 10)
+            .check(
+                an(arcConsistent(allDiff())).isStrongerThan(boundZConsistent(allDiff()))
+            );
     }
 
 

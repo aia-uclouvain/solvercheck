@@ -1,16 +1,12 @@
 package be.uclouvain.solvercheck.core.data;
 
+import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
 import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
 import org.quicktheories.WithQuickTheories;
 
-import java.util.function.Predicate;
-
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.MIN_VALUE;
 
 public class TestAssignmentFactory
         implements WithQuickTheories, WithCpGenerators {
@@ -25,23 +21,24 @@ public class TestAssignmentFactory
 
     @Test
     public void testFromPartialAssignmentEqualsAsAssignmentWhenCompete() {
-        forAnyPartialAssignment(
-                partialAssignment -> partialAssignment.isComplete(),
-                partialAssignment ->
-                    partialAssignment.asAssignment()
+        new ForAnyPartialAssignment()
+                .withDomainsOfSizeUpTo(1)
+                .assuming(PartialAssignment::isComplete)
+                .check(partialAssignment ->
+                        partialAssignment.asAssignment()
                             .equals(AssignmentFactory.from(partialAssignment))
-        );
+                );
     }
 
     @Test
     public void testFromPartialAssignmentFailsWhenNotCompete() {
-        forAnyPartialAssignment(
-                partialAssignment -> !partialAssignment.isComplete(),
-                partialAssignment ->
+        new ForAnyPartialAssignment()
+                .assuming(partialAssignment -> !partialAssignment.isComplete())
+                .check(partialAssignment ->
                     failsThrowing(
                         IllegalStateException.class,
                         () -> AssignmentFactory.from(partialAssignment))
-        );
+                );
     }
 
     @Test
@@ -50,26 +47,5 @@ public class TestAssignmentFactory
             .check(lst ->
                 lst.equals(lst.stream().collect(AssignmentFactory.collector()))
             );
-    }
-
-    private void forAnyPartialAssignment(
-            final Predicate<PartialAssignment> assumptions,
-            final Predicate<PartialAssignment> actual) {
-
-        final QuickTheory qt = qt()
-                .withGenerateAttempts(10000)
-                .withFixedSeed(1234567890);
-
-        qt.withExamples(100)
-          .forAll(integers().between(MIN_VALUE+5, MAX_VALUE-4))
-          .checkAssert(anchor ->
-             qt.withExamples(10)
-               .forAll(
-                  partialAssignments()
-                    .withUpToVariables(5)
-                    .withValuesRanging(anchor-5, anchor+4))
-               .assuming(assumptions)
-               .check(actual)
-          );
     }
 }
