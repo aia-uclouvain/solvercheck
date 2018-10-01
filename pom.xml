@@ -418,6 +418,101 @@
                 </plugins>
             </reporting>
         </profile>
+
+        <!-- USE THIS PROFILE TO GET FAST QA REPORTS *********************** -->
+        <!-- It provides: Checkstyle, SpotBugs and Branch Coverage (JaCoCo)  -->
+        <profile>
+            <id>fast</id>
+            <build>
+                <plugins>
+                    <!--
+                    Generate a project site with some useful reports.
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-site-plugin</artifactId>
+                        <version>${site.version}</version>
+                    </plugin>
+
+                    <!--
+                        Installs JaCoCo agent to collect coverage data.
+                    -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco.version}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <reporting>
+                <plugins>
+                    <!--
+                        CHECKSTYLE::
+                        To ensure that the code follows some well established
+                        coding guidelines.
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>${checkstyle.version}</version>
+                        <configuration>
+                            <!--
+                                Use my own checkstyle configuration which adapts
+                                SUN rules set to allow:
+                                1. shadowing by constructor parameters
+                                2. targetted warning suppression through
+                                   annotations
+                            -->
+                            <configLocation>./checkstyle.xml</configLocation>
+                            <!-- Ignore the style of tests source code -->
+                            <sourceDirectories>
+                                ${project.build.sourceDirectory}
+                            </sourceDirectories>
+                        </configuration>
+                    </plugin>
+
+                    <!--
+                        SPOTBUGS::
+                        To preemptively identify some potential bugs in the
+                        code of the project.
+                    -->
+                    <plugin>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
+                        <version>${spotbugs.version}</version>
+                        <configuration>
+                            <effort>${spotbugs.effort}</effort>
+                            <threshold>${spotbugs.threshold}</threshold>
+                        </configuration>
+                    </plugin>
+
+                    <!--
+                        JACOCO::
+                        To measure the fraction of the code which has been
+                        covered by tests.
+                    -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco.version}</version>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
     </profiles>
 
 </project>
