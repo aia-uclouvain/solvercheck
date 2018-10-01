@@ -6,11 +6,13 @@ import org.quicktheories.api.Function4;
 import org.quicktheories.api.Predicate3;
 import org.quicktheories.api.Predicate4;
 import org.quicktheories.core.Gen;
+import org.quicktheories.core.Strategy;
 
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * This class implements an "higher order" assertion which checks that the
@@ -48,7 +50,7 @@ public final class ForAllAssertion {
      * @return a hook to conveniently express a 1-parametric assertion.
      */
     public static <A> Forall1<A> forAll(
-            final TestConfiguration config,
+            final Supplier<Strategy> config,
             final Gen<A> genA) {
 
         return new Forall1<>(config, genA);
@@ -88,7 +90,7 @@ public final class ForAllAssertion {
      * @return a hook to conveniently express a 2-parametric assertion.
      */
     public static <A, B> Forall2<A, B> forAll(
-            final TestConfiguration config,
+            final Supplier<Strategy> config,
             final Gen<A> genA,
             final Gen<B> genB) {
 
@@ -133,7 +135,7 @@ public final class ForAllAssertion {
      * @return a hook to conveniently express a 3-parametric assertion.
      */
     public static <A, B, C> Forall3<A, B, C> forAll(
-            final TestConfiguration config,
+            final Supplier<Strategy> config,
             final Gen<A> genA,
             final Gen<B> genB,
             final Gen<C> genC) {
@@ -187,7 +189,7 @@ public final class ForAllAssertion {
      * @return a hook to conveniently express a 4-parametric assertion.
      */
     public static <A, B, C, D> Forall4<A, B, C, D> forAll(
-            final TestConfiguration config,
+            final Supplier<Strategy> config,
             final Gen<A> genA,
             final Gen<B> genB,
             final Gen<C> genC,
@@ -205,7 +207,7 @@ public final class ForAllAssertion {
      */
     public static final class Forall1<A> {
         /** The configuration used when generating the random args. */
-        private final TestConfiguration config;
+        private final Supplier<Strategy> config;
         /** The generator creating the generated 1st argument. */
         private final Gen<A> genA;
         /**
@@ -221,7 +223,7 @@ public final class ForAllAssertion {
          * @param config the configuration of the random args generation.
          * @param genA the generator creating the generated 1st argument.
          */
-        public Forall1(final TestConfiguration config, final Gen<A> genA) {
+        public Forall1(final Supplier<Strategy> config, final Gen<A> genA) {
             this.config = config;
             this.genA = genA;
             this.assumptions = a -> true;
@@ -266,7 +268,7 @@ public final class ForAllAssertion {
      */
     public static final class Forall2<A, B> {
         /** the configuration used when generating the random args. */
-        private final TestConfiguration config;
+        private final Supplier<Strategy> config;
         /** The generator creating the generated 1st argument. */
         private final Gen<A> genA;
         /** The generator creating the generated 2nd argument. */
@@ -286,7 +288,7 @@ public final class ForAllAssertion {
          * @param genB the generator creating the generated 2nd argument.
          */
         public Forall2(
-                final TestConfiguration config,
+                final Supplier<Strategy> config,
                 final Gen<A> genA,
                 final Gen<B> genB) {
 
@@ -338,7 +340,7 @@ public final class ForAllAssertion {
      */
     public static final class Forall3<A, B, C> {
         /** the configuration used when generating the random args. */
-        private final TestConfiguration config;
+        private final Supplier<Strategy> config;
         /** The generator creating the generated 1st argument. */
         private final Gen<A> genA;
         /** The generator creating the generated 2nd argument. */
@@ -361,7 +363,7 @@ public final class ForAllAssertion {
          * @param genC the generator creating the generated 3rd argument.
          */
         public Forall3(
-                final TestConfiguration config,
+                final Supplier<Strategy> config,
                 final Gen<A> genA,
                 final Gen<B> genB,
                 final Gen<C> genC) {
@@ -416,7 +418,7 @@ public final class ForAllAssertion {
      */
     public static final class Forall4<A, B, C, D> {
         /** the configuration used when generating the random args. */
-        private final TestConfiguration config;
+        private final Supplier<Strategy> config;
 
         /** The generator creating the generated 1st argument. */
         private final Gen<A> genA;
@@ -443,7 +445,7 @@ public final class ForAllAssertion {
          * @param genD the generator creating the generated 4th argument.
          */
         public Forall4(
-                final TestConfiguration config,
+                final Supplier<Strategy> config,
                 final Gen<A> genA,
                 final Gen<B> genB,
                 final Gen<C> genC,

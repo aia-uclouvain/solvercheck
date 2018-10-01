@@ -6,39 +6,22 @@ import be.uclouvain.solvercheck.core.task.StatefulFilter;
 import org.quicktheories.core.Gen;
 
 /**
- * This interface collects all the useful methods that let you plug
- * SolverCheck's assertion DSL into your code.
- *
- * This interface should really be thought of as a stackable trait in Scala
- * parlance.
+ * This class provides some utility methods to instanciate CP-level test cases.
  */
-public interface WithAssertions {
+public final class AssertionDSL {
+
+    /** An utility class has no public constructor. */
+    private AssertionDSL() { }
 
     /**
-     * Provides you with a convenient way to specify the configuration
-     * applicable in your test.
+     * This method returns an object holding the information to appropriately
+     * configure a running test.
      *
-     * @return a test configuration which you can customize to match your needs.
+     * @return an object holding the information to appropriately configure a
+     * running test.
      */
-    default TestConfiguration given() {
-        return AssertionDSL.given();
-    }
-
-    /**
-     * Provides you with a convenient way to express some assertion/property
-     * about a given propagator.
-     *
-     * .. Note::
-     *    The assertion returned by this method uses the default configuration
-     *    as if it were produced by the sequence <pre>given().propagator(x)
-     *    </pre>.
-     *
-     * @param actual the actual filter (propagator) about which a property is
-     *              being expressed.
-     * @return a builder to express the assertion about some Filter
-     */
-    default FilterAssertion propagator(final Filter actual) {
-        return AssertionDSL.propagator(actual);
+    public static TestConfiguration given() {
+        return new TestConfiguration();
     }
 
     /**
@@ -49,8 +32,8 @@ public interface WithAssertions {
      *              being expressed.
      * @return a builder to express the assertion about some Filter
      */
-    default FilterAssertion an(final Filter actual) {
-        return AssertionDSL.an(actual);
+    public static FilterAssertion an(final Filter actual) {
+        return propagator(actual);
     }
 
     /**
@@ -61,8 +44,43 @@ public interface WithAssertions {
      *              being expressed.
      * @return a builder to express the assertion about some Filter
      */
-    default FilterAssertion a(final Filter actual) {
-        return AssertionDSL.a(actual);
+    public static FilterAssertion a(final Filter actual) {
+        return propagator(actual);
+    }
+
+    /**
+     * Returns a FilterAssertion (builder) that uses the current configuration
+     * to assess the correctness of the property.
+     *
+     * @param actual the actual filter (propagator) whose property is to be
+     *               verified.
+     * @return FilterAssertion (builder) that uses the current configuration.
+     */
+    public static FilterAssertion propagator(final Filter actual) {
+        return new FilterAssertion(actual);
+    }
+
+    /**
+     * This method is an alias for (see statefulPropagator). It yields a
+     * DiveAssertion for the given SatefulFilter.
+     *
+     * @param actual the actual filter (stateful propagator) about which a
+     *               property is being expressed.
+     * @return a builder to express the assertion about some Filter
+     */
+    public static DiveAssertion a(final StatefulFilter actual) {
+        return statefulPropagator(actual);
+    }
+    /**
+     * This method is an alias for (see statefulPropagator). It yields a
+     * DiveAssertion for the given SatefulFilter.
+     *
+     * @param actual the actual filter (stateful propagator) about which a
+     *               property is being expressed.
+     * @return a builder to express the assertion about some Filter
+     */
+    public static DiveAssertion an(final StatefulFilter actual) {
+        return statefulPropagator(actual);
     }
 
     /**
@@ -73,43 +91,12 @@ public interface WithAssertions {
      *               to be verified.
      * @return DiveAssertion (builder) that uses the current configuration.
      */
-    default DiveAssertion statefulPropagator(final StatefulFilter actual) {
-        return AssertionDSL.statefulPropagator(actual);
-    }
-    /**
-     * This method is an alias for (see statefulPropagator). It yields a
-     * DiveAssertion for the given SatefulFilter.
-     *
-     * @param actual the actual filter (stateful propagator) about which a
-     *               property is being expressed.
-     * @return a builder to express the assertion about some Filter
-     */
-    default DiveAssertion a(final StatefulFilter actual) {
-        return AssertionDSL.a(actual);
-    }
-    /**
-     * This method is an alias for (see statefulPropagator). It yields a
-     * DiveAssertion for the given SatefulFilter.
-     *
-     * @param actual the actual filter (stateful propagator) about which a
-     *               property is being expressed.
-     * @return a builder to express the assertion about some Filter
-     */
-    default DiveAssertion an(final StatefulFilter actual) {
-        return AssertionDSL.an(actual);
+    public static DiveAssertion statefulPropagator(final StatefulFilter actual) {
+        return new DiveAssertion(actual);
     }
 
     /**
-     * Checks the validity of the given assertion.
-     *
-     * @param assertion the assertion to verify.
-     */
-    default void assertThat(final Assertion assertion) {
-        assertion.check();
-    }
-
-    /**
-     * Creates a 1-parametric assertion.
+     * Creates a 1-parametric assertion using the current configuration.
      *
      * This is particularly useful to check that not only constraint behave
      * correctly no matter what partial assignment they are facing, but also
@@ -121,15 +108,10 @@ public interface WithAssertions {
      *   **virtually all** partial assignments and **virtually all** possble
      *   table extensions.
      *
-     *   <pre>
+     *    <pre>
      *    assertThat(
-     *       forAll(tables())
-     *         .itIsTrueThat(table -&gt;
-     *              propagator(arcConsistent(table(t))
-     *             .isStrongerThan(boundZConsistent(table(t)))
-     *         )
-     *       )
-     *    )
+     *       forAll(booleans())
+     *          .itIsTrueThat(b -&gt; ... ) )))
      *    </pre>
      *
      *
@@ -137,12 +119,12 @@ public interface WithAssertions {
      * @param <A> the type of the parameter produced by the generator
      * @return a hook to conveniently express a 1-parametric assertion.
      */
-    default <A> ForAllAssertion.Forall1<A> forAll(final Gen<A> a) {
-        return AssertionDSL.forAll(a);
+    public static <A> ForAllAssertion.Forall1<A> forAll(final Gen<A> a) {
+        return ForAllAssertion.forAll(a);
     }
 
     /**
-     * Creates a 2-parametric assertion.
+     * Creates a 2-parametric assertion using the current configuration.
      *
      * This is particularly useful to check that not only constraint behave
      * correctly no matter what partial assignment they are facing, but also
@@ -157,9 +139,7 @@ public interface WithAssertions {
      *   <pre>
      *    assertThat(
      *       forAll(booleans(), integers.between(0, 10))
-     *         .itIsTrueThat((b, i) -&gt; ... ) )
-     *       )
-     *    )
+     *            .itIsTrueThat((b, i) -&gt; ... ) )))
      *    </pre>
      *
      *
@@ -169,15 +149,15 @@ public interface WithAssertions {
      * @param <B> the type of the parameter produced by the 2nd generator
      * @return a hook to conveniently express a 2-parametric assertion.
      */
-    default <A, B> ForAllAssertion.Forall2<A, B> forAll(
+    public static <A, B> ForAllAssertion.Forall2<A, B> forAll(
             final Gen<A> a,
             final Gen<B> b) {
 
-        return AssertionDSL.forAll(a, b);
+        return ForAllAssertion.forAll(a, b);
     }
 
     /**
-     * Creates a 3-parametric assertion.
+     * Creates a 3-parametric assertion using the current configuration.
      *
      * This is particularly useful to check that not only constraint behave
      * correctly no matter what partial assignment they are facing, but also
@@ -192,9 +172,7 @@ public interface WithAssertions {
      *   <pre>
      *    assertThat(
      *       forAll(xs(), ys(), zs())
-     *         .itIsTrueThat((x, y, z) -&gt; ... ) )
-     *       )
-     *    )
+     *            .itIsTrueThat((x, y, z) -&gt; ... ) )))
      *    </pre>
      *
      *
@@ -206,15 +184,15 @@ public interface WithAssertions {
      * @param <C> the type of the parameter produced by the 3rd generator
      * @return a hook to conveniently express a 3-parametric assertion.
      */
-    default <A, B, C> ForAllAssertion.Forall3<A, B, C> forAll(
+    public static <A, B, C> ForAllAssertion.Forall3<A, B, C> forAll(
             final Gen<A> a,
             final Gen<B> b,
             final Gen<C> c) {
 
-        return AssertionDSL.forAll(a, b, c);
+        return ForAllAssertion.forAll(a, b, c);
     }
     /**
-     * Creates a 4-parametric assertion.
+     * Creates a 4-parametric assertion using the current configuration.
      *
      * This is particularly useful to check that not only constraint behave
      * correctly no matter what partial assignment they are facing, but also
@@ -229,9 +207,7 @@ public interface WithAssertions {
      *   <pre>
      *    assertThat(
      *       forAll(ws(), xs(), ys(), zs())
-     *         .itIsTrueThat((w, x, y, z) -&gt; ... ) )
-     *       )
-     *    )
+     *            .itIsTrueThat((w, x, y, z) -&gt; ... ) )))
      *    </pre>
      *
      *
@@ -245,12 +221,14 @@ public interface WithAssertions {
      * @param <D> the type of the parameter produced by the 4th generator
      * @return a hook to conveniently express a 4-parametric assertion.
      */
-    default <A, B, C, D> ForAllAssertion.Forall4<A, B, C, D> forAll(
+    public static <A, B, C, D> ForAllAssertion.Forall4<A, B, C, D> forAll(
             final Gen<A> a,
             final Gen<B> b,
             final Gen<C> c,
             final Gen<D> d) {
 
-        return AssertionDSL.forAll(a, b, c, d);
+        return ForAllAssertion.forAll(a, b, c, d);
     }
+
+
 }

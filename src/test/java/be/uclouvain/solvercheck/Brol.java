@@ -1,16 +1,7 @@
 package be.uclouvain.solvercheck;
 
 import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
-import be.uclouvain.solvercheck.consistencies.ArcConsitency;
-import be.uclouvain.solvercheck.core.task.Checker;
-import be.uclouvain.solvercheck.core.task.DomainFilter;
-import be.uclouvain.solvercheck.stateful.StatefulFilterAdapter;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.function.Function;
-
-import static org.quicktheories.QuickTheory.qt;
 
 public class Brol implements WithSolverCheck {
 
@@ -39,8 +30,8 @@ public class Brol implements WithSolverCheck {
     public void statefulBoundZisWeakerThanArc() {
         assertThat(
             a(stateful(boundZConsistent(allDiff())))
-                .isWeakerThan(stateful(arcConsistent(allDiff())))
-                .forAll(partialAssignments().withValuesRanging(0, 3))
+                    .isWeakerThan(stateful(arcConsistent(allDiff())))
+                    .forAnyPartialAssignment().withValuesBetween(0, 3)
         );
     }
     @Test
@@ -48,7 +39,7 @@ public class Brol implements WithSolverCheck {
         assertThat(
                 a(boundZConsistent(allDiff()))
                         .isWeakerThan(boundDConsistent(allDiff()))
-                        .forAll(partialAssignments().withValuesRanging(0, 3))
+                        .forAnyPartialAssignment().withValuesBetween(0, 3)
         );
     }
     @Test
@@ -56,7 +47,7 @@ public class Brol implements WithSolverCheck {
         assertThat(
                 a(stateful(boundZConsistent(allDiff())))
                         .isWeakerThan(stateful(boundDConsistent(allDiff())))
-                        .forAll(partialAssignments().withValuesRanging(0, 3))
+                        .forAnyPartialAssignment().withValuesBetween(0, 3)
         );
     }
     @Test
@@ -64,7 +55,7 @@ public class Brol implements WithSolverCheck {
         assertThat(
                 a(stateful(boundDConsistent(allDiff())))
                         .isWeakerThan(stateful(arcConsistent(allDiff())))
-                        .forAll(partialAssignments().withValuesRanging(0, 3))
+                        .forAnyPartialAssignment().withValuesBetween(0, 3)
         );
     }
     @Test
@@ -72,28 +63,7 @@ public class Brol implements WithSolverCheck {
         assertThat(
                 a(stateful(arcConsistent(allDiff())))
                         .isStrongerThan(stateful(rangeConsistent(allDiff())))
-                        .forAll(partialAssignments().withValuesRanging(0, 3))
+                        .forAnyPartialAssignment().withValuesBetween(0, 3)
         );
     }
-
-    @Test
-    public void testHybridEquivalentToNormalConsistency() {
-        assertThat(
-                forAll(integers().between(0, 5))
-                .itIsTrueThat(size -> {
-                    Function<Checker, DomainFilter>[] filters =
-                            new Function[size];
-
-                    for (int i =  0; i < size; i++) {
-                        filters[i] = ArcConsitency::domainFilter;
-                    }
-
-                    return an(arcConsistent(allDiff()))
-                            .isEquivalentTo(hybrid(allDiff(), filters))
-                            .assuming(pa -> pa.size() == size);
-                })
-        );
-    }
-
-
 }

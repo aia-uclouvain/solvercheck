@@ -3,14 +3,16 @@ package be.uclouvain.solvercheck.assertions;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.generators.Generators;
 import org.quicktheories.QuickTheory;
+import org.quicktheories.core.Configuration;
 import org.quicktheories.core.Gen;
+import org.quicktheories.core.Strategy;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.MIN_VALUE;
-
 import static org.quicktheories.generators.SourceDSL.integers;
 
 /**
@@ -26,7 +28,7 @@ import static org.quicktheories.generators.SourceDSL.integers;
  *     this class is more varied and tackles a wider range of possible cases.
  * </div>
  */
-public final class ForAnyPartialAssignment {
+public class ForAnyPartialAssignment implements Supplier<Strategy> {
 
     /**
      * The default number of attempts made to generate an input that matches
@@ -78,7 +80,7 @@ public final class ForAnyPartialAssignment {
      * A hook used to build on top of the underlying QuickTheories
      * property-based testing library.
      */
-    private QuickTheory qt;
+    private Strategy strategy;
 
     /**
      * The number of `anchor values` which designate the 'center' of the
@@ -126,9 +128,11 @@ public final class ForAnyPartialAssignment {
     /**
      * Creates a new instance with all fields initialized to their default
      * values.
+     *
+     * @param config an initial configuration to start from
      */
-    public ForAnyPartialAssignment() {
-        this.qt = QuickTheory.qt().withGenerateAttempts(DEFAULT_GEN_ATTEMPTS);
+    public ForAnyPartialAssignment(final Supplier<Strategy> config) {
+        this.strategy      = config.get();
 
         this.anchorSamples = DEFAULT_ANCHOR_SAMPLES;
         this.examples      = DEFAULT_EXAMPLES;
@@ -144,14 +148,22 @@ public final class ForAnyPartialAssignment {
     }
 
     /**
+     * Creates a new instance with all fields initialized to their default
+     * values.
+     */
+    public ForAnyPartialAssignment() {
+        this(ForAnyPartialAssignment::defaultStrategy);
+    }
+
+    /**
      * Configures the seed of the PRNG used to pseudo-randomly generate partial
      * assignments, anchors and values.
      *
      * @param seed the seed to use to initialize the PRNG
      * @return this
      */
-    public ForAnyPartialAssignment withFixedSeed(final long seed) {
-        qt = qt.withFixedSeed(seed);
+    public final ForAnyPartialAssignment withFixedSeed(final long seed) {
+        strategy = strategy.withFixedSeed(seed);
         return this;
     }
 
@@ -163,8 +175,8 @@ public final class ForAnyPartialAssignment {
      * @param attempts the number of attempts to try before value exhaustion.
      * @return this
      */
-    public ForAnyPartialAssignment withGenerateAttempts(final int attempts) {
-        qt = qt.withGenerateAttempts(attempts);
+    public final ForAnyPartialAssignment withGenerateAttempts(final int attempts) {
+        strategy = strategy.withGenerateAttempts(attempts);
         return this;
     }
 
@@ -175,7 +187,7 @@ public final class ForAnyPartialAssignment {
      * @param n the number of anchor values to generate.
      * @return this
      */
-    public ForAnyPartialAssignment withAnchorSamples(final int n) {
+    public final ForAnyPartialAssignment withAnchorSamples(final int n) {
         anchorSamples = n;
         return this;
     }
@@ -187,7 +199,7 @@ public final class ForAnyPartialAssignment {
      *          anchor value.
      * @return this
      */
-    public ForAnyPartialAssignment withExamples(final int n) {
+    public final ForAnyPartialAssignment withExamples(final int n) {
         examples = n;
         return this;
     }
@@ -200,8 +212,8 @@ public final class ForAnyPartialAssignment {
      * @param cycles the number of shrink cycles to use.
      * @return this
      */
-    public ForAnyPartialAssignment withShrinkCycles(final int cycles) {
-        qt = qt.withShrinkCycles(cycles);
+    public final ForAnyPartialAssignment withShrinkCycles(final int cycles) {
+        strategy = strategy.withShrinkCycles(cycles);
         return this;
     }
 
@@ -221,7 +233,7 @@ public final class ForAnyPartialAssignment {
      *          assignment.
      * @return this
      */
-    public ForAnyPartialAssignment withValuesBetween(final int x, final int y) {
+    public final ForAnyPartialAssignment withValuesBetween(final int x, final int y) {
         if (y < x) {
             throw new IllegalArgumentException("x must be >= y");
         }
@@ -238,7 +250,7 @@ public final class ForAnyPartialAssignment {
      * @param n the maximum allowed spread (must be positive)
      * @return this
      */
-    public ForAnyPartialAssignment spreading(final int n) {
+    public final ForAnyPartialAssignment spreading(final int n) {
         if (n < 0) {
             throw new IllegalArgumentException("n must be >= 0");
         }
@@ -254,7 +266,7 @@ public final class ForAnyPartialAssignment {
      * @param n the maximum allowed domain size
      * @return this
      */
-    public ForAnyPartialAssignment withDomainsOfSizeUpTo(final int n) {
+    public final ForAnyPartialAssignment withDomainsOfSizeUpTo(final int n) {
         if (n < 0) {
             throw new IllegalArgumentException("n must be >= 0");
         }
@@ -270,7 +282,7 @@ public final class ForAnyPartialAssignment {
      * @param x the exact target size (must be positive).
      * @return this
      */
-    public ForAnyPartialAssignment ofSize(final int x) {
+    public final ForAnyPartialAssignment ofSize(final int x) {
         return ofSizeBetween(x, x);
     }
 
@@ -285,7 +297,7 @@ public final class ForAnyPartialAssignment {
      *          assignments.
      * @return this
      */
-    public ForAnyPartialAssignment ofSizeBetween(final int x, final int y) {
+    public final ForAnyPartialAssignment ofSizeBetween(final int x, final int y) {
         if (0 < x || y < x) {
             throw new IllegalArgumentException("0 <= x <= y");
         }
@@ -302,7 +314,7 @@ public final class ForAnyPartialAssignment {
      * @param assumption the assumption which must be satisfied
      * @return this
      */
-    public ForAnyPartialAssignment assuming(
+    public final ForAnyPartialAssignment assuming(
             final Predicate<PartialAssignment> assumption) {
         this.assumptions = this.assumptions.and(assumption);
         return this;
@@ -318,7 +330,9 @@ public final class ForAnyPartialAssignment {
      *
      * @param test a predicate whose validity is being tested.
      */
-    public void check(final Predicate<PartialAssignment> test) {
+    public final void check(final Predicate<PartialAssignment> test) {
+        final QuickTheory qt = QuickTheory.qt(this);
+
         qt.withExamples(anchorSamples)
           .forAll(integers().between(anchorMin(), anchorMax()))
           .checkAssert(anchor ->
@@ -340,7 +354,9 @@ public final class ForAnyPartialAssignment {
      * @param test an assertion snippet testing the validity of some property
      *            depending on partial assignment.
      */
-    public void checkAssert(final Consumer<PartialAssignment> test) {
+    public final void checkAssert(final Consumer<PartialAssignment> test) {
+        final QuickTheory qt = QuickTheory.qt(this);
+
         qt.withExamples(anchorSamples)
           .forAll(integers().between(anchorMin(), anchorMax()))
           .checkAssert(anchor ->
@@ -349,6 +365,12 @@ public final class ForAnyPartialAssignment {
                .assuming(assumptions)
                .checkAssert(test)
           );
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final Strategy get() {
+        return strategy;
     }
 
     /**
@@ -441,5 +463,16 @@ public final class ForAnyPartialAssignment {
      */
     private boolean rangeFitsInSpreadMax() {
         return (long) maxValue - (long) minValue <= (long) spread;
+    }
+
+    /**
+     * Returns the default strategy to run all tests.
+     *
+     * @return the default strategy
+     */
+    private static Strategy defaultStrategy() {
+        return Configuration
+                .systemStrategy()
+                .withGenerateAttempts(DEFAULT_GEN_ATTEMPTS);
     }
 }

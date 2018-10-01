@@ -180,9 +180,10 @@ public final class TestFilterAssertions implements WithSolverCheck {
         Filter beta  = mockFilter(STRONG);
 
         assertThat(
-           an(alpha).isEquivalentTo(beta).forAll(
-             partialAssignments().withUpToVariables(1)
-           )
+           an(alpha)
+                   .isEquivalentTo(beta)
+                   .forAnyPartialAssignment()
+                   .ofSizeBetween(0, 1)
         );
 
         ArgumentCaptor<PartialAssignment> captorA =
