@@ -1,6 +1,5 @@
 package be.uclouvain.solvercheck.assertions;
 
-import be.uclouvain.solvercheck.WithFluentConfig;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.generators.Generators;
 import org.quicktheories.QuickTheory;

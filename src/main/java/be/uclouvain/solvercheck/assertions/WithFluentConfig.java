@@ -1,4 +1,4 @@
-package be.uclouvain.solvercheck;
+package be.uclouvain.solvercheck.assertions;
 
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import org.quicktheories.core.Strategy;
