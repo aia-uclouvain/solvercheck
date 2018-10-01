@@ -88,11 +88,6 @@ public class ForAnyPartialAssignment implements Supplier<Strategy> {
      */
     private int anchorSamples;
     /**
-     * The number of partial assignment generated (and tested) for each
-     * anchor value.
-     */
-    private int examples;
-    /**
      * The minimal value that may appear in a generated partial assignment.
      */
     private int minValue;
@@ -135,8 +130,6 @@ public class ForAnyPartialAssignment implements Supplier<Strategy> {
         this.strategy      = config.get();
 
         this.anchorSamples = DEFAULT_ANCHOR_SAMPLES;
-        this.examples      = DEFAULT_EXAMPLES;
-
         this.minValue      = DEFAULT_MIN_VALUE;
         this.maxValue      = DEFAULT_MAX_VALUE;
         this.spread        = DEFAULT_SPREAD;
@@ -181,6 +174,18 @@ public class ForAnyPartialAssignment implements Supplier<Strategy> {
     }
 
     /**
+     * Configures the number of tests which are generated for each anchor value.
+     *
+     * @param n the number of example partial assignments produced for each
+     *          anchor value.
+     * @return this
+     */
+    public final ForAnyPartialAssignment withExamples(final int n) {
+        strategy = strategy.withExamples(n);
+        return this;
+    }
+
+    /**
      * Configures the desired number of anchors which are picked to seed a
      * round of partial assignment tests.
      *
@@ -189,18 +194,6 @@ public class ForAnyPartialAssignment implements Supplier<Strategy> {
      */
     public final ForAnyPartialAssignment withAnchorSamples(final int n) {
         anchorSamples = n;
-        return this;
-    }
-
-    /**
-     * Configures the number of tests which are generated for each anchor value.
-     *
-     * @param n the number of example partial assignments produced for each
-     *          anchor value.
-     * @return this
-     */
-    public final ForAnyPartialAssignment withExamples(final int n) {
-        examples = n;
         return this;
     }
 
@@ -336,8 +329,7 @@ public class ForAnyPartialAssignment implements Supplier<Strategy> {
         qt.withExamples(anchorSamples)
           .forAll(integers().between(anchorMin(), anchorMax()))
           .checkAssert(anchor ->
-             qt.withExamples(examples)
-               .forAll(partialAssignments(anchor))
+             qt.forAll(partialAssignments(anchor))
                .assuming(assumptions)
                .check(test)
           );
@@ -360,8 +352,7 @@ public class ForAnyPartialAssignment implements Supplier<Strategy> {
         qt.withExamples(anchorSamples)
           .forAll(integers().between(anchorMin(), anchorMax()))
           .checkAssert(anchor ->
-             qt.withExamples(examples)
-               .forAll(partialAssignments(anchor))
+             qt.forAll(partialAssignments(anchor))
                .assuming(assumptions)
                .checkAssert(test)
           );
@@ -473,6 +464,7 @@ public class ForAnyPartialAssignment implements Supplier<Strategy> {
     private static Strategy defaultStrategy() {
         return Configuration
                 .systemStrategy()
-                .withGenerateAttempts(DEFAULT_GEN_ATTEMPTS);
+                .withGenerateAttempts(DEFAULT_GEN_ATTEMPTS)
+                .withExamples(DEFAULT_EXAMPLES);
     }
 }

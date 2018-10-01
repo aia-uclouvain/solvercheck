@@ -51,7 +51,14 @@ public class TestTestConfiguration implements WithSolverCheck {
         Filter alpha = mockFilter(WEAK);
         Filter beta  = mockFilter(STRONG);
 
-        assertThat(given().examples(1).an(alpha).isWeakerThan(beta));
+        assertThat(
+            given()
+                .examples(1)
+                .an(alpha)
+                .isWeakerThan(beta)
+                .forAnyPartialAssignment()
+                .withAnchorSamples(1)
+        );
 
         verify(alpha, times(1)).filter(any());
         verify(beta , times(1)).filter(any());
