@@ -234,7 +234,7 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
     /** {@inheritDoc} */
     @Override
     public final T ofSizeBetween(final int x, final int y) {
-        if (0 < x || y < x) {
+        if (0 > x || y < x) {
             throw new IllegalArgumentException("0 <= x <= y");
         }
         this.nbVarMin = x;

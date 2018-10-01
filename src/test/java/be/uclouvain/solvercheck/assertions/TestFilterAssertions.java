@@ -174,55 +174,6 @@ public final class TestFilterAssertions implements WithSolverCheck {
         verify(beta , atLeastOnce()).filter(any());
     }
 
-    @Test
-    public void testForall() {
-        Filter alpha = mockFilter(STRONG);
-        Filter beta  = mockFilter(STRONG);
-
-        assertThat(
-           an(alpha)
-                   .isEquivalentTo(beta)
-                   .forAnyPartialAssignment()
-                   .ofSizeBetween(0, 1)
-        );
-
-        ArgumentCaptor<PartialAssignment> captorA =
-                ArgumentCaptor.forClass(PartialAssignment.class);
-        ArgumentCaptor<PartialAssignment> captorB =
-                ArgumentCaptor.forClass(PartialAssignment.class);
-
-        verify(alpha, atLeastOnce()).filter(captorA.capture());
-        verify(beta , atLeastOnce()).filter(captorB.capture());
-
-        assertTrue(
-            captorA.getAllValues().stream().allMatch(pa -> pa.size() <= 1));
-        assertTrue(
-            captorB.getAllValues().stream().allMatch(pa -> pa.size() <= 1));
-    }
-
-    @Test
-    public void testAssuming() {
-        Filter alpha = mockFilter(STRONG);
-        Filter beta  = mockFilter(STRONG);
-
-        assertThat(
-                an(alpha).isEquivalentTo(beta).assuming(pa -> pa.size() <= 1)
-        );
-
-        ArgumentCaptor<PartialAssignment> captorA =
-                ArgumentCaptor.forClass(PartialAssignment.class);
-        ArgumentCaptor<PartialAssignment> captorB =
-                ArgumentCaptor.forClass(PartialAssignment.class);
-
-        verify(alpha, atLeastOnce()).filter(captorA.capture());
-        verify(beta , atLeastOnce()).filter(captorB.capture());
-
-        assertTrue(
-                captorA.getAllValues().stream().allMatch(pa -> pa.size() <= 1));
-        assertTrue(
-                captorB.getAllValues().stream().allMatch(pa -> pa.size() <= 1));
-    }
-
     private static Filter mockFilter(final PartialAssignment pa) {
         Filter mockF = mock(Filter.class);
         when(mockF.filter(any(PartialAssignment.class))).thenReturn(pa);
