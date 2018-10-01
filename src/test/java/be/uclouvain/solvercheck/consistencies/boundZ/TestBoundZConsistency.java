@@ -1,5 +1,6 @@
 package be.uclouvain.solvercheck.consistencies.boundZ;
 
+import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.checkers.WithCheckers;
 import be.uclouvain.solvercheck.consistencies.WithConsistencies;
 import be.uclouvain.solvercheck.core.data.Assignment;
@@ -7,36 +8,25 @@ import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.task.Filter;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import be.uclouvain.solvercheck.utils.collections.Range;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
-import org.quicktheories.WithQuickTheories;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.MIN_VALUE;
 
-public class TestBoundZConsistency
-        implements WithQuickTheories,
-        WithCpGenerators,
-        WithConsistencies,
-        WithCheckers {
+public class TestBoundZConsistency implements WithConsistencies, WithCheckers {
 
-    private QuickTheory qt;
     private Checker checker;
     private Filter  filter;
 
     @Before
     public void setUp() {
-        qt = qt().withGenerateAttempts(10000);
         checker= allDiff();
         filter = boundZConsistent(checker);
     }
@@ -55,22 +45,15 @@ public class TestBoundZConsistency
      */
     @Test
     public void itMustBeWeaklyMonotonic() {
-        qt.withExamples(10)
-          .forAll(integers().between(MIN_VALUE+5, MAX_VALUE-4))
-          .checkAssert(anchor ->
-            qt.withExamples(100)
-              .forAll(
-                  partialAssignments()
-                    .withValuesRanging(anchor-5, anchor+4)
-                    .withUpToVariables(5))
-                .assuming(pa -> !pa.isError())
-                .checkAssert(pa -> {
-                        PartialAssignment filtered = filter.filter(pa);
+        new ForAnyPartialAssignment()
+             .assuming(pa -> !pa.isError())
+             .check(pa -> {
+                 PartialAssignment filtered = filter.filter(pa);
 
-                        // subseteq test
-                        Assert.assertTrue(List.of(STRONGER, EQUIVALENT).contains(filtered.compareWith(pa)));
-                    })
-          );
+                 // subseteq test
+                 return List.of(STRONGER, EQUIVALENT)
+                         .contains(filtered.compareWith(pa));
+             });
     }
 
     /**
@@ -79,22 +62,14 @@ public class TestBoundZConsistency
      */
     @Test
     public void itMustBeTheLeastFixpoint() {
-        qt.withExamples(10)
-          .forAll(integers().between(MIN_VALUE+5, MAX_VALUE-4))
-          .checkAssert(anchor ->
-            qt.withExamples(100)
-              .forAll(
-                  partialAssignments()
-                    .withValuesRanging(anchor-5, anchor+4)
-                    .withUpToVariables(5))
-                .assuming(pa -> !pa.isError())
-                .checkAssert(pa -> {
-                    PartialAssignment filtered  = filter.filter(pa);
-                    PartialAssignment filtered2 = filter.filter(filtered);
+        new ForAnyPartialAssignment()
+            .assuming(pa -> !pa.isError())
+            .checkAssert(pa -> {
+                PartialAssignment filtered  = filter.filter(pa);
+                PartialAssignment filtered2 = filter.filter(filtered);
 
-                    Assert.assertEquals(EQUIVALENT, filtered.compareWith(filtered2));
-                })
-          );
+                Assert.assertEquals(EQUIVALENT, filtered.compareWith(filtered2));
+            });
     }
 
     /**
@@ -102,34 +77,26 @@ public class TestBoundZConsistency
      */
     @Test
     public void itRemovesNoSolution() {
-        qt.withExamples(10)
-          .forAll(integers().between(MIN_VALUE+5, MAX_VALUE-4))
-          .checkAssert(anchor ->
-             qt.withExamples(100)
-               .forAll(
-                  partialAssignments()
-                     .withValuesRanging(anchor-5, anchor+4)
-                     .withUpToVariables(5))
-               .assuming(pa -> !pa.isError())
-               .checkAssert(pa -> {
+        new ForAnyPartialAssignment()
+            .assuming(pa -> !pa.isError())
+            .checkAssert(pa -> {
 
-                 PartialAssignment filtered = filter.filter(pa);
+              PartialAssignment filtered = filter.filter(pa);
 
-                   PartialAssignment solutions =
-                           PartialAssignment.unionOf(pa.size(),
-                                   CartesianProduct.of(pa)
-                                           .stream()
-                                           .filter(a -> checker.test(Assignment.from(a)))
-                                           .collect(Collectors.toList())
-                           );
+                PartialAssignment solutions =
+                        PartialAssignment.unionOf(pa.size(),
+                                CartesianProduct.of(pa)
+                                        .stream()
+                                        .filter(a -> checker.test(Assignment.from(a)))
+                                        .collect(Collectors.toList())
+                        );
 
-                 boolean error = solutions.isError();
-                 boolean solsOk= List.of(STRONGER, EQUIVALENT)
-                         .contains(solutions.compareWith(filtered));
+              boolean error = solutions.isError();
+              boolean solsOk= List.of(STRONGER, EQUIVALENT)
+                      .contains(solutions.compareWith(filtered));
 
-                 Assert.assertTrue(error || solsOk);
-             })
-          );
+              Assert.assertTrue(error || solsOk);
+          });
     }
 
     /**
@@ -137,46 +104,38 @@ public class TestBoundZConsistency
      */
     @Test
     public void testConsistencyDefinition() {
-        qt.withExamples(10)
-          .forAll(integers().between(MIN_VALUE+5, MAX_VALUE-4))
-          .checkAssert(anchor ->
-           qt.withExamples(100)
-             .forAll(
-                partialAssignments()
-                  .withValuesRanging(anchor-5, anchor+4)
-                  .withUpToVariables(5))
-                .assuming(pa -> !pa.isError())
-                .checkAssert(pa -> {
-                    PartialAssignment filtered  = filter.filter(pa);
+        new ForAnyPartialAssignment()
+           .assuming(pa -> !pa.isError())
+           .checkAssert(pa -> {
+               PartialAssignment filtered  = filter.filter(pa);
 
-                    CartesianProduct<Integer> possibilities =
-                            CartesianProduct.of(pa.stream().map(dom ->
-                                     Range.between(
-                                        (long) dom.minimum(),
-                                        (long) dom.maximum()+1))
-                                    .collect(Collectors.toList()));
+               CartesianProduct<Integer> possibilities =
+                       CartesianProduct.of(pa.stream().map(dom ->
+                                Range.between(
+                                   (long) dom.minimum(),
+                                   (long) dom.maximum()+1))
+                               .collect(Collectors.toList()));
 
-                    if (!filtered.isError()) {
-                        int arity = filtered.size();
+               if (!filtered.isError()) {
+                   int arity = filtered.size();
 
-                        for (int i = 0; i < arity; i++) {
-                            final int var = i;
-                            final Domain domain = filtered.get(var);
+                   for (int i = 0; i < arity; i++) {
+                       final int var = i;
+                       final Domain domain = filtered.get(var);
 
-                            boolean minHasSupport = possibilities.stream().anyMatch(ass ->
-                                    ass.get(var).equals(domain.minimum())
-                                            && checker.test(Assignment.from(ass))
-                            );
-                            Assert.assertTrue(minHasSupport);
+                       boolean minHasSupport = possibilities.stream().anyMatch(ass ->
+                               ass.get(var).equals(domain.minimum())
+                                       && checker.test(Assignment.from(ass))
+                       );
+                       Assert.assertTrue(minHasSupport);
 
-                            boolean maxHasSupport = possibilities.stream().anyMatch(ass ->
-                                    ass.get(var).equals(domain.minimum())
-                                            && checker.test(Assignment.from(ass))
-                            );
-                            Assert.assertTrue(maxHasSupport);
-                        }
-                    }
-                })
-          );
+                       boolean maxHasSupport = possibilities.stream().anyMatch(ass ->
+                               ass.get(var).equals(domain.minimum())
+                                       && checker.test(Assignment.from(ass))
+                       );
+                       Assert.assertTrue(maxHasSupport);
+                   }
+               }
+           });
     }
 }

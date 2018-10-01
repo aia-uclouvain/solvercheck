@@ -1,5 +1,6 @@
 package be.uclouvain.solvercheck.consistencies.utils;
 
+import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.consistencies.ConsistencyUtil;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
@@ -138,21 +139,8 @@ public class TestConsistencyUtil implements WithQuickTheories, WithCpGenerators 
     private void forAnyPartialAssignment(
             final Predicate<PartialAssignment> assumptions,
             final Predicate<PartialAssignment> actual) {
-        final QuickTheory qt = qt()
-                .withGenerateAttempts(10000)
-                .withFixedSeed(1234567890);
 
-        qt.withExamples(100)
-          .forAll(integers().between(MIN_VALUE+5, MAX_VALUE-4))
-          .checkAssert(anchor ->
-             qt.withExamples(10)
-               .forAll(
-                   partialAssignments()
-                       .withUpToVariables(5)
-                       .withValuesRanging(anchor-5, anchor+4))
-               .assuming(assumptions)
-               .check(actual)
-          );
+        new ForAnyPartialAssignment().assuming(assumptions).check(actual);
     }
 
 }

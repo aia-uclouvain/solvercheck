@@ -14,7 +14,7 @@ import static org.quicktheories.QuickTheory.qt;
 
 public class Brol implements WithSolverCheck {
 
-    /*
+
     @Test
     public void testTables() {
         assertThat(
@@ -22,29 +22,6 @@ public class Brol implements WithSolverCheck {
                     an(arcConsistent(allDiff())).isStrongerThan(boundZConsistent(table(t)))
             )
         );
-    }
-    */
-
-    class Counter {
-        int i = 0;
-    }
-    @Test
-    public void count() {
-        final Counter c = new Counter();
-
-        new ForAnyPartialAssignment()
-                .withFixedSeed(123456L)
-                .check(pa -> {
-                    c.i++;
-                    return true;
-                });
-
-        System.out.println(c.i);
-        c.i = 0;
-        qt().forAll(integers().all())
-                .checkAssert(i -> c.i ++);
-
-        System.out.println(c.i);
     }
 
     @Test

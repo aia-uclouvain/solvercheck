@@ -1,5 +1,6 @@
 package be.uclouvain.solvercheck.consistencies.hybrid;
 
+import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.checkers.WithCheckers;
 import be.uclouvain.solvercheck.consistencies.ArcConsitency;
 import be.uclouvain.solvercheck.consistencies.BoundDConsistency;
@@ -164,31 +165,21 @@ public class TestHybridConsistency
     private void testHCWithAssumptions(
             final Predicate<PartialAssignment> assumptions,
             final HybridConsistencyCheck actual) {
-        qt//.withFixedSeed(23314469440147L)
-          .withExamples(10)
-          .forAll(integers().between(MIN_VALUE+5, MAX_VALUE-4))
-          .checkAssert(anchor ->
-             qt//.withFixedSeed(23684206156302L)
-               .withExamples(10)
-               .forAll(
-                  partialAssignments()
-                    .withUpToVariables(5)
-                    .withValuesRanging(anchor-5, anchor+4))
-               .assuming(assumptions)
-               .checkAssert(partialAssignment ->
-                  qt//.withFixedSeed(23691073021520L)
-                    .withExamples(10)
-                    .forAll(
-                       lists()
-                         .of(domainFilters())
-                         .ofSize(partialAssignment.size()))
-                    .checkAssert(domainFilters ->
-                       actual.test(
-                         domainFilters.toArray(new DomainFilterProducer[0]),
-                         partialAssignment)
-                    )
-               )
-          );
+        new ForAnyPartialAssignment()
+             .assuming(assumptions)
+             .checkAssert(partialAssignment ->
+                qt//.withFixedSeed(23691073021520L)
+                  .withExamples(10)
+                  .forAll(
+                     lists()
+                       .of(domainFilters())
+                       .ofSize(partialAssignment.size()))
+                  .checkAssert(domainFilters ->
+                     actual.test(
+                       domainFilters.toArray(new DomainFilterProducer[0]),
+                       partialAssignment)
+                  )
+             );
     }
 
     private Gen<DomainFilterProducer> domainFilters() {
