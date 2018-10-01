@@ -67,7 +67,8 @@ public class TestConsistencyUtil implements WithQuickTheories, WithCpGenerators 
 
     @Test
     public void shrinkBounds() {
-        qt().withGenerateAttempts(10000)
+        qt().withExamples(10)
+            .withGenerateAttempts(10000)
             .forAll(integers().between(0, 10), integers().between(0, 10))
             .assuming((x, y) -> x <= y)
             .checkAssert((x, y) ->

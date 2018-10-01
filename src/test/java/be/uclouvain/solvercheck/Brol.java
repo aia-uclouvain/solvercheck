@@ -5,15 +5,23 @@ import org.junit.Test;
 
 public class Brol implements WithSolverCheck {
 
-
+/*
     @Test
     public void testTables() {
         assertThat(
-            forAll(tables()).itIsTrueThat(t ->
-                    an(arcConsistent(allDiff())).isStrongerThan(boundZConsistent(table(t)))
-            )
+          given()
+           .examples(5)
+           .forAll(tables())
+           .itIsTrueThat(t ->
+              an(arcConsistent(table(t)))
+                      .isStrongerThan(boundZConsistent(table(t)))
+                   .forAnyPartialAssignment()
+                   .withAnchorSamples(5)
+                   .withExamples(5)
+           )
         );
     }
+*/
 
     @Test
     public void arcConsistentIsStrongerThanBoundZ() {

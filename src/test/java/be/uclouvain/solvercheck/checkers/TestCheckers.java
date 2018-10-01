@@ -67,18 +67,18 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
 
     @Test
     public void testGccIsTrueIffAllValuesOccurWithGivenCardinality() {
-        qt.withExamples(100)
+        qt.withExamples(10)
             .forAll(integers().between(0, 10).describedAs(s -> "SIZE("+s+")"))
             .checkAssert(S ->
                 // FIXME: Questionnable ? Can it make sense to have
                 //        multiple occurrences of the same value ?
-                qt.withExamples(100)
+                qt.withExamples(10)
                     .forAll(Generators.setsOfUpTo(S,integers().between(-10,10)).describedAs(s -> "VALUES("+s+")"))
                     .checkAssert(values ->
-                        qt.withExamples(100)
+                        qt.withExamples(10)
                             .forAll(lists().of(integers().between(0, 10)).ofSize(values.size()).describedAs(s -> "CARDS("+s+")"))
                             .checkAssert(cards ->
-                                qt.withExamples(100)
+                                qt.withExamples(10)
                                     .forAll(Generators.assignments().withValuesRanging(-10, 10).describedAs(a -> "ASSIGNMENT("+a+")"))
                                     .check(ass -> {
 
