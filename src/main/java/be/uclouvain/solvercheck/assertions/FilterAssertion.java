@@ -18,13 +18,8 @@ import java.util.function.Supplier;
 // certain (setter) methods.
 @SuppressWarnings("checkstyle:hiddenfield")
 public final class FilterAssertion
+        extends AbstractFluentConfig<FilterAssertion>
         implements Predicate<PartialAssignment>, Assertion {
-
-    /**
-     * The configuration telling how to explore the set of possible partial
-     * assignments.
-     */
-    private final ForAnyPartialAssignment config;
 
     /** The actual filter being tested. */
     private final Filter actual;
@@ -46,7 +41,10 @@ public final class FilterAssertion
      * @param actual the Filter whose property is being evaluated.
      */
     public FilterAssertion(final Filter actual) {
-        this(new ForAnyPartialAssignment(), actual);
+        super();
+        this.actual = actual;
+        this.other  = new ArcConsitency(Checkers.alwaysTrue());
+        this.check  = x -> true;
     }
 
     /**
@@ -58,10 +56,16 @@ public final class FilterAssertion
      */
     public FilterAssertion(final Supplier<Strategy> config,
                            final Filter actual) {
-        this.config = new ForAnyPartialAssignment(config);
+        super(config);
         this.actual = actual;
         this.other  = new ArcConsitency(Checkers.alwaysTrue());
         this.check  = x -> true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected FilterAssertion getThis() {
+        return this;
     }
 
     /**
@@ -138,174 +142,7 @@ public final class FilterAssertion
 
     /** {@inheritDoc} */
     public void check() {
-        config.check(this);
-    }
-
-    /**
-     * Makes the interface of the filter assertion more fluent.
-     *
-     * @return this.
-     */
-    public FilterAssertion forAnyPartialAssignment() {
-        return this;
-    }
-
-    /**
-     * Configures the seed of the PRNG used to pseudo-randomly generate partial
-     * assignments, anchors and values.
-     *
-     * @param seed the seed to use to initialize the PRNG
-     * @return this
-     */
-    public FilterAssertion withFixedSeed(final long seed) {
-        config.withFixedSeed(seed);
-
-        return this;
-    }
-
-    /**
-     * Configures the underlying quicktheories layer to try to generate a
-     * partial assignment satisfying the assumptions at least `attempts` time
-     * before failing on value exhaustion.
-     *
-     * @param attempts the number of attempts to try before value exhaustion.
-     * @return this
-     */
-    public FilterAssertion withGenerateAttempts(final int attempts) {
-        config.withGenerateAttempts(attempts);
-
-        return this;
-    }
-
-    /**
-     * Configures the desired number of anchors which are picked to seed a
-     * round of partial assignment tests.
-     *
-     * @param n the number of anchor values to generate.
-     * @return this
-     */
-    public FilterAssertion withAnchorSamples(final int n) {
-        config.withAnchorSamples(n);
-
-        return this;
-    }
-
-    /**
-     * Configures the number of tests which are generated for each anchor value.
-     *
-     * @param n the number of example partial assignments produced for each
-     *          anchor value.
-     * @return this
-     */
-    public FilterAssertion withExamples(final int n) {
-        config.withAnchorSamples(n);
-
-        return this;
-    }
-
-    /**
-     * Configures the number of shrink cycles used by the underlying
-     * quicktheories layer in order to determine the smallest possible
-     * violation instances.
-     *
-     * @param cycles the number of shrink cycles to use.
-     * @return this
-     */
-    public FilterAssertion withShrinkCycles(final int cycles) {
-        config.withShrinkCycles(cycles);
-
-        return this;
-    }
-
-    /**
-     * Configures the range of values which can appear in the partial
-     * assignments.
-     *
-     * <div>
-     *     <h1>Note</h1>
-     *     The range of values must be expressed with x being smaller or
-     *     equal to y. Any other combination will be rejected.
-     * </div>
-     *
-     * @param x the lowest value that can possibly appear in a partial
-     *          assignment.
-     * @param y the highest value that can possibly appear in a partial
-     *          assignment.
-     * @return this
-     */
-    public FilterAssertion withValuesBetween(final int x, final int y) {
-        config.withValuesBetween(x, y);
-
-        return this;
-    }
-
-    /**
-     * Configures the maximum spread between any two values appearing in the
-     * partial assignment.
-     *
-     * @param n the maximum allowed spread (must be positive)
-     * @return this
-     */
-    public FilterAssertion spreading(final int n) {
-        config.spreading(n);
-
-        return this;
-    }
-
-    /**
-     * Configures the maximum size of the domains composing the partial
-     * assignments.
-     *
-     * @param n the maximum allowed domain size
-     * @return this
-     */
-    public FilterAssertion withDomainsOfSizeUpTo(final int n) {
-        config.withDomainsOfSizeUpTo(n);
-
-        return this;
-    }
-
-    /**
-     * Configures the size of the generated partial assignments. All
-     * resulting PAs will have that exact size.
-     *
-     * @param x the exact target size (must be positive).
-     * @return this
-     */
-    public FilterAssertion ofSize(final int x) {
-        config.ofSize(x);
-
-        return this;
-    }
-
-    /**
-     * Configures the minimum and maximum size of the generated partial
-     * assignments. All resulting PAs will comprise at least x variables and
-     * at most y.
-     *
-     * @param x minimum number of variables in the generated partial
-     *          assignments.
-     * @param y maximum number of variables in the generated partial
-     *          assignments.
-     * @return this
-     */
-    public FilterAssertion ofSizeBetween(final int x, final int y) {
-        config.ofSizeBetween(x, y);
-
-        return this;
-    }
-
-    /**
-     * Enforces the given predicate as an assumption on the generated partial
-     * assignments.
-     *
-     * @param assumption the assumption which must be satisfied
-     * @return this
-     */
-    public FilterAssertion assuming(final Predicate<PartialAssignment> assumption) {
-        config.assuming(assumption);
-
-        return this;
+        doCheck(this);
     }
 
     /**

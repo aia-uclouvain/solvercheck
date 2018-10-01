@@ -58,11 +58,6 @@ public final class TestConfiguration implements Supplier<Strategy> {
      * falsifying a checked property.
      */
     private int nbShrinkCycles = DEFAULT_NB_SHRINK_CYLES;
-    /**
-     * The number of 'dives' (branches that are explored until a leaf is
-     * reached) explored when performing the stateful check of some property.
-     */
-    private int nbDives = DEFAULT_NB_DIVES;
 
     /**
      * Configures the dependent tests to use the given random seed to
@@ -116,26 +111,6 @@ public final class TestConfiguration implements Supplier<Strategy> {
     public TestConfiguration shrinkCycles(final int n) {
         this.nbShrinkCycles = n;
         return this;
-    }
-
-    /**
-     * Configures the dependent stateful tests to execute `n` dives when
-     * trying to invalidate some property.
-     *
-     * @param n the number of branches to explore until a leaf is reached.
-     * @return this
-     */
-    public TestConfiguration dives(final int n) {
-        this.nbDives = n;
-        return this;
-    }
-    /**
-     * Return the current value of the number of dives that was configured.
-     *
-     * @return the configured number of dives.
-     */
-    public int getNbDives() {
-        return this.nbDives;
     }
 
     /**

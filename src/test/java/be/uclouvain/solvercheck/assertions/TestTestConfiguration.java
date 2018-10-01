@@ -69,11 +69,6 @@ public class TestTestConfiguration implements WithSolverCheck {
         Assert.assertTrue(Objects.nonNull(given().get()));
     }
 
-    @Test
-    public void testDives() {
-        Assert.assertEquals(given().dives(5).getNbDives(), 5);
-    }
-
     @Test(expected = AssertionError.class)
     public void testShrinkCycles() {
         Filter alpha = mockFilter(WEAK);
