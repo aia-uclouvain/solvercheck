@@ -3,24 +3,7 @@ package be.uclouvain.solvercheck;
 import org.junit.Test;
 
 public class Brol implements WithSolverCheck {
-
-/*
-    @Test
-    public void testTables() {
-        assertThat(
-          given()
-           .examples(5)
-           .forAll(tables())
-           .itIsTrueThat(t ->
-              an(arcConsistent(table(t)))
-                      .isStrongerThan(boundZConsistent(table(t)))
-                   .forAnyPartialAssignment()
-                   .withAnchorSamples(5)
-                   .withExamples(5)
-           )
-        );
-    }
-*/
+    /*
 
     @Test
     public void arcConsistentIsStrongerThanBoundZ() {
@@ -80,4 +63,6 @@ public class Brol implements WithSolverCheck {
             .withValuesBetween(0, 3)
         );
     }
+
+    */
 }

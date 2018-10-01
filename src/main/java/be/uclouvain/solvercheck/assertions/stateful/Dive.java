@@ -159,6 +159,7 @@ import java.util.function.Supplier;
      */
     private void doBacktrack() {
         while (!decisions.isEmpty() && backtracks.get()) {
+            history.add(Pop.getInstance());
             assertion.popState();
             decisions.pop();
         }

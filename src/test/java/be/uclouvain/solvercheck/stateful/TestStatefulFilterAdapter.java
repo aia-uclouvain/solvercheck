@@ -50,8 +50,11 @@ public class TestStatefulFilterAdapter implements WithSolverCheck {
            .ofSizeBetween(1, 5)
            .assuming(pa -> !pa.isError())
            .checkAssert(pa -> {
-               when(filter.filter(pa))
-                       .thenReturn(PartialAssignment.unionOf(pa.size(), List.of()));
+               PartialAssignment restricted =
+                       PartialAssignment.restrict(pa, 0, Operator.EQ, 4);
+
+               when(filter.filter(pa)).thenReturn(pa);
+               when(filter.filter(restricted)).thenReturn(restricted);
 
                tested.setup(pa);
 

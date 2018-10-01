@@ -63,7 +63,7 @@ public final class StatefulFilterAdapter implements StatefulFilter {
     /** {@inheritDoc} */
     @Override
     public void branchOn(final int variable, final Operator op, final int value) {
-        current = PartialAssignment.restrict(current, variable, op, value);
+        current = filter(PartialAssignment.restrict(current, variable, op, value));
     }
 
     /**

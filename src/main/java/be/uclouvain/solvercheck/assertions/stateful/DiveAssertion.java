@@ -171,7 +171,7 @@ public final class DiveAssertion
 
     /** {@inheritDoc} */
     public void check() {
-        doCheckAssert(this::dive);
+        doCheckAssert(pa -> dive(pa).run());
     }
 
     /**
