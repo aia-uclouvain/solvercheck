@@ -34,11 +34,6 @@ public final class TestConfiguration implements Supplier<Strategy> {
      * a test case that was shown to falsify the tested property.
      */
     private static final int DEFAULT_NB_SHRINK_CYLES = 1000000;
-    /**
-     * The number of 'dives' (branches that are explored until a leaf is
-     * reached) explored by default when testing a stateful property.
-     */
-    private static final int DEFAULT_NB_DIVES = 1000;
 
 
     /** The random seed used to initialize the randomness source. */
@@ -111,6 +106,28 @@ public final class TestConfiguration implements Supplier<Strategy> {
     public TestConfiguration shrinkCycles(final int n) {
         this.nbShrinkCycles = n;
         return this;
+    }
+
+    /**
+     * This class provides a simple way to define and check a property that
+     * should hold for any partial assignment. However, it should not be used
+     * in place of the more specific methods (an, a) which are much more
+     * powerful.
+     *
+     * <div>
+     *     <h1>Note</h1>
+     *     In the returned `ForAnyPartialAssignment`, the semantic of
+     *     `examples` is altered. Indeed, in that context, it represents the
+     *     number of test cases generated <b>for each anchor value</b>
+     *     whereas in any other context, it stands for the total number of
+     *     cases to generate.
+     * </div>
+     *
+     * @return a simple way to define and check a property that should hold
+     * for any partial assignment.
+     */
+    public ForAnyPartialAssignment forAnyPartialAssignment() {
+        return new ForAnyPartialAssignment(this);
     }
 
     /**

@@ -82,6 +82,21 @@ public class TestTestConfiguration implements WithSolverCheck {
 
     }
 
+    // ------ FOR ANY PARTIAL ASSIGNMENT --------------------------------------
+    @Test
+    public void testForAnyPartialAssignment() {
+        final Counter cnt = new Counter();
+
+        assertThat(
+                given()
+                    .examples(1)
+                    .forAnyPartialAssignment()
+                    .itIsTrueThat(pa -> () -> cnt.inc())
+        );
+
+        Assert.assertTrue(cnt.get() > 0);
+    }
+
     // ------ FORALL 1 --------------------------------------------------------
     @Test
     public void testForall1() {

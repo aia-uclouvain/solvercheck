@@ -25,6 +25,19 @@ public final class AssertionDSL {
     }
 
     /**
+     * This class provides a simple way to define and check a property that
+     * should hold for any partial assignment. However, it should not be used
+     * in place of the more specific methods (an, a) which are much more
+     * powerful.
+     *
+     * @return a simple way to define and check a property that should hold
+     * for any partial assignment.
+     */
+    public static ForAnyPartialAssignment forAnyPartialAssignment() {
+        return new ForAnyPartialAssignment();
+    }
+
+    /**
      * This method is an alias for (see propagator). It yields a
      * FilterAssertion for the given filter.
      *

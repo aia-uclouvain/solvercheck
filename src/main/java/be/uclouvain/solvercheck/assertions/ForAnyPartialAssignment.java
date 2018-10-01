@@ -4,6 +4,7 @@ import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import org.quicktheories.core.Strategy;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -14,7 +15,7 @@ import java.util.function.Supplier;
  * two provide much more advanced services to check the correctness of a
  * constraint.
  */
-public class ForAnyPartialAssignment
+public final class ForAnyPartialAssignment
         extends AbstractFluentConfig<ForAnyPartialAssignment> {
 
     /** Creates a new instance. */
@@ -47,7 +48,7 @@ public class ForAnyPartialAssignment
      *
      * @param test a predicate whose validity is being tested.
      */
-    public final void check(final Predicate<PartialAssignment> test) {
+    public void check(final Predicate<PartialAssignment> test) {
         doCheck(test);
     }
 
@@ -62,7 +63,26 @@ public class ForAnyPartialAssignment
      * @param test an assertion snippet testing the validity of some property
      *            depending on partial assignment.
      */
-    public final void checkAssert(final Consumer<PartialAssignment> test) {
+    public void checkAssert(final Consumer<PartialAssignment> test) {
         doCheckAssert(test);
+    }
+
+
+    /**
+     * Tests the validity of the given assertion by feeding it a large number
+     * of test cases.
+     * <div>
+     *     <h1>Note</h1>
+     *     This is the core of the utility of this class.
+     * </div>
+     *
+     * @param assertion an assertion snippet testing the validity of some
+     *                  property depending on partial assignment.
+     * @return an assertion which is to be tested against a wide range of
+     * partial assignments.
+     */
+    public Assertion itIsTrueThat(
+            final Function<PartialAssignment, Assertion> assertion) {
+        return () -> doCheckAssert(pa -> assertion.apply(pa).check());
     }
 }

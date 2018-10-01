@@ -25,6 +25,19 @@ public interface WithAssertions {
     }
 
     /**
+     * This class provides a simple way to define and check a property that
+     * should hold for any partial assignment. However, it should not be used
+     * in place of the more specific methods (an, a) which are much more
+     * powerful.
+     *
+     * @return a simple way to define and check a property that should hold
+     * for any partial assignment.
+     */
+    default ForAnyPartialAssignment forAnyPartialAssignment() {
+        return AssertionDSL.forAnyPartialAssignment();
+    }
+
+    /**
      * Provides you with a convenient way to express some assertion/property
      * about a given propagator.
      *
