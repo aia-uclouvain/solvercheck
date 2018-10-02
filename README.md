@@ -3,7 +3,8 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.bitbucket.xaviergillard/SolverCheck.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.bitbucket.xaviergillard%22%20AND%20a:%22SolverCheck%22)
 [![Javadocs](https://www.javadoc.io/badge/org.bitbucket.xaviergillard/SolverCheck.svg)](https://www.javadoc.io/doc/org.bitbucket.xaviergillard/SolverCheck)
-![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/xaviergillard/solvercheck.svg)
+[![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/xaviergillard/solvercheck.svg)](https://bitbucket.org/xaviergillard/solvercheck/src/master/)
+[![codecov](https://codecov.io/bb/xaviergillard/solvercheck/branch/master/graph/badge.svg)](https://codecov.io/bb/xaviergillard/solvercheck)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 SolverCheck is a library to test the implementation of constraints in CP solvers.
@@ -37,10 +38,6 @@ The complete javadoc of the project available
 Alternatively, the complete maven-site with all javadoc and quality assurance 
 reports can be downloaded from [here](https://bitbucket.org/xaviergillard/solvercheck/downloads/SolverCheck-1.0.0.qa_site.tgz).
 
-## Releases
-### 1.0.0
-* Initial version of the tool, provides all the necessary tooling.
-
 ## Quality Assurance
 A high amount of effort has been paid to write `SolverCheck` in a clear 
 (intelligible) and correct way. Additionally, some tools are used to 
@@ -55,6 +52,10 @@ Practically, the following tools are used:
 
 The complete maven-site with all javadoc and quality assurance reports can be 
 downloaded [here](https://bitbucket.org/xaviergillard/solvercheck/downloads/SolverCheck-1.0.0.qa_site.tgz).
+
+## Releases
+### 1.0.0
+* Initial version of the tool, provides all the necessary tooling.
 
 ##### TODO:
 * [ ] Pruners/non-monotonic stuff
