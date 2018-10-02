@@ -3,9 +3,11 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.bitbucket.xaviergillard/SolverCheck.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.bitbucket.xaviergillard%22%20AND%20a:%22SolverCheck%22)
 [![Javadocs](https://www.javadoc.io/badge/org.bitbucket.xaviergillard/SolverCheck.svg)](https://www.javadoc.io/doc/org.bitbucket.xaviergillard/SolverCheck)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 [![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/xaviergillard/solvercheck.svg)](https://bitbucket.org/xaviergillard/solvercheck/src/master/)
 [![codecov](https://codecov.io/bb/xaviergillard/solvercheck/branch/master/graph/badge.svg)](https://codecov.io/bb/xaviergillard/solvercheck)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 
 SolverCheck is a library to test the implementation of constraints in CP solvers.
 
