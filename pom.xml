@@ -38,10 +38,10 @@
     <!-- SCM *************************************************************** -->
     <scm>
         <connection>
-            scm:git:git://bitbucket.org/xaviergillard/solvercheck.git
+            scm:git:ssh://git@bitbucket.org/xaviergillard/solvercheck.git
         </connection>
         <developerConnection>
-            scm:git:ssh://bitbucket.org:/xaviergillard/solvercheck.git
+            scm:git:ssh://git@bitbucket.org:/xaviergillard/solvercheck.git
         </developerConnection>
         <url>
             https://bitbucket.org/xaviergillard/solvercheck/src
