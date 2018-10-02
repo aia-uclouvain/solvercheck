@@ -43,6 +43,8 @@ public class TestRangeConsistencyDomainFilter
      * </i>
      *
      * ``Weakly Monotonic Propagators'' (Schulte, Tack, 2009)
+     *
+     * @throws Exception when it fails
      */
     @Test
     public void itMustBeWeaklyMonotonic() throws Exception {

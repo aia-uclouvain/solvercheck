@@ -31,7 +31,7 @@ jobs:
           key: v1-dependencies-{{ checksum "pom.xml" }}
         
       # run tests!
-      - run: mvn verify site -P QA
+      - run: mvn verify site -P fast
       
       # make a tarball with the sites report
       - run: 
