@@ -6,4 +6,5 @@ pipelines:
         caches:
           - maven
         script: # Modify the commands below to build your repository.
-          - mvn -B test -P default # -B batch mode makes Maven less verbose
+          - mvn -B test verify -P fast
+          - bash <(curl -s https://codecov.io/bash)

@@ -125,7 +125,7 @@
 
 
     <!-- =================================================================== -->
-    <!-- So far, this POM provides three distinct profiles, each aiming at   -->
+    <!-- So far, this POM provides the following profiles, each aiming at    -->
     <!-- a specific goal:                                                    -->
     <!--    * The `default` profile, targets fast completion times. This is  -->
     <!--      the profile that should be used while developing.              -->
@@ -133,6 +133,10 @@
     <!--      during its `verify` phase. It should be used every once in a   -->
     <!--      while. And it should definitely be used before pushing a       -->
     <!--      series of commits.                                             -->
+    <!--    * The `fast` profile generates a maven site with the QA reports  -->
+    <!--      that are fairly quick to produce. This includes Checkstyle,    -->
+    <!--      SpotBugs and JaCoCo. Mutation testing is *not* part of this    -->
+    <!--      profile.                                                       -->
     <!--    * The `release` profile is the one that should be used to        -->
     <!--      publish releases on maven central (through sonatype oss)       -->
     <!-- =================================================================== -->
