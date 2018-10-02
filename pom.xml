@@ -46,7 +46,8 @@
         <url>
             https://bitbucket.org/xaviergillard/solvercheck/src
         </url>
-    </scm>
+      <tag>HEAD</tag>
+  </scm>
 
     <!-- Releases are to be published on Maven Central through Sonatype OSS  -->
     <distributionManagement>
