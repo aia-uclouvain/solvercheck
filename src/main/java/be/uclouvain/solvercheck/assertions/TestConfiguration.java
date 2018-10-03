@@ -33,7 +33,7 @@ public final class TestConfiguration implements Supplier<Strategy> {
      * The default value for the number of cycles spent shrinking the size of
      * a test case that was shown to falsify the tested property.
      */
-    private static final int DEFAULT_NB_SHRINK_CYLES = 1000000;
+    private static final int DEFAULT_NB_SHRINK_CYLES = 10;
 
 
     /** The random seed used to initialize the randomness source. */

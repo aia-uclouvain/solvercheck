@@ -31,6 +31,12 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      */
     private static final int DEFAULT_GEN_ATTEMPTS = 10000;
     /**
+     * The default the number of shrink cycles used by the underlying
+     * quicktheories layer in order to determine the smallest possible
+     * violation instances.
+     */
+    private static final int DEFAULT_SHRINK_CYCLES = 10;
+    /**
      * The default number of `anchor values` which designate the 'center' of
      * the values distributions in a partial assignment.
      */
@@ -403,6 +409,7 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
         return Configuration
                 .systemStrategy()
                 .withGenerateAttempts(DEFAULT_GEN_ATTEMPTS)
+                .withShrinkCycles(DEFAULT_SHRINK_CYCLES)
                 .withExamples(DEFAULT_EXAMPLES);
     }
 }
