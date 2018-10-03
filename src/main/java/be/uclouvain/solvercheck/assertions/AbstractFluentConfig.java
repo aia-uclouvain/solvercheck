@@ -45,7 +45,7 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      * The default number of partial assignment generated (and tested) for each
      * anchor value.
      */
-    private static final int DEFAULT_EXAMPLES = 10;
+    private static final int DEFAULT_EXAMPLES = 100;
     /**
      * The default minimal value that may appear in a generated partial
      * assignment.
