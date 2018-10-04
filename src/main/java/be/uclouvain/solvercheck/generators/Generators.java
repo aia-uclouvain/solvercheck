@@ -365,7 +365,7 @@ public final class Generators {
         public Gen<PartialAssignment> build() {
             return lists().of(domainBuilder.build())
                     .ofSizeBetween(nbVarsMin, nbVarsMax)
-                    .map(PartialAssignment::from);
+                    .map(lst -> PartialAssignment.from(lst));
         }
     }
 

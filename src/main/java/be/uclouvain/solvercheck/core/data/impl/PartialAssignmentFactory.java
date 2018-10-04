@@ -5,6 +5,7 @@ import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +30,17 @@ public final class PartialAssignmentFactory {
      */
     public static PartialAssignment from(final List<Domain> domains) {
         return new BasicPartialAssignment(domains);
+    }
+
+    /**
+     * Creates a new PartialAssignement from the given list of domains.
+     *
+     * @param domains the domains that will compose the new partial
+     *                assignment instance
+     * @return a new PartialAssignement from the given list of domains
+     */
+    public static PartialAssignment from(final Domain...domains) {
+        return new BasicPartialAssignment(Arrays.asList(domains));
     }
 
     /**
@@ -76,6 +88,10 @@ public final class PartialAssignmentFactory {
             final int arity,
             final Collection<? extends List<Integer>> tuples) {
 
+        if (arity < 0) {
+            throw new IllegalArgumentException("Arity must be natural");
+        }
+
         if (tuples.isEmpty()) {
             ArrayList<Domain> resulting = new ArrayList<>();
             for (int i = 0; i < arity; i++) {
@@ -104,6 +120,19 @@ public final class PartialAssignmentFactory {
 
         // and then turn that all into a partial assignment
         return domains.stream().collect(collector());
+    }
+
+    /**
+     * Returns a partial assignment with the specified arity whose domains
+     * are all empty. This "error" partial assignment is meant to be used as
+     * a marker to tell that a contradiction has been detected.
+     *
+     * @param arity the desired arity for the partial assignment.
+     * @return a partial assignment with the specified arity whose domains
+     * are all empty.
+     */
+    public static PartialAssignment error(final int arity) {
+        return unionOf(arity, List.of());
     }
 
     /**

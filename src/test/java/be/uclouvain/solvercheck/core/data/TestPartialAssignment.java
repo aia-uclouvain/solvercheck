@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -111,6 +112,35 @@ public class TestPartialAssignment
     public void testFromList() {
         qt().forAll(lists().of(domains()).ofSizeBetween(0, 1000))
             .check(lst -> lst.equals(PartialAssignment.from(lst)));
+    }
+
+    @Test
+    public void testFromArray() {
+        qt().forAll(
+           arrays().ofClass(domains(), Domain.class).withLengthBetween(0, 1000))
+           .check(array ->
+              Arrays.asList(array).equals(PartialAssignment.from(array))
+           );
+    }
+
+    // ERROR
+    @Test
+    public void testError() {
+        qt().forAll(integers().between(0, 1000))
+           .check(arity -> {
+               PartialAssignment result = PartialAssignment.error(arity);
+
+               return result.size() == arity
+                  && result.stream().allMatch(Domain::isEmpty);
+           });
+    }
+    @Test
+    public void errorMustRejectNegativeArity() {
+        qt().forAll(integers().between(-1000, -1))
+           .check(arity ->
+              failsThrowing(
+                 IllegalArgumentException.class,
+                 () -> PartialAssignment.error(arity)));
     }
 
 

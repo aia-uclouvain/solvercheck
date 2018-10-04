@@ -92,6 +92,17 @@ public interface PartialAssignment
     }
 
     /**
+     * Creates a new PartialAssignement from the given list of domains.
+     *
+     * @param domains the domains that will compose the new partial
+     *                assignment instance
+     * @return a new PartialAssignement from the given list of domains
+     */
+    static PartialAssignment from(final Domain...domains) {
+        return PartialAssignmentFactory.from(domains);
+    }
+
+    /**
      * This method returns a copy of the given `partial` assignment in which
      * the domain of `variable` has been restricted according to
      * [`op`, `value`]. (see DomainFactory.restrict).
@@ -129,6 +140,19 @@ public interface PartialAssignment
             final int arity,
             final Collection<? extends List<Integer>> tuples) {
         return PartialAssignmentFactory.unionOf(arity, tuples);
+    }
+
+    /**
+     * Returns a partial assignment with the specified arity whose domains
+     * are all empty. This "error" partial assignment is meant to be used as
+     * a marker to tell that a contradiction has been detected.
+     *
+     * @param arity the desired arity for the partial assignment.
+     * @return a partial assignment with the specified arity whose domains
+     * are all empty.
+     */
+    static PartialAssignment error(final int arity) {
+        return PartialAssignmentFactory.error(arity);
     }
 
     /**

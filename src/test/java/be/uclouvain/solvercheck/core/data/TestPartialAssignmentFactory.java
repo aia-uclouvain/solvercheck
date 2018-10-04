@@ -8,7 +8,10 @@ import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 
 public class TestPartialAssignmentFactory
         implements WithQuickTheories, WithCpGenerators {
@@ -20,6 +23,34 @@ public class TestPartialAssignmentFactory
             .check(lst ->
                 lst.equals(PartialAssignmentFactory.from(lst))
             );
+    }
+    @Test
+    public void testFromArray() {
+        qt().forAll(
+           arrays().ofClass(domains(), Domain.class).withLengthBetween(0, 1000))
+           .check(array ->
+              Arrays.asList(array).equals(PartialAssignmentFactory.from(array))
+           );
+    }
+
+    // ERROR
+    @Test
+    public void testError() {
+        qt().forAll(integers().between(0, 1000))
+           .check(arity -> {
+               PartialAssignment result = PartialAssignmentFactory.error(arity);
+
+               return result.size() == arity
+                   && result.stream().allMatch(Domain::isEmpty);
+           });
+    }
+    @Test
+    public void errorMustRejectNegativeArity() {
+        qt().forAll(integers().between(-1000, -1))
+           .check(arity ->
+              failsThrowing(
+                 IllegalArgumentException.class,
+                 () -> PartialAssignmentFactory.error(arity)));
     }
 
     // RESTRICT
