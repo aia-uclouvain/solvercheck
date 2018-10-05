@@ -70,8 +70,6 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
         qt.withExamples(10)
             .forAll(integers().between(0, 10).describedAs(s -> "SIZE("+s+")"))
             .checkAssert(S ->
-                // FIXME: Questionnable ? Can it make sense to have
-                //        multiple occurrences of the same value ?
                 qt.withExamples(10)
                     .forAll(Generators.setsOfUpTo(S,integers().between(-10,10)).describedAs(s -> "VALUES("+s+")"))
                     .checkAssert(values ->
@@ -114,8 +112,6 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
     @Test
     public void testGccVarIsTrueIffAllValuesOccurWithGivenCardinality() {
       qt.forAll(lists().of(integers().between(-10, 10)).ofSizeBetween(0, 10))
-          // FIXME: Questionnable ? Can it make sense to have
-          //        multiple occurrences of the same value ?
           .assuming(vals -> vals.size() == new HashSet<>(vals).size())
           .checkAssert(values -> {
               int nbVarsMin = values.size();
