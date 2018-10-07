@@ -60,6 +60,12 @@ downloaded [here](https://bitbucket.org/xaviergillard/solvercheck/downloads/Solv
 ### 1.0.0
 * Initial version of the tool, provides all the necessary tooling.
 
+### 1.0.1-SNAPSHOT (ongoing)
+* Reduces the default number of shrink cycles to improve practical usability.
+* Increase the default number of examples generated for each anchor-value.
+* Add some utility methods to ease the development of test-utility methods.
+* Additional `ForwardChecking` consistency.
+
 ##### TODO:
 * [ ] Pruners/non-monotonic stuff
 * [ ] Write the rest of the Readme

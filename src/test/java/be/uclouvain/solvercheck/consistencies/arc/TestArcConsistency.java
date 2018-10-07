@@ -24,7 +24,7 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
 public class TestArcConsistency
         implements WithQuickTheories,
                    WithCpGenerators,
-        WithConsistencies,
+                   WithConsistencies,
                    WithCheckers {
 
     private QuickTheory qt;
