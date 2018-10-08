@@ -6,6 +6,8 @@ import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 
+import java.util.Arrays;
+
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 
 public class TestAssignmentFactory
@@ -17,6 +19,17 @@ public class TestAssignmentFactory
                 .check(lst ->
                         lst.equals(AssignmentFactory.from(lst))
                 );
+    }
+
+    @Test
+    public void testFromArray() {
+        qt().forAll(
+           arrays().ofIntegers(integers().all()).withLengthBetween(0, 1000))
+           .check(array -> {
+               int[] values =
+                  Arrays.stream(array).mapToInt(Integer::intValue).toArray();
+               return Arrays.asList(array).equals(AssignmentFactory.from(values));
+           });
     }
 
     @Test

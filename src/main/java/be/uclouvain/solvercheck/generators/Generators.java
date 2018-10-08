@@ -462,7 +462,7 @@ public final class Generators {
         public Gen<Assignment> build() {
             return lists().of(integers().between(valueMin, valueMax))
                     .ofSizeBetween(nbVarsMin, nbVarsMax)
-                    .map(Assignment::from);
+                    .map(lst -> Assignment.from(lst));
         }
     }
 

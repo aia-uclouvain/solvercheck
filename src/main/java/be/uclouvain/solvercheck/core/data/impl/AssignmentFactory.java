@@ -30,6 +30,16 @@ public final class AssignmentFactory {
     }
 
     /**
+     * @param assignedValues the list of values assigned to each of the
+     *                       variables. (ith item in the list corresponds to
+     *                       the value assigned to variable x_i)
+     * @return Creates a new Assignement from the given list of assigned values
+     */
+    public static Assignment from(final int... assignedValues) {
+        return new BasicAssignment(assignedValues);
+    }
+
+    /**
      * @param partial a partial assignment which is fixed. Hence, have all its
      *                domains limited to one single value.
      * @return Creates a new Assignement from the given fixed partial assignment

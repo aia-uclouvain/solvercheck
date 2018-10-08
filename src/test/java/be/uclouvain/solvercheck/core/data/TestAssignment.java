@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
@@ -64,6 +65,17 @@ public class TestAssignment
             .check(lst ->
                 lst.equals(Assignment.from(lst))
             );
+    }
+
+    @Test
+    public void testFromArray() {
+        qt().forAll(
+           arrays().ofIntegers(integers().all()).withLengthBetween(0, 1000))
+           .check(array -> {
+               int[] values =
+                  Arrays.stream(array).mapToInt(Integer::intValue).toArray();
+               return Arrays.asList(array).equals(Assignment.from(values));
+           });
     }
 
     @Test

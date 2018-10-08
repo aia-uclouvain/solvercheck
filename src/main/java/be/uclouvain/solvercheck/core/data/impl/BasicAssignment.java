@@ -3,8 +3,10 @@ package be.uclouvain.solvercheck.core.data.impl;
 import be.uclouvain.solvercheck.core.data.Assignment;
 
 import java.util.AbstractList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.RandomAccess;
+import java.util.stream.Collectors;
 
 /**
  * This class merely wraps an existing list type to interpret it as a (complete)
@@ -25,6 +27,17 @@ import java.util.RandomAccess;
      */
     /* package */ BasicAssignment(final List<Integer> values) {
         this.values = List.copyOf(values);
+    }
+
+    /**
+     * Creates a new (immutable !) value from the given list of values.
+     *
+     * @param values the list of values assigned to each of the variables.
+     *               (ith item in the list corresponds to the value assigned
+     *               to variable x_i)
+     */
+    /* package */ BasicAssignment(final int... values) {
+        this.values = Arrays.stream(values).boxed().collect(Collectors.toList());
     }
 
     /** {@inheritDoc} */
