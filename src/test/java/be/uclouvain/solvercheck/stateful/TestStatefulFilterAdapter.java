@@ -5,6 +5,7 @@ import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -93,6 +94,22 @@ public class TestStatefulFilterAdapter implements WithSolverCheck {
 
                     reset(filter);
                 });
+    }
+
+    @Test
+    public void whenCurrentStateIsErrorItReturnsAnErrorPa() {
+        forAnyPartialAssignment()
+           .withValuesBetween(10, 100)
+           .ofSizeBetween(1, 5)
+           .assuming(PartialAssignment::isError)
+           .checkAssert(pa -> {
+               when(filter.filter(pa))
+                  .thenReturn(PartialAssignment.unionOf(pa.size(), List.of()));
+               
+               tested.setup(pa);
+
+               Assert.assertEquals(PartialAssignment.error(pa.size()), tested.currentState());
+           });
     }
 
 }

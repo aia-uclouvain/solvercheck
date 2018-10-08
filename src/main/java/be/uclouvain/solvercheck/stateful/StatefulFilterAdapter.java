@@ -57,7 +57,11 @@ public final class StatefulFilterAdapter implements StatefulFilter {
     /** {@inheritDoc} */
     @Override
     public PartialAssignment currentState() {
-        return current;
+        if (current.isError()) {
+            return PartialAssignment.error(current.size());
+        } else {
+            return current;
+        }
     }
 
     /** {@inheritDoc} */
