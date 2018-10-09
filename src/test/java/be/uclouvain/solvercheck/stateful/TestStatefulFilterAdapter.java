@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertSame;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -77,6 +78,7 @@ public class TestStatefulFilterAdapter implements WithSolverCheck {
     @Test
     public void popWillNotGoOverTheRoot() {
         forAnyPartialAssignment()
+                //.withFixedSeed(39822486463804555L)
                 .withValuesBetween(10, 100)
                 .ofSizeBetween(1, 5)
                 .assuming(pa -> !pa.isError())
@@ -89,7 +91,7 @@ public class TestStatefulFilterAdapter implements WithSolverCheck {
                     PartialAssignment pa1 = tested.currentState();
                     for (int i = 0; i < 10; i++) {
                         tested.popState();
-                        assertSame(pa1, tested.currentState());
+                        assertEquals(pa1, tested.currentState());
                     }
 
                     reset(filter);
