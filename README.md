@@ -50,8 +50,8 @@ quality of the tests it generates.
 Practically, the following tools are used:
 * `Checkstyle` to enforce a consistent coding standard.
 * `Spotbugs` to statically detect frequently occurring bug patterns.
-* `JaCoCo` to compute the **branch** coverage of the test base.
-* `PIT` to compute the **mutations** coverage of the test base.
+* [`JaCoCo`](http://jenkins2.info.ucl.ac.be/job/SolverCheck/ws/target/site/jacoco/index.html) to compute the **branch** coverage of the test base.
+* [`PIT`](http://jenkins2.info.ucl.ac.be/job/SolverCheck/ws/target/pit-reports/) to compute the **mutations** coverage of the test base.
 
 The complete maven-site with all javadoc and quality assurance reports can be 
 downloaded [here](https://bitbucket.org/xaviergillard/solvercheck/downloads/SolverCheck-1.0.0.qa_site.tgz).
