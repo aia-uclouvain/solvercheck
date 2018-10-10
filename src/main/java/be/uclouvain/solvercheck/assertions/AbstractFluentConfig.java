@@ -318,7 +318,8 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
         return Generators.partialAssignments()
                 .withVariablesBetween(nbVarMin, nbVarMax)
                 .withDomainsOfSizeUpTo(maxDomSize)
-                .withValuesRanging(lowerBound(anchor), upperBound(anchor));
+                .withValuesRanging(lowerBound(anchor), upperBound(anchor))
+                .describedAs(pa -> String.format("PARTIAL_ASSIGNMENT(%s)", pa));
     }
 
     /**
@@ -326,7 +327,9 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      * checkAssert phase.
      */
     private Gen<Integer> anchors() {
-        return integers().between(anchorMin(), anchorMax());
+        return integers()
+           .between(anchorMin(), anchorMax())
+           .describedAs(i -> String.format("ANCHOR(%d)", i));
     }
 
     /**
