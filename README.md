@@ -5,7 +5,7 @@
 [![Javadocs](https://www.javadoc.io/badge/org.bitbucket.xaviergillard/SolverCheck.svg)](https://www.javadoc.io/doc/org.bitbucket.xaviergillard/SolverCheck)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/xaviergillard/solvercheck.svg)](https://bitbucket.org/xaviergillard/solvercheck/src/master/)
+[![Build Status](http://jenkins2.info.ucl.ac.be/job/SolverCheck/badge/icon)](http://jenkins2.info.ucl.ac.be/job/SolverCheck/)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4f6250ef42444390aa30619e10193e64)](https://www.codacy.com/app/xaviergillard/solvercheck?utm_source=xaviergillard@bitbucket.org&amp;utm_medium=referral&amp;utm_content=xaviergillard/solvercheck&amp;utm_campaign=Badge_Grade)
 [![codecov](https://codecov.io/bb/xaviergillard/solvercheck/branch/master/graph/badge.svg)](https://codecov.io/bb/xaviergillard/solvercheck)
 
