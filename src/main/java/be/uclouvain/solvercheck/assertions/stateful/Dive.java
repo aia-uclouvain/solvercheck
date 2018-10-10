@@ -98,6 +98,7 @@ import java.util.function.Supplier;
     /** {@inheritDoc} */
     public void run() {
         assertion.setup(root);
+        doCheck();
 
         for (int i = 0; i < assertion.getNbDives(); i++) {
             exploreOneBranch();
