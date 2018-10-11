@@ -1,6 +1,8 @@
 package be.uclouvain.solvercheck.checkers;
 
 import be.uclouvain.solvercheck.core.data.Assignment;
+import be.uclouvain.solvercheck.core.data.Domain;
+import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.generators.Generators;
 import org.junit.Assert;
 import org.junit.Before;
@@ -226,32 +228,111 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
     @Test
     public void testSumEQ(){
         qt.forAll(assignments(), integers().all())
-            .check((a, c) -> sum(EQ, c).test(a) == (a.stream().mapToInt(Integer::intValue).sum() == c) );
+          .check((a, c) -> sum(EQ, c).test(a) == (a.stream().mapToLong(Integer::longValue).sum() == c) );
     }
     @Test
     public void testSumNE(){
         qt.forAll(assignments(), integers().all())
-                .check((a, c) -> sum(NE, c).test(a) == (a.stream().mapToInt(Integer::intValue).sum() != c) );
+          .check((a, c) -> sum(NE, c).test(a) == (a.stream().mapToLong(Integer::longValue).sum() != c) );
     }
     @Test
     public void testSumLT(){
         qt.forAll(assignments(), integers().all())
-                .check((a, c) -> sum(LT, c).test(a) == (a.stream().mapToInt(Integer::intValue).sum() < c) );
+          .check((a, c) -> sum(LT, c).test(a) == (a.stream().mapToLong(Integer::longValue).sum() < c) );
     }
     @Test
     public void testSumLE(){
         qt.forAll(assignments(), integers().all())
-                .check((a, c) -> sum(LE, c).test(a) == (a.stream().mapToInt(Integer::intValue).sum() <= c) );
+          .check((a, c) -> sum(LE, c).test(a) == (a.stream().mapToLong(Integer::longValue).sum() <= c) );
     }
     @Test
     public void testSumGT(){
         qt.forAll(assignments(), integers().all())
-                .check((a, c) -> sum(GT, c).test(a) == (a.stream().mapToInt(Integer::intValue).sum() > c) );
+          .check((a, c) -> sum(GT, c).test(a) == (a.stream().mapToLong(Integer::longValue).sum() > c) );
     }
     @Test
     public void testSumGE(){
         qt.forAll(assignments(), integers().all())
-                .check((a, c) -> sum(GE, c).test(a) == (a.stream().mapToInt(Integer::intValue).sum() >= c) );
+          .check((a, c) -> sum(GE, c).test(a) == (a.stream().mapToLong(Integer::longValue).sum() >= c) );
+    }
+
+    @Test
+    public void testSumLeIsNotSubjectToOverflows() {
+        qt.forAll(
+           assignments().describedAs(a -> "ASSIGNMENT(" + a + ")"),
+           integers().all().describedAs(rhs -> "RHS(" + rhs + ")"))
+           .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
+           .check((assignment, rhs) -> {
+               long sumL =
+                  assignment.stream().mapToLong(Integer::longValue).sum();
+
+               return sum(LE, rhs).test(assignment) == (sumL <= (long) rhs);
+           });
+    }
+    @Test
+    public void testSumLtIsNotSubjectToOverflows() {
+        qt.forAll(
+               assignments().describedAs(a -> "ASSIGNMENT(" + a + ")"),
+               integers().all().describedAs(rhs -> "RHS(" + rhs + ")"))
+           .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
+           .check((assignment, rhs) -> {
+               long sumL =
+                  assignment.stream().mapToLong(Integer::longValue).sum();
+
+               return sum(LT, rhs).test(assignment) == (sumL <  (long) rhs);
+           });
+    }
+    @Test
+    public void testSumEqIsNotSubjectToOverflows() {
+        qt.forAll(
+               assignments().describedAs(a -> "ASSIGNMENT(" + a + ")"),
+               integers().all().describedAs(rhs -> "RHS(" + rhs + ")"))
+           .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
+           .check((assignment, rhs) -> {
+               long sumL =
+                  assignment.stream().mapToLong(Integer::longValue).sum();
+
+               return sum(EQ, rhs).test(assignment) == (sumL == (long) rhs);
+           });
+    }
+    @Test
+    public void testSumNeIsNotSubjectToOverflows() {
+        qt.forAll(
+               assignments().describedAs(a -> "ASSIGNMENT(" + a + ")"),
+               integers().all().describedAs(rhs -> "RHS(" + rhs + ")"))
+           .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
+           .check((assignment, rhs) -> {
+               long sumL =
+                  assignment.stream().mapToLong(Integer::longValue).sum();
+
+               return sum(NE, rhs).test(assignment) == (sumL != (long) rhs);
+           });
+    }
+    @Test
+    public void testSumGeIsNotSubjectToOverflows() {
+        qt.forAll(
+               assignments().describedAs(a -> "ASSIGNMENT(" + a + ")"),
+               integers().all().describedAs(rhs -> "RHS(" + rhs + ")"))
+           .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
+           .check((assignment, rhs) -> {
+               long sumL =
+                  assignment.stream().mapToLong(Integer::longValue).sum();
+
+               return sum(GE, rhs).test(assignment) == (sumL >= (long) rhs);
+           });
+    }
+    @Test
+    public void testSumGtIsNotSubjectToOverflows() {
+        qt.forAll(
+               assignments().describedAs(a -> "ASSIGNMENT(" + a + ")"),
+               integers().all().describedAs(rhs -> "RHS(" + rhs + ")"))
+           .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
+           .check((assignment, rhs) -> {
+               long sumL =
+                  assignment.stream().mapToLong(Integer::longValue).sum();
+
+               return sum(GT, rhs).test(assignment) == (sumL >  (long) rhs);
+           });
     }
 
     @Test
@@ -269,4 +350,19 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
                 .withValuesRanging(-10, 10)
                 .build();
     }
+
+    /**
+     * This assumption ensures that either an overflow or an underflow
+     * underflow happens while summing up the values.
+     *
+     * @param pa the assignment on which the assuption bears.
+     * @return true iff no overflow can happen during the summation.
+     */
+    private boolean underflowOrOverflow(final Assignment pa) {
+        long sumL = pa.stream().mapToLong(Integer::longValue).sum();
+        int  sumI = pa.stream().mapToInt(Integer::intValue).sum();
+
+        return sumL != sumI;
+    }
+
 }
