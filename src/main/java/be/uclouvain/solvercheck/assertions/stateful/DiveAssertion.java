@@ -11,6 +11,7 @@ import be.uclouvain.solvercheck.stateful.StatefulFilterAdapter;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 import org.quicktheories.core.Strategy;
 
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -24,7 +25,7 @@ import java.util.function.Supplier;
 @SuppressWarnings("checkstyle:hiddenfield")
 public final class DiveAssertion
         extends AbstractFluentConfig<DiveAssertion>
-        implements Assertion {
+        implements Predicate<PartialAssignment>, Assertion {
     /**
      * The number of 'dives' (branches that are explored until a leaf is
      * reached) explored by default when testing a stateful property.
@@ -170,8 +171,28 @@ public final class DiveAssertion
     }
 
     /** {@inheritDoc} */
+    @Override
     public void check() {
         doCheckAssert(pa -> dive(pa).run());
+    }
+
+    /**
+     * Verifies the property for the one given test case.
+     * @param pa the test case for whichg to verify the property
+     */
+    public void check(final PartialAssignment pa) {
+        dive(pa).run();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean test(final PartialAssignment pa) {
+        try {
+            dive(pa).run();
+            return true;
+        } catch (AssertionError error) {
+            return false;
+        }
     }
 
     /**

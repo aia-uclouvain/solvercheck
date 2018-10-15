@@ -2,10 +2,8 @@ package be.uclouvain.solvercheck.core.data;
 
 import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 /**
  * An assignment is a complete mapping from variables to values. In this

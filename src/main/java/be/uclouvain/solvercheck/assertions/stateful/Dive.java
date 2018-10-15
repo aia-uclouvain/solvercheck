@@ -97,12 +97,18 @@ import java.util.function.Supplier;
 
     /** {@inheritDoc} */
     public void run() {
-        assertion.setup(root);
-        doCheck();
+        try {
+            assertion.setup(root);
+            doCheck();
 
-        for (int i = 0; i < assertion.getNbDives(); i++) {
-            exploreOneBranch();
-            doBacktrack();
+            for (int i = 0; i < assertion.getNbDives(); i++) {
+                exploreOneBranch();
+                doBacktrack();
+            }
+        } catch (Throwable problem) {
+            throw new AssertionError(
+               problem.getMessage() + "\n" + scenario(),
+               problem);
         }
     }
 
@@ -150,7 +156,7 @@ import java.util.function.Supplier;
      */
     private void doCheck() {
         if (!assertion.checkTest()) {
-            throw new AssertionError(scenario());
+            throw new AssertionError("Found a counterexample of the property");
         }
     }
 
