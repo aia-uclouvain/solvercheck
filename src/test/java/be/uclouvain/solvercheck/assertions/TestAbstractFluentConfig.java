@@ -5,6 +5,7 @@ import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import org.junit.Test;
 
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class TestAbstractFluentConfig {
     @Test
@@ -13,7 +14,7 @@ public class TestAbstractFluentConfig {
         int high= 100;
         new DummyFluentConfig()
                 .withValuesBetween(low, high)
-                .doCheck(pa ->
+                .doChk(pa ->
                     pa.stream().allMatch(domain ->
                         domain.stream().allMatch(value ->
                             low <= value && value <= high
@@ -29,7 +30,7 @@ public class TestAbstractFluentConfig {
 
         new DummyFluentConfig()
                 .withValuesBetween(low, high)
-                .doCheck(pa -> true);
+                .doChk(pa -> true);
     }
 
     @Test
@@ -39,7 +40,7 @@ public class TestAbstractFluentConfig {
 
         new DummyFluentConfig()
                 .withValuesBetween(low, high)
-                .doCheck(PartialAssignment::isLeaf);
+                .doChk(PartialAssignment::isLeaf);
     }
 
 
@@ -49,7 +50,7 @@ public class TestAbstractFluentConfig {
         new DummyFluentConfig()
                 .spreading(spread)
                 .assuming(pa -> !pa.isError())
-                .doCheck(pa ->
+                .doChk(pa ->
                    pa.stream().allMatch(domain ->
                       domain.maximum() - domain.minimum() <= spread
                    )
@@ -62,7 +63,7 @@ public class TestAbstractFluentConfig {
 
         new DummyFluentConfig()
                 .spreading(spread)
-                .doCheck(pa -> true);
+                .doChk(pa -> true);
     }
 
     @Test
@@ -71,7 +72,7 @@ public class TestAbstractFluentConfig {
 
         new DummyFluentConfig()
                 .spreading(spread)
-                .doCheck(PartialAssignment::isLeaf);
+                .doChk(PartialAssignment::isLeaf);
     }
 
     @Test
@@ -79,7 +80,7 @@ public class TestAbstractFluentConfig {
         int size = 10;
         new DummyFluentConfig()
                 .withDomainsOfSizeUpTo(size)
-                .doCheck(pa ->
+                .doChk(pa ->
                    pa.stream().allMatch(domain ->
                       domain.size() <= size
                    )
@@ -91,7 +92,7 @@ public class TestAbstractFluentConfig {
         int size = -10;
         new DummyFluentConfig()
                 .withDomainsOfSizeUpTo(size)
-                .doCheck(pa -> true);
+                .doChk(pa -> true);
     }
 
     @Test
@@ -99,7 +100,7 @@ public class TestAbstractFluentConfig {
         int size = 0;
         new DummyFluentConfig()
                 .withDomainsOfSizeUpTo(size)
-                .doCheck(pa -> pa.stream().allMatch(Set::isEmpty));
+                .doChk(pa -> pa.stream().allMatch(Set::isEmpty));
     }
 
     @Test
@@ -108,7 +109,7 @@ public class TestAbstractFluentConfig {
         int high= 20;
         new DummyFluentConfig()
                 .ofSizeBetween(low, high)
-                .doCheck(pa ->
+                .doChk(pa ->
                    low <= pa.size() && pa.size() <= high
                 );
     }
@@ -119,7 +120,7 @@ public class TestAbstractFluentConfig {
         int high= 10;
         new DummyFluentConfig()
                 .ofSizeBetween(low, high)
-                .doCheck(pa -> true);
+                .doChk(pa -> true);
     }
 
     @Test
@@ -128,7 +129,7 @@ public class TestAbstractFluentConfig {
         int high= 20;
         new DummyFluentConfig()
                 .ofSizeBetween(low, high)
-                .doCheck(pa -> pa.size() == 20);
+                .doChk(pa -> pa.size() == 20);
     }
 
     @Test
@@ -136,7 +137,7 @@ public class TestAbstractFluentConfig {
         int size = 10;
         new DummyFluentConfig()
                .ofSize(size)
-               .doCheck(pa ->
+               .doChk(pa ->
                   pa.size() == size
                );
     }
@@ -146,7 +147,7 @@ public class TestAbstractFluentConfig {
         int size = -10;
         new DummyFluentConfig()
                 .ofSize(size)
-                .doCheck(pa -> true);
+                .doChk(pa -> true);
     }
 
     @Test
@@ -154,7 +155,7 @@ public class TestAbstractFluentConfig {
         int size = 10;
         new DummyFluentConfig()
                 .assuming(pa -> pa.size() <= size)
-                .doCheck(pa ->
+                .doChk(pa ->
                    pa.stream().allMatch(domain ->
                       domain.size() <= size
                    )
@@ -166,10 +167,13 @@ public class TestAbstractFluentConfig {
     public void assumingMustThrowAnExceptionWhenAssumptionIsUnsat() {
         new DummyFluentConfig()
                 .assuming(pa -> false)
-                .doCheck(pa -> true);
+                .doChk(pa -> true);
     }
 
     private class DummyFluentConfig extends AbstractFluentConfig<DummyFluentConfig> {
+        public void doChk(Predicate<PartialAssignment> pa) {
+            super.doCheck(pa);
+        }
         @Override
         protected DummyFluentConfig getThis() {
             return this;

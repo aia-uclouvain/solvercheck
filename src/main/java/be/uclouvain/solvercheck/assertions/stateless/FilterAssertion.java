@@ -2,15 +2,21 @@ package be.uclouvain.solvercheck.assertions.stateless;
 
 import be.uclouvain.solvercheck.assertions.Assertion;
 import be.uclouvain.solvercheck.assertions.util.AbstractFluentConfig;
-import be.uclouvain.solvercheck.checkers.Checkers;
-import be.uclouvain.solvercheck.consistencies.ArcConsitency;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
-import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 import org.quicktheories.core.Strategy;
 
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import static be.uclouvain.solvercheck.assertions.stateless.StatelessProperties.contracting;
+import static be.uclouvain.solvercheck.assertions.stateless.StatelessProperties.equivalentTo;
+import static be.uclouvain.solvercheck.assertions.stateless.StatelessProperties.idempotent;
+import static be.uclouvain.solvercheck.assertions.stateless.StatelessProperties.strictlyStrongerThan;
+import static be.uclouvain.solvercheck.assertions.stateless.StatelessProperties.strictlyWeakerThan;
+import static be.uclouvain.solvercheck.assertions.stateless.StatelessProperties.strongerThan;
+import static be.uclouvain.solvercheck.assertions.stateless.StatelessProperties.weakerThan;
+import static be.uclouvain.solvercheck.assertions.stateless.StatelessProperties.weaklyMonotonic;
 
 /**
  * This is the class that implements the assertions relative to the various
@@ -27,11 +33,6 @@ public final class FilterAssertion
     private final Filter actual;
 
     /**
-     * The reference filter with which to compare the resuts.
-     */
-    private Filter other;
-
-    /**
      * The condition effectively being checked when testing some partial
      * assignment.
      */
@@ -45,7 +46,6 @@ public final class FilterAssertion
     public FilterAssertion(final Filter actual) {
         super();
         this.actual = actual;
-        this.other  = new ArcConsitency(Checkers.alwaysTrue());
         this.check  = x -> true;
     }
 
@@ -60,13 +60,18 @@ public final class FilterAssertion
                            final Filter actual) {
         super(config);
         this.actual = actual;
-        this.other  = new ArcConsitency(Checkers.alwaysTrue());
         this.check  = x -> true;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected FilterAssertion getThis() {
+    /**
+     * Configures the assertion `check` with the arbitrarily specified property.
+     *
+     * @param property the property that must hold for this assertion to be
+     *                 valid
+     * @return this
+     */
+    public FilterAssertion is(final Predicate<PartialAssignment> property) {
+        this.check = property;
         return this;
     }
 
@@ -78,10 +83,7 @@ public final class FilterAssertion
      * @return this
      */
     public FilterAssertion isEquivalentTo(final Filter other) {
-        this.other = other;
-        this.check = this::checkEquivalent;
-
-        return this;
+        return is(equivalentTo(actual, other));
     }
 
     /**
@@ -92,11 +94,9 @@ public final class FilterAssertion
      * @return this
      */
     public FilterAssertion isWeakerThan(final Filter other) {
-        this.other = other;
-        this.check = this::checkWeaker;
-
-        return this;
+        return is(weakerThan(actual, other));
     }
+
     /**
      * Configure the assertion to check that `actual` has propagation
      * strength which is strictly weaker than that of `other`.
@@ -105,11 +105,9 @@ public final class FilterAssertion
      * @return this
      */
     public FilterAssertion isStrictlyWeakerThan(final Filter other) {
-        this.other = other;
-        this.check = this::checkStrictlyWeaker;
-
-        return this;
+        return is(strictlyWeakerThan(actual, other));
     }
+
     /**
      * Configure the assertion to check that `actual` has propagation
      * strength which is stronger or equivalent to that of `other`.
@@ -118,11 +116,9 @@ public final class FilterAssertion
      * @return this
      */
     public FilterAssertion isStrongerThan(final Filter other) {
-        this.other = other;
-        this.check = this::checkStronger;
-
-        return this;
+        return is(strongerThan(actual, other));
     }
+
     /**
      * Configure the assertion to check that `actual` has propagation
      * strength which is strictly stronger than that of `other`.
@@ -131,10 +127,40 @@ public final class FilterAssertion
      * @return this
      */
     public FilterAssertion isStrictlyStrongerThan(final Filter other) {
-        this.other = other;
-        this.check = this::checkStrictlyStronger;
+        return is(strictlyStrongerThan(actual, other));
+    }
 
-        return this;
+    /**
+     * Configures the assertion to check that the `actual` propagator is
+     * contracting. That is to say:
+     * $\forall d \in PartialAssignments : actual(d) \subseteq d$
+     *
+     * @return this
+     */
+    public FilterAssertion isContracting() {
+        return is(contracting(actual));
+    }
+
+    /**
+     * Configures the assertion to check that the `actual` propagator is
+     * contracting. That is to say:
+     * $\forall d \in PartialAssignments : actual(actual(d)) = actual(d)$
+     *
+     * @return this
+     */
+    public FilterAssertion isIdempotent() {
+        return is(idempotent(actual));
+    }
+
+    /**
+     * Configures the assertion to check that the `actual` propagator is
+     * contracting. That is to say:
+     * $\forall d \in PartialAssignment, \forall a \in d: actual({a}) \subseteq actual(d)$
+     *
+     * @return this
+     */
+    public FilterAssertion isWeaklyMonotonic() {
+        return is(weaklyMonotonic(actual));
     }
 
     /** {@inheritDoc} */
@@ -147,78 +173,9 @@ public final class FilterAssertion
         doCheck(this);
     }
 
-    /**
-     * Checks that `actual` and `other` have equivalent propagating strengths
-     * for the given `domains` test case.
-     *
-     * @param domains the randomly generated test case which is to be fed to
-     *                the compared filters.
-     * @return true iff actual is equivalent to other
-     */
-    private boolean checkEquivalent(final PartialAssignment domains) {
-        final PartialOrdering comparison =
-                actual.filter(domains).compareWith(other.filter(domains));
-
-        return comparison == PartialOrdering.EQUIVALENT;
-    }
-
-    /**
-     * Checks that `actual` is weaker or equivalent to `other` for the given
-     * `domains` test case.
-     *
-     * @param domains the randomly generated test case which is to be fed to
-     *                the compared filters.
-     * @return true iff actual is weaker or equivalent to other
-     */
-    private boolean checkWeaker(final PartialAssignment domains) {
-        final PartialOrdering comparison =
-                actual.filter(domains).compareWith(other.filter(domains));
-
-        return comparison == PartialOrdering.WEAKER
-            || comparison == PartialOrdering.EQUIVALENT;
-    }
-    /**
-     * Checks that `actual` is weaker than `other` for the given `domains`
-     * test case.
-     *
-     * @param domains the randomly generated test case which is to be fed to
-     *                the compared filters.
-     * @return true iff actual is weaker than other
-     */
-    private boolean checkStrictlyWeaker(final PartialAssignment domains) {
-        final PartialOrdering comparison =
-                actual.filter(domains).compareWith(other.filter(domains));
-
-        return comparison == PartialOrdering.WEAKER;
-    }
-    /**
-     * Checks that `actual` is stronger or equivalent to `other` for the given
-     * `domain` test case.
-     *
-     * @param domains the randomly generated test case which is to be fed to
-     *                the compared filters.
-     * @return true iff actual is stronger or equivalent to other
-     */
-    private boolean checkStronger(final PartialAssignment domains) {
-        final PartialOrdering comparison =
-                actual.filter(domains).compareWith(other.filter(domains));
-
-        return comparison == PartialOrdering.STRONGER
-            || comparison == PartialOrdering.EQUIVALENT;
-    }
-
-    /**
-     * Checks that `actual` is stronger than `other` for the given `domains`
-     * test case.
-     *
-     * @param domains the randomly generated test case which is to be fed to
-     *                the compared filters.
-     * @return true iff actual is stronger than other
-     */
-    private boolean checkStrictlyStronger(final PartialAssignment domains) {
-        final PartialOrdering comparison =
-                actual.filter(domains).compareWith(other.filter(domains));
-
-        return comparison == PartialOrdering.STRONGER;
+    /** {@inheritDoc} */
+    @Override
+    protected FilterAssertion getThis() {
+        return this;
     }
 }
