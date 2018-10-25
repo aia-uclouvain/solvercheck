@@ -1,5 +1,6 @@
 package be.uclouvain.solvercheck.assertions;
 
+import be.uclouvain.solvercheck.assertions.util.AbstractFluentConfig;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import org.junit.Test;
 

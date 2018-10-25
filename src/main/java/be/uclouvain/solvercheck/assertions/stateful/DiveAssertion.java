@@ -1,6 +1,6 @@
 package be.uclouvain.solvercheck.assertions.stateful;
 
-import be.uclouvain.solvercheck.assertions.AbstractFluentConfig;
+import be.uclouvain.solvercheck.assertions.util.AbstractFluentConfig;
 import be.uclouvain.solvercheck.assertions.Assertion;
 import be.uclouvain.solvercheck.checkers.Checkers;
 import be.uclouvain.solvercheck.consistencies.ArcConsitency;

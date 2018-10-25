@@ -1,6 +1,10 @@
 package be.uclouvain.solvercheck.assertions;
 
 import be.uclouvain.solvercheck.assertions.stateful.DiveAssertion;
+import be.uclouvain.solvercheck.assertions.stateless.FilterAssertion;
+import be.uclouvain.solvercheck.assertions.util.ForAllAssertion;
+import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
+import be.uclouvain.solvercheck.assertions.util.TestConfiguration;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
 import org.quicktheories.core.Gen;

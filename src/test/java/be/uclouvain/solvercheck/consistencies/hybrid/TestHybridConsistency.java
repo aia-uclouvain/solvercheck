@@ -1,6 +1,6 @@
 package be.uclouvain.solvercheck.consistencies.hybrid;
 
-import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
+import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.checkers.WithCheckers;
 import be.uclouvain.solvercheck.consistencies.ArcConsitency;
 import be.uclouvain.solvercheck.consistencies.BoundDConsistency;
@@ -28,8 +28,6 @@ import java.util.stream.Collectors;
 
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.MIN_VALUE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

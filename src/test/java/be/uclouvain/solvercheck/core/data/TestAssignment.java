@@ -1,6 +1,6 @@
 package be.uclouvain.solvercheck.core.data;
 
-import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
+import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;

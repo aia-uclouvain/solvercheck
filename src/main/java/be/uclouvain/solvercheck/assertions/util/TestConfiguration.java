@@ -1,5 +1,6 @@
-package be.uclouvain.solvercheck.assertions;
+package be.uclouvain.solvercheck.assertions.util;
 
+import be.uclouvain.solvercheck.assertions.stateless.FilterAssertion;
 import be.uclouvain.solvercheck.assertions.stateful.DiveAssertion;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;

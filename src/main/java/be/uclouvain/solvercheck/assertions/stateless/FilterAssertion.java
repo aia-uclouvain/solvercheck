@@ -1,5 +1,7 @@
-package be.uclouvain.solvercheck.assertions;
+package be.uclouvain.solvercheck.assertions.stateless;
 
+import be.uclouvain.solvercheck.assertions.Assertion;
+import be.uclouvain.solvercheck.assertions.util.AbstractFluentConfig;
 import be.uclouvain.solvercheck.checkers.Checkers;
 import be.uclouvain.solvercheck.consistencies.ArcConsitency;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;

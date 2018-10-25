@@ -1,6 +1,6 @@
 package be.uclouvain.solvercheck.consistencies.utils;
 
-import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
+import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.consistencies.ConsistencyUtil;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
@@ -9,7 +9,6 @@ import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import be.uclouvain.solvercheck.utils.collections.Range;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
 import org.quicktheories.WithQuickTheories;
 
 import java.util.Collection;
@@ -22,8 +21,6 @@ import static be.uclouvain.solvercheck.checkers.Checkers.allDiff;
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.MIN_VALUE;
 
 public class TestConsistencyUtil implements WithQuickTheories, WithCpGenerators {
 

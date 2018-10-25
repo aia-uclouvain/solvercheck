@@ -1,5 +1,6 @@
-package be.uclouvain.solvercheck.assertions;
+package be.uclouvain.solvercheck.assertions.util;
 
+import be.uclouvain.solvercheck.assertions.Assertion;
 import org.quicktheories.QuickTheory;
 import org.quicktheories.api.Function3;
 import org.quicktheories.api.Function4;
