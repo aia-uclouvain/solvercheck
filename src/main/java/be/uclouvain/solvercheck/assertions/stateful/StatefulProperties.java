@@ -5,6 +5,10 @@ import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
+
 /**
  * This class acts as a stateless property factory. It lets you create basic
  * predicates (bearing on partial assignment) applicable for some given
@@ -167,7 +171,7 @@ public final class StatefulProperties {
                 final PartialOrdering comparison =
                    actual.currentState().compareWith(other.currentState());
 
-                return comparison == PartialOrdering.EQUIVALENT;
+                return comparison == EQUIVALENT;
             }
         };
     }
@@ -187,8 +191,7 @@ public final class StatefulProperties {
                 final PartialOrdering comparison =
                    actual.currentState().compareWith(other.currentState());
 
-                return comparison == PartialOrdering.WEAKER
-                   || comparison == PartialOrdering.EQUIVALENT;
+                return comparison == WEAKER || comparison == EQUIVALENT;
             }
         };
     }
@@ -207,7 +210,7 @@ public final class StatefulProperties {
                 final PartialOrdering comparison =
                    actual.currentState().compareWith(other.currentState());
 
-                return comparison == PartialOrdering.WEAKER;
+                return comparison == WEAKER;
             }
         };
     }
@@ -226,8 +229,7 @@ public final class StatefulProperties {
                 final PartialOrdering comparison =
                    actual.currentState().compareWith(other.currentState());
 
-                return comparison == PartialOrdering.STRONGER
-                   || comparison == PartialOrdering.EQUIVALENT;
+                return comparison == STRONGER || comparison == EQUIVALENT;
             }
         };
     }
@@ -247,7 +249,7 @@ public final class StatefulProperties {
                 final PartialOrdering comparison =
                    actual.currentState().compareWith(other.currentState());
 
-                return comparison == PartialOrdering.STRONGER;
+                return comparison == STRONGER;
             }
         };
     }

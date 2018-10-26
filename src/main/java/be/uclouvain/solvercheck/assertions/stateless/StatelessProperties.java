@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
 
 /**
  * This class acts as a stateless property factory. It lets you create basic
@@ -47,7 +48,7 @@ public final class StatelessProperties {
             PartialOrdering comparison =
                actual.filter(domains).compareWith(other.filter(domains));
 
-            return comparison == PartialOrdering.EQUIVALENT;
+            return comparison == EQUIVALENT;
         };
     }
 
@@ -67,8 +68,7 @@ public final class StatelessProperties {
             final PartialOrdering comparison =
                actual.filter(domains).compareWith(other.filter(domains));
 
-            return comparison == PartialOrdering.WEAKER
-               || comparison == PartialOrdering.EQUIVALENT;
+            return comparison == WEAKER || comparison == EQUIVALENT;
         };
     }
 
@@ -88,7 +88,7 @@ public final class StatelessProperties {
             final PartialOrdering comparison =
                actual.filter(domains).compareWith(other.filter(domains));
 
-            return comparison == PartialOrdering.WEAKER;
+            return comparison == WEAKER;
         };
     }
 
@@ -108,8 +108,7 @@ public final class StatelessProperties {
             final PartialOrdering comparison =
                actual.filter(domains).compareWith(other.filter(domains));
 
-            return comparison == PartialOrdering.STRONGER
-               || comparison == PartialOrdering.EQUIVALENT;
+            return comparison == STRONGER || comparison == EQUIVALENT;
         };
     }
 
@@ -129,7 +128,7 @@ public final class StatelessProperties {
             final PartialOrdering comparison =
                actual.filter(domains).compareWith(other.filter(domains));
 
-            return comparison == PartialOrdering.STRONGER;
+            return comparison == STRONGER;
         };
     }
 
@@ -145,8 +144,7 @@ public final class StatelessProperties {
         return domains -> {
             final PartialOrdering comparison =
                filter.filter(domains).compareWith(domains);
-            return comparison == STRONGER
-               || comparison == EQUIVALENT;
+            return comparison == STRONGER || comparison == EQUIVALENT;
         };
     }
 
