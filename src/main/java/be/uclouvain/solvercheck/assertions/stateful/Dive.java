@@ -22,8 +22,11 @@ import java.util.function.Supplier;
  * or an error is encountered.
  */
 /* package */ final class Dive implements Runnable {
-    /** The assertion being verified during this 'dive' check. */
-    private final DiveAssertion assertion;
+    /** The property being verified during this 'dive' check. */
+    private final StatefulProperties.Property property;
+
+    /** The number of 'dives' to perform (the number of branches to explore). */
+    private final int nbDives;
 
     /**
      * This is the supplier used to randomly pick a variable from the
@@ -70,7 +73,7 @@ import java.util.function.Supplier;
     /**
      * Configures and instanciates a new runnable dive.
      *
-     * @param assertion the assertion being verified during this 'dive' check.
+     * @param property the property being verified during this 'dive' check.
      * @param strategy the ongoing strategy used by the underlying
      *                 QuickTheories layer. It is used to generate the
      *                 appropriate distributions from generators seeded with
@@ -79,11 +82,13 @@ import java.util.function.Supplier;
      *             basis for the search tree explored by this dive check.
      */
     /* package */ Dive(
-            final DiveAssertion assertion,
+            final StatefulProperties.Property property,
+            final int nbDives,
             final Strategy strategy,
             final PartialAssignment  root) {
 
-        this.assertion  = assertion;
+        this.property   = property;
+        this.nbDives    = nbDives;
         this.root       = root;
 
         this.variables  = variablesSupplier(strategy, root);
@@ -98,10 +103,10 @@ import java.util.function.Supplier;
     /** {@inheritDoc} */
     public void run() {
         try {
-            assertion.setup(root);
+            property.setup(root);
             doCheck();
 
-            for (int i = 0; i < assertion.getNbDives(); i++) {
+            for (int i = 0; i < nbDives; i++) {
                 exploreOneBranch();
                 doBacktrack();
             }
@@ -117,7 +122,7 @@ import java.util.function.Supplier;
      * whether the `check` condition holds at each node.
      */
     private void exploreOneBranch() {
-        while (!assertion.isCurrentStateLeaf()) {
+        while (!property.isCurrentStateLeaf()) {
             doPush();
             doDecide();
             doCheck();
@@ -130,7 +135,7 @@ import java.util.function.Supplier;
      */
     private void doPush() {
         history.add(Push.getInstance());
-        assertion.pushState();
+        property.pushState();
     }
 
     /**
@@ -146,7 +151,7 @@ import java.util.function.Supplier;
         history.add(branch);
         decisions.push(branch);
 
-        assertion.branchOn(variable, op, value);
+        property.branchOn(variable, op, value);
     }
 
     /**
@@ -155,7 +160,7 @@ import java.util.function.Supplier;
      * raised describing the scenario that lead to this violation.
      */
     private void doCheck() {
-        if (!assertion.checkTest()) {
+        if (!property.checkTest()) {
             throw new AssertionError("Found a counterexample of the property");
         }
     }
@@ -167,7 +172,7 @@ import java.util.function.Supplier;
     private void doBacktrack() {
         while (!decisions.isEmpty() && backtracks.get()) {
             history.add(Pop.getInstance());
-            assertion.popState();
+            property.popState();
             decisions.pop();
         }
     }
@@ -190,10 +195,10 @@ import java.util.function.Supplier;
 
         builder.append("########################### \n");
         builder.append("ACTUAL STATE : \n");
-        builder.append(assertion.actualState()).append("\n");
+        builder.append(property.actualState()).append("\n");
         builder.append("########################### \n");
         builder.append("EXPECTED STATE : \n");
-        builder.append(assertion.otherState()).append("\n");
+        builder.append(property.expectedState()).append("\n");
 
         builder.append("########################### \n");
         builder.append("BRANCH THAT LED TO FAILURE: \n");

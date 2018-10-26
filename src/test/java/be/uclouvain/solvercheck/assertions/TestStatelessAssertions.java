@@ -17,7 +17,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public final class TestFilterAssertions implements WithSolverCheck {
+public final class TestStatelessAssertions implements WithSolverCheck {
 
     private static final PartialAssignment WEAK =
             PartialAssignment.from(List.of(

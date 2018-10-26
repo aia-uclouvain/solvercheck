@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import java.util.Stack;
 
-public class TestDiveAssertion implements WithSolverCheck {
+public class TestStatefulAssertion implements WithSolverCheck {
 
     @Test(expected = AssertionError.class)
     public void itMustDetectProblemsEvenIfTheOnlyDifferenceOccursAfterSetup() {

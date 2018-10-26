@@ -1,7 +1,7 @@
 package be.uclouvain.solvercheck.assertions;
 
-import be.uclouvain.solvercheck.assertions.stateful.DiveAssertion;
-import be.uclouvain.solvercheck.assertions.stateless.FilterAssertion;
+import be.uclouvain.solvercheck.assertions.stateful.StatefulAssertion;
+import be.uclouvain.solvercheck.assertions.stateless.StatelessAssertion;
 import be.uclouvain.solvercheck.assertions.util.ForAllAssertion;
 import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.assertions.util.TestConfiguration;
@@ -54,65 +54,65 @@ public interface WithAssertions {
      *              being expressed.
      * @return a builder to express the assertion about some Filter
      */
-    default FilterAssertion propagator(final Filter actual) {
+    default StatelessAssertion propagator(final Filter actual) {
         return AssertionDSL.propagator(actual);
     }
 
     /**
      * This method is an alias for (see propagator). It yields a
-     * FilterAssertion for the given filter.
+     * StatelessAssertion for the given filter.
      *
      * @param actual the actual filter (propagator) about which a property is
      *              being expressed.
      * @return a builder to express the assertion about some Filter
      */
-    default FilterAssertion an(final Filter actual) {
+    default StatelessAssertion an(final Filter actual) {
         return AssertionDSL.an(actual);
     }
 
     /**
      * This method is an alias for (see propagator). It yields a
-     * FilterAssertion for the given filter.
+     * StatelessAssertion for the given filter.
      *
      * @param actual the actual filter (propagator) about which a property is
      *              being expressed.
      * @return a builder to express the assertion about some Filter
      */
-    default FilterAssertion a(final Filter actual) {
+    default StatelessAssertion a(final Filter actual) {
         return AssertionDSL.a(actual);
     }
 
     /**
-     * Returns a DiveAssertion (builder) that uses the current configuration
+     * Returns a StatefulAssertion (builder) that uses the current configuration
      * to assess the correctness of the property.
      *
      * @param actual the actual StatefulFilter (propagator) whose property is
      *               to be verified.
-     * @return DiveAssertion (builder) that uses the current configuration.
+     * @return StatefulAssertion (builder) that uses the current configuration.
      */
-    default DiveAssertion statefulPropagator(final StatefulFilter actual) {
+    default StatefulAssertion statefulPropagator(final StatefulFilter actual) {
         return AssertionDSL.statefulPropagator(actual);
     }
     /**
      * This method is an alias for (see statefulPropagator). It yields a
-     * DiveAssertion for the given SatefulFilter.
+     * StatefulAssertion for the given SatefulFilter.
      *
      * @param actual the actual filter (stateful propagator) about which a
      *               property is being expressed.
      * @return a builder to express the assertion about some Filter
      */
-    default DiveAssertion a(final StatefulFilter actual) {
+    default StatefulAssertion a(final StatefulFilter actual) {
         return AssertionDSL.a(actual);
     }
     /**
      * This method is an alias for (see statefulPropagator). It yields a
-     * DiveAssertion for the given SatefulFilter.
+     * StatefulAssertion for the given SatefulFilter.
      *
      * @param actual the actual filter (stateful propagator) about which a
      *               property is being expressed.
      * @return a builder to express the assertion about some Filter
      */
-    default DiveAssertion an(final StatefulFilter actual) {
+    default StatefulAssertion an(final StatefulFilter actual) {
         return AssertionDSL.an(actual);
     }
 

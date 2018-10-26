@@ -42,7 +42,7 @@ public final class StatelessProperties {
      * propagation strengths.
      */
     public static Property equivalentTo(final Filter actual,
-                                         final Filter other) {
+                                        final Filter other) {
         return domains -> {
             PartialOrdering comparison =
                actual.filter(domains).compareWith(other.filter(domains));
@@ -83,7 +83,7 @@ public final class StatelessProperties {
      * strength (always) weaker than that of other.
      */
     public static Property strictlyWeakerThan(final Filter actual,
-                                               final Filter other) {
+                                              final Filter other) {
         return domains -> {
             final PartialOrdering comparison =
                actual.filter(domains).compareWith(other.filter(domains));
@@ -103,7 +103,7 @@ public final class StatelessProperties {
      * strength stronger or equivalent to that of other.
      */
     public static Property strongerThan(final Filter actual,
-                                         final Filter other) {
+                                        final Filter other) {
         return domains -> {
             final PartialOrdering comparison =
                actual.filter(domains).compareWith(other.filter(domains));
@@ -124,7 +124,7 @@ public final class StatelessProperties {
      * strength (always) stronger than that of other.
      */
     public static Property strictlyStrongerThan(final Filter actual,
-                                                 final Filter other) {
+                                                final Filter other) {
         return domains -> {
             final PartialOrdering comparison =
                actual.filter(domains).compareWith(other.filter(domains));

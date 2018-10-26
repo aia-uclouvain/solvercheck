@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 /**
  * This class provides a simple way to define and check a property that
  * should hold for any partial assignment. However, this class should not be
- * used when FilterAssertion or DiveAssertion can be used. Indeed, the latter
+ * used when StatelessAssertion or StatefulAssertion can be used. Indeed, the latter
  * two provide much more advanced services to check the correctness of a
  * constraint.
  */

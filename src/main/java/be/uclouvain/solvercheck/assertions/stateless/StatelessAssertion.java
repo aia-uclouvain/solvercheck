@@ -25,8 +25,8 @@ import static be.uclouvain.solvercheck.assertions.stateless.StatelessProperties.
 // Given that this class behaves as a builder, it is ok to shadow fields in
 // certain (setter) methods.
 @SuppressWarnings("checkstyle:hiddenfield")
-public final class FilterAssertion
-        extends AbstractFluentConfig<FilterAssertion>
+public final class StatelessAssertion
+        extends AbstractFluentConfig<StatelessAssertion>
         implements Predicate<PartialAssignment>, Assertion {
 
     /** The actual filter being tested. */
@@ -43,7 +43,7 @@ public final class FilterAssertion
      *
      * @param actual the Filter whose property is being evaluated.
      */
-    public FilterAssertion(final Filter actual) {
+    public StatelessAssertion(final Filter actual) {
         super();
         this.actual = actual;
         this.check  = x -> true;
@@ -56,8 +56,8 @@ public final class FilterAssertion
      *               customized)
      * @param actual the Filter whose property is being evaluated.
      */
-    public FilterAssertion(final Supplier<Strategy> config,
-                           final Filter actual) {
+    public StatelessAssertion(final Supplier<Strategy> config,
+                              final Filter actual) {
         super(config);
         this.actual = actual;
         this.check  = x -> true;
@@ -70,7 +70,7 @@ public final class FilterAssertion
      *                 valid
      * @return this
      */
-    public FilterAssertion is(final Predicate<PartialAssignment> property) {
+    public StatelessAssertion is(final Predicate<PartialAssignment> property) {
         this.check = property;
         return this;
     }
@@ -82,7 +82,7 @@ public final class FilterAssertion
      * @param other the reference filter with which to compare the results.
      * @return this
      */
-    public FilterAssertion isEquivalentTo(final Filter other) {
+    public StatelessAssertion isEquivalentTo(final Filter other) {
         return is(equivalentTo(actual, other));
     }
 
@@ -93,7 +93,7 @@ public final class FilterAssertion
      * @param other the reference filter with which to compare the results.
      * @return this
      */
-    public FilterAssertion isWeakerThan(final Filter other) {
+    public StatelessAssertion isWeakerThan(final Filter other) {
         return is(weakerThan(actual, other));
     }
 
@@ -104,7 +104,7 @@ public final class FilterAssertion
      * @param other the reference filter with which to compare the results.
      * @return this
      */
-    public FilterAssertion isStrictlyWeakerThan(final Filter other) {
+    public StatelessAssertion isStrictlyWeakerThan(final Filter other) {
         return is(strictlyWeakerThan(actual, other));
     }
 
@@ -115,7 +115,7 @@ public final class FilterAssertion
      * @param other the reference filter with which to compare the results.
      * @return this
      */
-    public FilterAssertion isStrongerThan(final Filter other) {
+    public StatelessAssertion isStrongerThan(final Filter other) {
         return is(strongerThan(actual, other));
     }
 
@@ -126,7 +126,7 @@ public final class FilterAssertion
      * @param other the reference filter with which to compare the results.
      * @return this
      */
-    public FilterAssertion isStrictlyStrongerThan(final Filter other) {
+    public StatelessAssertion isStrictlyStrongerThan(final Filter other) {
         return is(strictlyStrongerThan(actual, other));
     }
 
@@ -137,7 +137,7 @@ public final class FilterAssertion
      *
      * @return this
      */
-    public FilterAssertion isContracting() {
+    public StatelessAssertion isContracting() {
         return is(contracting(actual));
     }
 
@@ -148,7 +148,7 @@ public final class FilterAssertion
      *
      * @return this
      */
-    public FilterAssertion isIdempotent() {
+    public StatelessAssertion isIdempotent() {
         return is(idempotent(actual));
     }
 
@@ -159,7 +159,7 @@ public final class FilterAssertion
      *
      * @return this
      */
-    public FilterAssertion isWeaklyMonotonic() {
+    public StatelessAssertion isWeaklyMonotonic() {
         return is(weaklyMonotonic(actual));
     }
 
@@ -175,7 +175,7 @@ public final class FilterAssertion
 
     /** {@inheritDoc} */
     @Override
-    protected FilterAssertion getThis() {
+    protected StatelessAssertion getThis() {
         return this;
     }
 }
