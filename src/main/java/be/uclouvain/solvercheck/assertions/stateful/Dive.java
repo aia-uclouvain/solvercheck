@@ -74,6 +74,8 @@ import java.util.function.Supplier;
      * Configures and instanciates a new runnable dive.
      *
      * @param property the property being verified during this 'dive' check.
+     * @param nbDives  the number of branches to explore until a leaf is
+     *                 reached.
      * @param strategy the ongoing strategy used by the underlying
      *                 QuickTheories layer. It is used to generate the
      *                 appropriate distributions from generators seeded with

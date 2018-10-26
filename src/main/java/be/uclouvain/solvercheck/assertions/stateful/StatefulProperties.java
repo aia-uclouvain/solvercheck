@@ -82,12 +82,12 @@ public final class StatefulProperties {
     /**
      * An utility class to wrap stateful properties.
      */
-    private static abstract class StatefulFilterComparisonProperty implements Property {
+    private abstract static class StatefulFilterComparisonProperty implements Property {
         /** The stateful filter under test. */
-        protected final StatefulFilter actual;
+        private final StatefulFilter actual;
 
         /** The reference stateful filter. */
-        protected final StatefulFilter other;
+        private final StatefulFilter other;
 
         /**
          * Creates a new stateful comparison property that compares the
@@ -97,8 +97,8 @@ public final class StatefulProperties {
          * @param actual the stateful filter under test
          * @param other  the reference stateful filter
          */
-        public StatefulFilterComparisonProperty(final StatefulFilter actual,
-                                                final StatefulFilter other) {
+        StatefulFilterComparisonProperty(final StatefulFilter actual,
+                                         final StatefulFilter other) {
             this.actual = actual;
             this.other  = other;
         }
@@ -153,13 +153,24 @@ public final class StatefulProperties {
         public final PartialAssignment expectedState() {
             return other.currentState();
         }
+
+        /** @return the actual stateful filter */
+        protected final StatefulFilter getActual() {
+            return actual;
+        }
+        /** @return the reference stateful filter */
+        protected final StatefulFilter getOther() {
+            return other;
+        }
     }
 
     /**
      * Checks that `actual` and `other` have equivalent propagating strengths
      * for the given `domains` test case.
      *
-     * @return true iff actual is equivalent to other
+     * @param actual the stateful filter under test
+     * @param other  the reference stateful filter
+     * @return a property which is true iff actual is equivalent to other
      */
     public static Property equivalentTo(final StatefulFilter actual,
                                         final StatefulFilter other) {
@@ -180,7 +191,9 @@ public final class StatefulProperties {
      * Checks that `actual` is weaker or equivalent to `other` for the given
      * `domains` test case.
      *
-     * @return true iff actual is weaker or equivalent to other
+     * @param actual the stateful filter under test
+     * @param other the reference stateful filter
+     * @return a property which is true iff actual is weaker or equivalent to other
      */
     public static Property weakerThan(final StatefulFilter actual,
                                       final StatefulFilter other) {
@@ -199,7 +212,9 @@ public final class StatefulProperties {
      * Checks that `actual` is weaker than `other` for the given `domains`
      * test case.
      *
-     * @return true iff actual is weaker than other
+     * @param actual the stateful filter under test
+     * @param other  the reference stateful filter
+     * @return a property which is true iff actual is weaker than other
      */
     public static Property strictlyWeakerThan(final StatefulFilter actual,
                                               final StatefulFilter other) {
@@ -218,7 +233,9 @@ public final class StatefulProperties {
      * Checks that `actual` is stronger or equivalent to `other` for the given
      * `domain` test case.
      *
-     * @return true iff actual is stronger or equivalent to other
+     * @param actual the stateful filter under test
+     * @param other  the reference stateful filter
+     * @return a property which is true iff actual is stronger or equivalent to other
      */
     public static Property strongerThan(final StatefulFilter actual,
                                         final StatefulFilter other) {
@@ -238,7 +255,9 @@ public final class StatefulProperties {
      * Checks that `actual` is stronger than `other` for the given `domains`
      * test case.
      *
-     * @return true iff actual is stronger than other
+     * @param actual the stateful filter under test
+     * @param other  the reference stateful filter
+     * @return a property which is true iff actual is stronger than other
      */
     public static Property strictlyStrongerThan(final StatefulFilter actual,
                                                 final StatefulFilter other) {
