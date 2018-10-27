@@ -262,12 +262,9 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
            .parallel()
            .forEach(pa -> {
                try {
-                   test.accept(pa);
+                 test.accept(pa);
                } catch (Throwable cause) {
-                   throw new AssertionError(
-                      explanation(pa, cause.getMessage()),
-                      cause
-                   );
+                 throw new AssertionError(explanation(pa, cause.getMessage()));
                }
            });
     }

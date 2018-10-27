@@ -2,11 +2,13 @@ package be.uclouvain.solvercheck.assertions;
 
 import be.uclouvain.solvercheck.assertions.stateful.StatefulAssertion;
 import be.uclouvain.solvercheck.assertions.stateless.StatelessAssertion;
+import be.uclouvain.solvercheck.assertions.util.AssertionRunner;
 import be.uclouvain.solvercheck.assertions.util.ForAllAssertion;
 import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
 
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 /**
@@ -16,6 +18,28 @@ public final class AssertionDSL {
 
     /** An utility class has no public constructor. */
     private AssertionDSL() { }
+
+    /**
+     * Builds a runner for some assertion that will timeout after the
+     * specified time period.
+     *
+     * @param timeout the duration (in `unit`) after which the assertion
+     *                should be killed.
+     * @param unit the time unit to use to interpret the value of `duration`.
+     * @return a runner able to evaluate some assertion.
+     */
+    public static AssertionRunner given(final long timeout, final TimeUnit unit) {
+        return new AssertionRunner(timeout, unit);
+    }
+
+    /**
+     * Checks the validity of the given assertion.
+     *
+     * @param assertion the assertion to verify.
+     */
+    public static void assertThat(final Assertion assertion) {
+        new AssertionRunner().assertThat(assertion);
+    }
 
     /**
      * This class provides a simple way to define and check a property that

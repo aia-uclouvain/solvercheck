@@ -2,11 +2,13 @@ package be.uclouvain.solvercheck.assertions;
 
 import be.uclouvain.solvercheck.assertions.stateful.StatefulAssertion;
 import be.uclouvain.solvercheck.assertions.stateless.StatelessAssertion;
+import be.uclouvain.solvercheck.assertions.util.AssertionRunner;
 import be.uclouvain.solvercheck.assertions.util.ForAllAssertion;
 import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
 
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 /**
@@ -17,6 +19,28 @@ import java.util.stream.Stream;
  * parlance.
  */
 public interface WithAssertions {
+
+    /**
+     * Checks the validity of the given assertion.
+     *
+     * @param assertion the assertion to verify.
+     */
+    default void assertThat(final Assertion assertion) {
+        AssertionDSL.assertThat(assertion);
+    }
+
+    /**
+     * Builds a runner for some assertion that will timeout after the
+     * specified time period.
+     *
+     * @param timeout the duration (in `unit`) after which the assertion
+     *                should be killed.
+     * @param unit the time unit to use to interpret the value of `duration`.
+     * @return a runner able to evaluate some assertion.
+     */
+    default AssertionRunner given(final long timeout, final TimeUnit unit) {
+        return AssertionDSL.given(timeout, unit);
+    }
 
     /**
      * This class provides a simple way to define and check a property that
@@ -104,15 +128,6 @@ public interface WithAssertions {
      */
     default StatefulAssertion an(final StatefulFilter actual) {
         return AssertionDSL.an(actual);
-    }
-
-    /**
-     * Checks the validity of the given assertion.
-     *
-     * @param assertion the assertion to verify.
-     */
-    default void assertThat(final Assertion assertion) {
-        assertion.check();
     }
 
     /**

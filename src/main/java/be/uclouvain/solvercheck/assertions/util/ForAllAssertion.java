@@ -127,8 +127,7 @@ public final class ForAllAssertion {
                            assertion.apply(a).check();
                        } catch (Throwable cause) {
                             throw new AssertionError(
-                               explanation(a, cause.getMessage()),
-                               cause);
+                               explanation(a, cause.getMessage()));
                        }
                    });
             };
@@ -234,9 +233,7 @@ public final class ForAllAssertion {
                         assertion.apply(itemA, itemB).check();
                     } catch (Throwable cause) {
                         throw new AssertionError(
-                           explanation(itemA, itemB, cause.getMessage()),
-                           cause
-                        );
+                           explanation(itemA, itemB, cause.getMessage()));
                     }
                 }
             };
