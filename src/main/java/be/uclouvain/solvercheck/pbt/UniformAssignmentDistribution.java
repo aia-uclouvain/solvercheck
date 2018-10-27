@@ -5,6 +5,8 @@ import be.uclouvain.solvercheck.core.data.Assignment;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
+
 public final class UniformAssignmentDistribution {
 
     /** Utility class has no public constructor. */
@@ -16,7 +18,7 @@ public final class UniformAssignmentDistribution {
                                             final int valMax) {
         return Stream.generate(() ->
            randomItem(
-              UniformIntDistribution.randomInt(szMin, szMax),
+              randomInt(szMin, szMax),
               UniformIntDistribution.stream(valMin, valMax))
         );
     }

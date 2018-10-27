@@ -1,8 +1,7 @@
 package be.uclouvain.solvercheck.core.data;
 
-import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
 import be.uclouvain.solvercheck.core.data.impl.DomainFactory;
-import be.uclouvain.solvercheck.generators.Generators;
+import be.uclouvain.solvercheck.generators.GeneratorsDSL;
 import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 import org.junit.Before;
 import org.junit.Test;
@@ -322,6 +321,6 @@ public class TestDomain implements WithQuickTheories {
         return domains(10);
     }
     private Gen<Domain> domains(int to) {
-        return Generators.domains().ofSizeUpTo(to).build();
+        return GeneratorsDSL.domains().ofSizeUpTo(to).build();
     }
 }

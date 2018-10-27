@@ -84,19 +84,6 @@
 
     <dependencies>
         <!--
-            QuickTheories the PBT library for java.
-
-            Note:
-            It is not test scoped because it is at the heart from what
-            SolverCheck should do
-        -->
-        <dependency>
-            <groupId>org.quicktheories</groupId>
-            <artifactId>quicktheories</artifactId>
-            <version>0.25</version>
-        </dependency>
-
-        <!--
             AssertJ provides an assertion DSL to evaluate your solver. Hence,
             it is not test
             scoped either.
@@ -112,6 +99,14 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- No longer used in the core development -->
+        <dependency>
+            <groupId>org.quicktheories</groupId>
+            <artifactId>quicktheories</artifactId>
+            <version>0.25</version>
             <scope>test</scope>
         </dependency>
 

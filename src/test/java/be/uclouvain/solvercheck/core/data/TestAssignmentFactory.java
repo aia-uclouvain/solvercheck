@@ -2,7 +2,7 @@ package be.uclouvain.solvercheck.core.data;
 
 import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
+import be.uclouvain.solvercheck.generators.WithGenerators;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 
@@ -11,7 +11,7 @@ import java.util.Arrays;
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 
 public class TestAssignmentFactory
-        implements WithQuickTheories, WithCpGenerators {
+        implements WithQuickTheories, WithGenerators {
 
     @Test
     public void testFromList() {

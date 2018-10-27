@@ -1,19 +1,18 @@
 package be.uclouvain.solvercheck.assertions.util;
 
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.generators.Generators;
-import org.quicktheories.QuickTheory;
-import org.quicktheories.core.Configuration;
-import org.quicktheories.core.Gen;
-import org.quicktheories.core.Strategy;
+import be.uclouvain.solvercheck.generators.GeneratorsDSL;
+import be.uclouvain.solvercheck.pbt.Generators;
+import be.uclouvain.solvercheck.pbt.Randomness;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.MIN_VALUE;
-import static org.quicktheories.generators.SourceDSL.integers;
 
 /**
  * This class provides the basic services to create classes of assertions that
@@ -25,17 +24,6 @@ import static org.quicktheories.generators.SourceDSL.integers;
 public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
         implements WithFluentConfig<T> {
 
-    /**
-     * The default number of attempts made to generate an input that matches
-     * the assumptions.
-     */
-    private static final int DEFAULT_GEN_ATTEMPTS = 10000;
-    /**
-     * The default the number of shrink cycles used by the underlying
-     * quicktheories layer in order to determine the smallest possible
-     * violation instances.
-     */
-    private static final int DEFAULT_SHRINK_CYCLES = 10;
     /**
      * The default number of `anchor values` which designate the 'center' of
      * the values distributions in a partial assignment.
@@ -78,16 +66,15 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
     private static final int DEFAULT_MAX_DOM_SIZE = 10;
 
     /**
-     * A hook used to build on top of the underlying QuickTheories
-     * property-based testing library.
-     */
-    private Strategy strategy;
-
-    /**
      * The number of `anchor values` which designate the 'center' of the
      * values distributions in a partial assignment.
      */
     private int anchorSamples;
+    /**
+     * The number of number of partial assignment generated (and tested) for
+     * each anchor value.
+     */
+    private int examples;
     /**
      * The minimal value that may appear in a generated partial assignment.
      */
@@ -124,13 +111,10 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
     /**
      * Creates a new instance with all fields initialized to their default
      * values.
-     *
-     * @param config an initial configuration to start from
      */
-    public AbstractFluentConfig(final Supplier<Strategy> config) {
-        this.strategy      = config.get();
-
+    public AbstractFluentConfig() {
         this.anchorSamples = DEFAULT_ANCHOR_SAMPLES;
+        this.examples      = DEFAULT_EXAMPLES;
         this.minValue      = DEFAULT_MIN_VALUE;
         this.maxValue      = DEFAULT_MAX_VALUE;
         this.spread        = DEFAULT_SPREAD;
@@ -139,14 +123,6 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
         this.maxDomSize    = DEFAULT_MAX_DOM_SIZE;
 
         this.assumptions   = pa -> true;
-    }
-
-    /**
-     * Creates a new instance with all fields initialized to their default
-     * values.
-     */
-    public AbstractFluentConfig() {
-        this(AbstractFluentConfig::defaultStrategy);
     }
 
     /**
@@ -164,21 +140,14 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
     /** {@inheritDoc} */
     @Override
     public final T withFixedSeed(final long seed) {
-        strategy = strategy.withFixedSeed(seed);
-        return getThis();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public final T withGenerateAttempts(final int attempts) {
-        strategy = strategy.withGenerateAttempts(attempts);
+        Randomness.seed(seed);
         return getThis();
     }
 
     /** {@inheritDoc} */
     @Override
     public final T withExamples(final int n) {
-        strategy = strategy.withExamples(n);
+        this.examples = n;
         return getThis();
     }
 
@@ -186,13 +155,6 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
     @Override
     public final T withAnchorSamples(final int n) {
         anchorSamples = n;
-        return getThis();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public final T withShrinkCycles(final int cycles) {
-        strategy = strategy.withShrinkCycles(cycles);
         return getThis();
     }
 
@@ -267,15 +229,18 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      * @param test a predicate whose validity is being tested.
      */
     protected final void doCheck(final Predicate<PartialAssignment> test) {
-        final QuickTheory qt = QuickTheory.qt(this);
+        Optional<PartialAssignment> failure = anchors()
+           .limit(anchorSamples)
+           .mapToObj(a  -> partialAssignments(a).limit(examples))
+           .flatMap(pas -> pas.filter(assumptions).filter(pa -> !test.test(pa)))
+           .parallel()
+           .findAny();
 
-        qt.withExamples(anchorSamples)
-          .forAll(anchors())
-          .checkAssert(anchor ->
-              qt.forAll(partialAssignments(anchor))
-                .assuming(assumptions)
-                .check(test)
-          );
+        if (failure.isPresent()) {
+            throw new AssertionError(
+               explanation(failure.get(), "Property violated")
+            );
+        }
     }
 
     /**
@@ -290,21 +255,34 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      *            depending on partial assignment.
      */
     protected final void doCheckAssert(final Consumer<PartialAssignment> test) {
-        final QuickTheory qt = QuickTheory.qt(this);
-
-        qt.withExamples(anchorSamples)
-          .forAll(anchors())
-          .checkAssert(anchor ->
-             qt.forAll(partialAssignments(anchor))
-               .assuming(assumptions)
-               .checkAssert(test)
-          );
+        anchors()
+           .limit(anchorSamples)
+           .mapToObj(a  -> partialAssignments(a).limit(examples))
+           .flatMap(pas -> pas.filter(assumptions))
+           .parallel()
+           .forEach(pa -> {
+               try {
+                   test.accept(pa);
+               } catch (Throwable cause) {
+                   throw new AssertionError(
+                      explanation(pa, cause.getMessage()),
+                      cause
+                   );
+               }
+           });
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public final Strategy get() {
-        return strategy;
+    protected String explanation(final PartialAssignment pa,
+                                 final String cause) {
+
+        final StringBuilder builder = new StringBuilder("\n");
+        builder.append("########################### \n");
+        builder.append("WITNESS   : ").append(pa).append("\n");
+        builder.append("SEED      : ").append(Randomness.seed()).append("\n");
+        builder.append("CAUSE     : ").append(cause).append("\n");
+        builder.append("########################### \n");
+
+        return builder.toString();
     }
 
     /**
@@ -314,22 +292,20 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      * @param anchor the anchor value
      * @return a generator of partial assignment.
      */
-    private Gen<PartialAssignment> partialAssignments(final int anchor) {
-        return Generators.partialAssignments()
+    private Stream<PartialAssignment> partialAssignments(final int anchor) {
+        return GeneratorsDSL.partialAssignments()
                 .withVariablesBetween(nbVarMin, nbVarMax)
                 .withDomainsOfSizeUpTo(maxDomSize)
                 .withValuesRanging(lowerBound(anchor), upperBound(anchor))
-                .describedAs(pa -> String.format("PARTIAL_ASSIGNMENT(%s)", pa));
+                .build();
     }
 
     /**
      * @return a generator producing the anchors used during a check or
      * checkAssert phase.
      */
-    private Gen<Integer> anchors() {
-        return integers()
-           .between(anchorMin(), anchorMax())
-           .describedAs(i -> String.format("ANCHOR(%d)", i));
+    private IntStream anchors() {
+        return Generators.ints(anchorMin(), anchorMax());
     }
 
     /**
@@ -400,19 +376,5 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      */
     private boolean rangeFitsInSpreadMax() {
         return (long) maxValue - (long) minValue <= (long) spread;
-    }
-
-
-    /**
-     * Returns the default strategy to run all tests.
-     *
-     * @return the default strategy
-     */
-    private static Strategy defaultStrategy() {
-        return Configuration
-                .systemStrategy()
-                .withGenerateAttempts(DEFAULT_GEN_ATTEMPTS)
-                .withShrinkCycles(DEFAULT_SHRINK_CYCLES)
-                .withExamples(DEFAULT_EXAMPLES);
     }
 }

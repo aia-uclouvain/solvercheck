@@ -13,7 +13,7 @@ import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.task.DomainFilter;
 import be.uclouvain.solvercheck.core.task.Filter;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
+import be.uclouvain.solvercheck.generators.WithGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestHybridConsistency
         implements WithQuickTheories,
-        WithCpGenerators,
+   WithGenerators,
         WithConsistencies,
         WithCheckers {
 

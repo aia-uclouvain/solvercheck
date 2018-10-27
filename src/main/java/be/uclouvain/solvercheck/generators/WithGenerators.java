@@ -1,7 +1,8 @@
 package be.uclouvain.solvercheck.generators;
 
 import be.uclouvain.solvercheck.core.data.Operator;
-import org.quicktheories.core.Gen;
+
+import java.util.stream.Stream;
 
 /**
  * This interface collects all the useful methods that let you plug
@@ -10,45 +11,47 @@ import org.quicktheories.core.Gen;
  * This interface should really be thought of as a stackable trait in Scala
  * parlance.
  */
-public interface WithCpGenerators {
+public interface WithGenerators {
+
+
 
     /**
      * @return a configurable generator meant to produce random
      * `Assignment` instances
      */
-    default Generators.GenAssignmentBuilder assignments() {
-        return Generators.assignments();
+    default GeneratorsDSL.GenAssignmentBuilder assignments() {
+        return GeneratorsDSL.assignments();
     }
 
     /**
      * @return a configurable generator meant to produce random
      * `Domain` instances
      */
-    default Generators.GenDomainBuilder domains() {
-        return Generators.domains();
+    default GeneratorsDSL.GenDomainBuilder domains() {
+        return GeneratorsDSL.domains();
     }
 
     /**
      * @return a generator meant to produce random `Operator` instances
      */
-    default Gen<Operator> operators() {
-        return Generators.operators();
+    default Stream<Operator> operators() {
+        return GeneratorsDSL.operators();
     }
 
     /**
      * @return a configurable generator meant to produce random
      * `PartialAssignment` instances
      */
-    default Generators.GenPartialAssignmentBuilder partialAssignments() {
-        return Generators.partialAssignments();
+    default GeneratorsDSL.GenPartialAssignmentBuilder partialAssignments() {
+        return GeneratorsDSL.partialAssignments();
     }
 
     /**
      * @return a configurable generator meant to produce random tables. That
      * is to say, to produce random lists of `Assignment`.
      */
-    default Generators.GenTableBuilder tables() {
-        return Generators.tables();
+    default GeneratorsDSL.GenTableBuilder tables() {
+        return GeneratorsDSL.tables();
     }
 
 }

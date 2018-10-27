@@ -4,10 +4,8 @@ import be.uclouvain.solvercheck.assertions.Assertion;
 import be.uclouvain.solvercheck.assertions.util.AbstractFluentConfig;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
-import org.quicktheories.core.Strategy;
 
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import static be.uclouvain.solvercheck.assertions.stateful.StatefulProperties.equivalentTo;
 import static be.uclouvain.solvercheck.assertions.stateful.StatefulProperties.strictlyStrongerThan;
@@ -61,29 +59,11 @@ public final class StatefulAssertion
         assuming(root -> !root.isEmpty());
     }
 
-    /**
-     * Creates a new instance evaluating some property of the `actual` filter.
-     *
-     * @param config the initial configuration of the test case (can be
-     *               customized)
-     * @param actual the Filter whose property is being evaluated.
-     */
-    public StatefulAssertion(final Supplier<Strategy> config,
-                             final StatefulFilter actual) {
-        super(config);
-        this.actual  = actual;
-        this.nbDives = DEFAULT_NB_DIVES;
-
-        // performing dives for an empty root makes no sense.
-        assuming(root -> !root.isEmpty());
-    }
-
     /** {@inheritDoc} */
     @Override
     protected StatefulAssertion getThis() {
         return this;
     }
-
 
     /**
      * Configures the assertion `check` with the arbitrarily specified property.
@@ -195,6 +175,6 @@ public final class StatefulAssertion
      * @return a new Dive rooted at the given `root`.
      */
     private Dive dive(final PartialAssignment root) {
-        return new Dive(property, nbDives, get(), root);
+        return new Dive(property, nbDives, root);
     }
 }

@@ -2,7 +2,7 @@ package be.uclouvain.solvercheck.core.data;
 
 import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.core.data.impl.PartialAssignmentFactory;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
+import be.uclouvain.solvercheck.generators.WithGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
@@ -14,7 +14,7 @@ import java.util.List;
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 
 public class TestPartialAssignmentFactory
-        implements WithQuickTheories, WithCpGenerators {
+        implements WithQuickTheories, WithGenerators {
 
     // FROM
     @Test

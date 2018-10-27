@@ -12,8 +12,8 @@ import java.util.Objects;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 
-public class TestDefaultGenerators
-        implements WithQuickTheories, WithCpGenerators {
+public class TestDefaultGeneratorsDSL
+        implements WithQuickTheories, WithGenerators {
 
     private static final int INTMAX   = 100;
     private static final int EXAMPLES = 100;

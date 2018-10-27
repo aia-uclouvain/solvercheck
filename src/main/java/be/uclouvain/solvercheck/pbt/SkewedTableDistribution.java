@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static be.uclouvain.solvercheck.pbt.UniformIntDistribution.randomInt;
+import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
 
 public final class SkewedTableDistribution {
 

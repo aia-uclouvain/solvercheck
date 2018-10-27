@@ -1,9 +1,7 @@
 package be.uclouvain.solvercheck.checkers;
 
 import be.uclouvain.solvercheck.core.data.Assignment;
-import be.uclouvain.solvercheck.core.data.Domain;
-import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.generators.Generators;
+import be.uclouvain.solvercheck.generators.GeneratorsDSL;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +19,7 @@ import static be.uclouvain.solvercheck.core.data.Operator.GT;
 import static be.uclouvain.solvercheck.core.data.Operator.LE;
 import static be.uclouvain.solvercheck.core.data.Operator.LT;
 import static be.uclouvain.solvercheck.core.data.Operator.NE;
-import static be.uclouvain.solvercheck.generators.Generators.tables;
+import static be.uclouvain.solvercheck.generators.GeneratorsDSL.tables;
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
 
@@ -73,13 +71,13 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
             .forAll(integers().between(0, 10).describedAs(s -> "SIZE("+s+")"))
             .checkAssert(S ->
                 qt.withExamples(10)
-                    .forAll(Generators.setsOfUpTo(S,integers().between(-10,10)).describedAs(s -> "VALUES("+s+")"))
+                    .forAll(GeneratorsDSL.setsOfUpTo(S,integers().between(-10,10)).describedAs(s -> "VALUES("+s+")"))
                     .checkAssert(values ->
                         qt.withExamples(10)
                             .forAll(lists().of(integers().between(0, 10)).ofSize(values.size()).describedAs(s -> "CARDS("+s+")"))
                             .checkAssert(cards ->
                                 qt.withExamples(10)
-                                    .forAll(Generators.assignments().withValuesRanging(-10, 10).describedAs(a -> "ASSIGNMENT("+a+")"))
+                                    .forAll(GeneratorsDSL.assignments().withValuesRanging(-10, 10).describedAs(a -> "ASSIGNMENT("+a+")"))
                                     .check(ass -> {
 
                      List<Integer> vals = new ArrayList<>(values);
@@ -118,7 +116,7 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
           .checkAssert(values -> {
               int nbVarsMin = values.size();
               qt.forAll(
-                      Generators.assignments()
+                      GeneratorsDSL.assignments()
                                 .withVariablesBetween(nbVarsMin,3*(1+nbVarsMin))
                                 .withValuesRanging(0, 10)
                     )
@@ -215,7 +213,7 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
                                 .of(integers().between(0, 10))
                                 .ofSizeBetween(0, 100)
                                 .describedAs(v ->"VALS("+v+")"),
-                        Generators.assignments()
+                        GeneratorsDSL.assignments()
                                 .withUpToVariables(100)
                                 .describedAs(a -> "ASSIGNMENT("+a+")"))
                 .assuming((vals, ass) -> vals.size() > ass.size())
@@ -342,10 +340,10 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
     }
 
     private Gen<Assignment> assignments() {
-        return Generators.assignments().build();
+        return GeneratorsDSL.assignments().build();
     }
     private Gen<Assignment> assignmentWithAtLeast(int nVars) {
-        return Generators.assignments()
+        return GeneratorsDSL.assignments()
                 .withVariablesBetween(nVars, nVars+3)
                 .withValuesRanging(-10, 10)
                 .build();

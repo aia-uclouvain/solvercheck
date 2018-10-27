@@ -5,7 +5,7 @@ import be.uclouvain.solvercheck.consistencies.ConsistencyUtil;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
+import be.uclouvain.solvercheck.generators.WithGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import be.uclouvain.solvercheck.utils.collections.Range;
 import org.junit.Test;
@@ -22,7 +22,7 @@ import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
 
-public class TestConsistencyUtil implements WithQuickTheories, WithCpGenerators {
+public class TestConsistencyUtil implements WithQuickTheories, WithGenerators {
 
 
     @Test

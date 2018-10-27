@@ -2,12 +2,10 @@ package be.uclouvain.solvercheck.assertions.util;
 
 import be.uclouvain.solvercheck.assertions.Assertion;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import org.quicktheories.core.Strategy;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * This class provides a simple way to define and check a property that
@@ -22,15 +20,6 @@ public final class ForAnyPartialAssignment
     /** Creates a new instance. */
     public ForAnyPartialAssignment() {
         super();
-    }
-
-    /**
-     * Creates a new instance based on a given config.
-     *
-     * @param config the initial configuration to use.
-     */
-    public ForAnyPartialAssignment(final Supplier<Strategy> config) {
-        super(config);
     }
 
     /** {@inheritDoc} */

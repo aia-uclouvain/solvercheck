@@ -4,10 +4,8 @@ import be.uclouvain.solvercheck.assertions.Assertion;
 import be.uclouvain.solvercheck.assertions.util.AbstractFluentConfig;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
-import org.quicktheories.core.Strategy;
 
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import static be.uclouvain.solvercheck.assertions.stateless.StatelessProperties.contracting;
 import static be.uclouvain.solvercheck.assertions.stateless.StatelessProperties.equivalentTo;
@@ -45,20 +43,6 @@ public final class StatelessAssertion
      */
     public StatelessAssertion(final Filter actual) {
         super();
-        this.actual = actual;
-        this.check  = x -> true;
-    }
-
-    /**
-     * Creates a new instance evaluating some property of the `actual` filter.
-     *
-     * @param config the initial configuration of the test case (can be
-     *               customized)
-     * @param actual the Filter whose property is being evaluated.
-     */
-    public StatelessAssertion(final Supplier<Strategy> config,
-                              final Filter actual) {
-        super(config);
         this.actual = actual;
         this.check  = x -> true;
     }

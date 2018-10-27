@@ -4,10 +4,10 @@ import be.uclouvain.solvercheck.assertions.stateful.StatefulAssertion;
 import be.uclouvain.solvercheck.assertions.stateless.StatelessAssertion;
 import be.uclouvain.solvercheck.assertions.util.ForAllAssertion;
 import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
-import be.uclouvain.solvercheck.assertions.util.TestConfiguration;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
-import org.quicktheories.core.Gen;
+
+import java.util.stream.Stream;
 
 /**
  * This interface collects all the useful methods that let you plug
@@ -17,16 +17,6 @@ import org.quicktheories.core.Gen;
  * parlance.
  */
 public interface WithAssertions {
-
-    /**
-     * Provides you with a convenient way to specify the configuration
-     * applicable in your test.
-     *
-     * @return a test configuration which you can customize to match your needs.
-     */
-    default TestConfiguration given() {
-        return AssertionDSL.given();
-    }
 
     /**
      * This class provides a simple way to define and check a property that
@@ -154,7 +144,7 @@ public interface WithAssertions {
      * @param <A> the type of the parameter produced by the generator
      * @return a hook to conveniently express a 1-parametric assertion.
      */
-    default <A> ForAllAssertion.Forall1<A> forAll(final Gen<A> a) {
+    default <A> ForAllAssertion.Forall1<A> forAll(final Stream<A> a) {
         return AssertionDSL.forAll(a);
     }
 
@@ -173,7 +163,7 @@ public interface WithAssertions {
      *
      *   <pre>
      *    assertThat(
-     *       forAll(booleans(), integers.between(0, 10))
+     *       forAll(ints(0, 10), ints(20, 30))
      *         .itIsTrueThat((b, i) -&gt; ... ) )
      *       )
      *    )
@@ -187,87 +177,9 @@ public interface WithAssertions {
      * @return a hook to conveniently express a 2-parametric assertion.
      */
     default <A, B> ForAllAssertion.Forall2<A, B> forAll(
-            final Gen<A> a,
-            final Gen<B> b) {
+            final Stream<A> a,
+            final Stream<B> b) {
 
         return AssertionDSL.forAll(a, b);
-    }
-
-    /**
-     * Creates a 3-parametric assertion.
-     *
-     * This is particularly useful to check that not only constraint behave
-     * correctly no matter what partial assignment they are facing, but also
-     * to show that they behave correctly no matter the way they are configured.
-     *
-     * .. Example::
-     *   The following example illustrates how one can use a parametric
-     *   assertion to validate the behavior of the table constraint on
-     *   **virtually all** partial assignments and **virtually all** possble
-     *   table extensions.
-     *
-     *   <pre>
-     *    assertThat(
-     *       forAll(xs(), ys(), zs())
-     *         .itIsTrueThat((x, y, z) -&gt; ... ) )
-     *       )
-     *    )
-     *    </pre>
-     *
-     *
-     * @param a the generator creating the generated 1st argument.
-     * @param b the generator creating the generated 2nd argument.
-     * @param c the generator creating the generated 3rd argument.
-     * @param <A> the type of the parameter produced by the 1st generator
-     * @param <B> the type of the parameter produced by the 2nd generator
-     * @param <C> the type of the parameter produced by the 3rd generator
-     * @return a hook to conveniently express a 3-parametric assertion.
-     */
-    default <A, B, C> ForAllAssertion.Forall3<A, B, C> forAll(
-            final Gen<A> a,
-            final Gen<B> b,
-            final Gen<C> c) {
-
-        return AssertionDSL.forAll(a, b, c);
-    }
-    /**
-     * Creates a 4-parametric assertion.
-     *
-     * This is particularly useful to check that not only constraint behave
-     * correctly no matter what partial assignment they are facing, but also
-     * to show that they behave correctly no matter the way they are configured.
-     *
-     * .. Example::
-     *   The following example illustrates how one can use a parametric
-     *   assertion to validate the behavior of the table constraint on
-     *   **virtually all** partial assignments and **virtually all** possble
-     *   table extensions.
-     *
-     *   <pre>
-     *    assertThat(
-     *       forAll(ws(), xs(), ys(), zs())
-     *         .itIsTrueThat((w, x, y, z) -&gt; ... ) )
-     *       )
-     *    )
-     *    </pre>
-     *
-     *
-     * @param a the generator creating the generated 1st argument.
-     * @param b the generator creating the generated 2nd argument.
-     * @param c the generator creating the generated 3rd argument.
-     * @param d the generator creating the generated 4th argument.
-     * @param <A> the type of the parameter produced by the 1st generator
-     * @param <B> the type of the parameter produced by the 2nd generator
-     * @param <C> the type of the parameter produced by the 3rd generator
-     * @param <D> the type of the parameter produced by the 4th generator
-     * @return a hook to conveniently express a 4-parametric assertion.
-     */
-    default <A, B, C, D> ForAllAssertion.Forall4<A, B, C, D> forAll(
-            final Gen<A> a,
-            final Gen<B> b,
-            final Gen<C> c,
-            final Gen<D> d) {
-
-        return AssertionDSL.forAll(a, b, c, d);
     }
 }

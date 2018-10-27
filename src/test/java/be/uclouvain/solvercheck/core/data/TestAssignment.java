@@ -1,7 +1,7 @@
 package be.uclouvain.solvercheck.core.data;
 
 import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
+import be.uclouvain.solvercheck.generators.WithGenerators;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 import org.quicktheories.core.Gen;
@@ -14,7 +14,7 @@ import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
 import static org.junit.Assert.assertEquals;
 
 public class TestAssignment
-        implements WithQuickTheories, WithCpGenerators {
+        implements WithQuickTheories, WithGenerators {
 
     @Test
     public void testSize() {

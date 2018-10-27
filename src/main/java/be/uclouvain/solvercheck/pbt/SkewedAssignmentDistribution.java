@@ -5,7 +5,7 @@ import be.uclouvain.solvercheck.core.data.Assignment;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static be.uclouvain.solvercheck.pbt.UniformIntDistribution.randomInt;
+import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
 
 public final class SkewedAssignmentDistribution {
 

@@ -6,7 +6,7 @@ import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.task.Filter;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
+import be.uclouvain.solvercheck.generators.WithGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,7 +25,7 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
  */
 public class TestForwardChecking
             implements WithQuickTheories,
-                       WithCpGenerators,
+   WithGenerators,
                        WithCheckers,
                        WithConsistencies {
 

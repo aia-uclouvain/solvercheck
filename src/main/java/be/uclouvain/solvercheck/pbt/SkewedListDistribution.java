@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static be.uclouvain.solvercheck.pbt.UniformIntDistribution.randomInt;
+import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
 
 public final class SkewedListDistribution {
 

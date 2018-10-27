@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
+
 public final class UniformListDistribution {
 
     /** Utility class has no public constructor. */
@@ -16,7 +18,7 @@ public final class UniformListDistribution {
                                                final int valMax) {
         return Stream.generate(() ->
            randomItem(
-              UniformIntDistribution.randomInt(szMin, szMax),
+              randomInt(szMin, szMax),
               UniformIntDistribution.stream(valMin, valMax))
         );
     }

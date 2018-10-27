@@ -1,10 +1,8 @@
 package be.uclouvain.solvercheck.assertions.util;
 
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import org.quicktheories.core.Strategy;
 
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * This class provides a mini framework to setup tests relative to the use of
@@ -22,8 +20,7 @@ import java.util.function.Supplier;
  * @param <T> the concrete type of the implementing subclass.
  */
 
-public interface WithFluentConfig<T extends WithFluentConfig<T>>
-       extends Supplier<Strategy> {
+public interface WithFluentConfig<T extends WithFluentConfig<T>> {
 
     /**
      * Makes the interface of the filter assertion more fluent.
@@ -42,16 +39,6 @@ public interface WithFluentConfig<T extends WithFluentConfig<T>>
     T withFixedSeed(long seed);
 
     /**
-     * Configures the underlying quicktheories layer to try to generate a
-     * partial assignment satisfying the assumptions at least `attempts` time
-     * before failing on value exhaustion.
-     *
-     * @param attempts the number of attempts to try before value exhaustion.
-     * @return this
-     */
-    T withGenerateAttempts(int attempts);
-
-    /**
      * Configures the desired number of anchors which are picked to seed a
      * round of partial assignment tests.
      *
@@ -68,16 +55,6 @@ public interface WithFluentConfig<T extends WithFluentConfig<T>>
      * @return this
      */
     T withExamples(int n);
-
-    /**
-     * Configures the number of shrink cycles used by the underlying
-     * quicktheories layer in order to determine the smallest possible
-     * violation instances.
-     *
-     * @param cycles the number of shrink cycles to use.
-     * @return this
-     */
-    T withShrinkCycles(int cycles);
 
     /**
      * Configures the range of values which can appear in the partial

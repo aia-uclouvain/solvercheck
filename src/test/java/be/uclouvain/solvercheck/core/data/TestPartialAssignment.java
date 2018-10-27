@@ -1,8 +1,8 @@
 package be.uclouvain.solvercheck.core.data;
 
 import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
-import be.uclouvain.solvercheck.generators.Generators;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
+import be.uclouvain.solvercheck.generators.GeneratorsDSL;
+import be.uclouvain.solvercheck.generators.WithGenerators;
 import be.uclouvain.solvercheck.utils.Utils;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Test;
@@ -26,7 +26,7 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
 
 public class TestPartialAssignment
-        implements WithQuickTheories, WithCpGenerators {
+        implements WithQuickTheories, WithGenerators {
 
     @Test
     public void testIsComplete() {
@@ -305,7 +305,7 @@ public class TestPartialAssignment
     }
 
     private Gen<PartialAssignment> notFailedPartialAssignments() {
-        return Generators.partialAssignments()
+        return GeneratorsDSL.partialAssignments()
                 .withVariablesBetween(1, 10)
                 .withDomainsOfSizeUpTo(10)
                 .withValuesRanging(-10, 10)
@@ -314,7 +314,7 @@ public class TestPartialAssignment
     }
 
     private Gen<PartialAssignment> nonEmptyAssignments() {
-        return Generators.partialAssignments()
+        return GeneratorsDSL.partialAssignments()
                 .withVariablesBetween(1, 10)
                 .withDomainsOfSizeUpTo(10)
                 .withValuesRanging(-10, 10)

@@ -5,6 +5,8 @@ import be.uclouvain.solvercheck.core.data.Domain;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
+
 public final class UniformDomainDistribution {
 
     /** Utility class has no public constructor. */
@@ -23,7 +25,7 @@ public final class UniformDomainDistribution {
 
         return Stream.generate(() ->
            randomItem(
-              UniformIntDistribution.randomInt(szMin, szMax),
+              randomInt(szMin, szMax),
               UniformIntDistribution.stream(valMin, valMax))
         );
     }

@@ -1,7 +1,7 @@
 package be.uclouvain.solvercheck.core.data;
 
 import be.uclouvain.solvercheck.core.data.impl.DomainFactory;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
+import be.uclouvain.solvercheck.generators.WithGenerators;
 import org.junit.Test;
 import org.quicktheories.WithQuickTheories;
 
@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TestDomainFactory implements WithQuickTheories, WithCpGenerators {
+public class TestDomainFactory implements WithQuickTheories, WithGenerators {
 
     @Test
     public void testFromExtension() {

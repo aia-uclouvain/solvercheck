@@ -18,6 +18,10 @@ public final class Generators {
         return SkewedIntDistribution.stream(from, to);
     }
 
+    public static Stream<Boolean> booleans() {
+        return ints(0, 1).mapToObj(i -> i % 2 == 0);
+    }
+
     public static Stream<List<Integer>> lists(final int szMin,
                                               final int szMax,
                                               final int valMin,
@@ -65,13 +69,5 @@ public final class Generators {
                                                   final int valMax) {
         return SkewedTableDistribution
            .stream(nbLinesMin, nbLinesMax, nbVarsMin, nbVarsMax, valMin, valMax);
-    }
-
-    public static void main(String[] args) {
-        //partialAssignments(4, 4, false, 3, -1, 5)
-        //domains(false, 3, 0, 5)
-        tables(0, 5, 3, 3, 0, 5)
-           .limit(10)
-           .forEach(System.out::println);
     }
 }
