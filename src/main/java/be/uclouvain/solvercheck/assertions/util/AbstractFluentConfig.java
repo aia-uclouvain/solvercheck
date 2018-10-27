@@ -28,12 +28,12 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      * The default number of `anchor values` which designate the 'center' of
      * the values distributions in a partial assignment.
      */
-    private static final int DEFAULT_ANCHOR_SAMPLES = 100;
+    private static final int DEFAULT_ANCHOR_SAMPLES = 10;
     /**
      * The default number of partial assignment generated (and tested) for each
      * anchor value.
      */
-    private static final int DEFAULT_EXAMPLES = 100;
+    private static final int DEFAULT_EXAMPLES = 10;
     /**
      * The default minimal value that may appear in a generated partial
      * assignment.
@@ -63,7 +63,7 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      * The default maximum number of values in a domain constitutive of a
      * partial assignment.
      */
-    private static final int DEFAULT_MAX_DOM_SIZE = 10;
+    private static final int DEFAULT_MAX_DOM_SIZE = 5;
 
     /**
      * The number of `anchor values` which designate the 'center' of the

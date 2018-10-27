@@ -71,7 +71,7 @@ public final class ForAllAssertion {
         /**
          * The number of inputs that will be auto generated
          */
-        private int examples = 100;
+        private int examples;
 
         /**
          * Creates a new hook to facilitate the writing of 1-parametric
@@ -81,7 +81,7 @@ public final class ForAllAssertion {
          */
         public Forall1(final Stream<A> genA) {
             this.genA = genA;
-            this.examples = 100;
+            this.examples = 10;
             this.assumptions = a -> true;
         }
 
@@ -135,9 +135,9 @@ public final class ForAllAssertion {
         }
 
         private String explanation(final A a, final String cause) {
-            final StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder("\n");
             builder.append("########################### \n");
-            builder.append("CONTEXT A : ").append(a).append("\n");
+            builder.append("CONTEXT A : ").append(a);
             builder.append(cause);
             return builder.toString();
         }
@@ -159,7 +159,7 @@ public final class ForAllAssertion {
         /**
          * The number of inputs that will be auto generated
          */
-        private int examples = 100;
+        private int examples;
         /**
          * A predicate encapsulating the assumptions used to filter out
          * parameter values which are not relevant for the test at hand.
@@ -179,7 +179,7 @@ public final class ForAllAssertion {
 
             this.genA = genA;
             this.genB = genB;
-            this.examples = 100;
+            this.examples = 10;
             this.assumptions = (a, b) -> true;
         }
 
@@ -243,10 +243,10 @@ public final class ForAllAssertion {
         }
 
         private String explanation(final A a, final B b, final String cause) {
-            final StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder("\n");
             builder.append("########################### \n");
             builder.append("CONTEXT A : ").append(a).append("\n");
-            builder.append("CONTEXT B : ").append(b).append("\n");
+            builder.append("CONTEXT B : ").append(b);
             builder.append(cause);
             return builder.toString();
         }

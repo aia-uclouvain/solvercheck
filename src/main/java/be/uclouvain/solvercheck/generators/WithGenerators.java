@@ -13,7 +13,9 @@ import java.util.stream.Stream;
  */
 public interface WithGenerators {
 
-
+    default Stream<Integer> integers(final int from, final int to) {
+        return GeneratorsDSL.ints(from, to).boxed();
+    }
 
     /**
      * @return a configurable generator meant to produce random

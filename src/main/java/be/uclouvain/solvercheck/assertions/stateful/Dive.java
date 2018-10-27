@@ -4,6 +4,7 @@ import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.pbt.Generators;
+import be.uclouvain.solvercheck.pbt.Randomness;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -222,7 +223,7 @@ import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
      * distribution.
      */
     private Iterator<Integer> variables(final PartialAssignment forDomains) {
-        return Generators.ints(0, forDomains.size() - 1).iterator();
+        return Randomness.getInstance().ints(0, forDomains.size()).iterator();
     }
 
     /**
