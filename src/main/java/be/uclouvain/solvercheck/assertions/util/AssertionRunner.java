@@ -39,7 +39,7 @@ public final class AssertionRunner {
         try {
             future.get(duration, unit);
         } catch (ExecutionException exec) {
-            throw new AssertionError(exec);
+            throw new RuntimeException(exec.getCause());
         } catch (TimeoutException timeout) {
             if (failOnTimeout) {
                 throw new AssertionError("Assertion timed out");

@@ -263,8 +263,15 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
            .forEach(pa -> {
                try {
                  test.accept(pa);
+               } catch (AssertionError cause) {
+                 throw new AssertionError(
+                      explanation(pa, cause.getMessage()), cause);
                } catch (Throwable cause) {
-                 throw new AssertionError(explanation(pa, cause.getMessage()));
+                 throw new AssertionError(
+                      explanation(pa,
+                      "\nCAUSE     : An exception was caught"
+                         + "\n###########################"),
+                      cause);
                }
            });
     }

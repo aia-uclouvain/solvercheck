@@ -125,9 +125,16 @@ public final class ForAllAssertion {
                    .forEach(a -> {
                        try {
                            assertion.apply(a).check();
-                       } catch (Throwable cause) {
+                       } catch (AssertionError cause) {
                             throw new AssertionError(
-                               explanation(a, cause.getMessage()));
+                               explanation(a, cause.getMessage()),
+                               cause);
+                       } catch (Throwable cause) {
+                           throw new AssertionError(
+                              explanation(a,
+                              "\nCAUSE     : An exception was caught"
+                                 + "\n###########################"),
+                              cause);
                        }
                    });
             };
@@ -231,9 +238,16 @@ public final class ForAllAssertion {
                         }
 
                         assertion.apply(itemA, itemB).check();
+                    } catch (AssertionError cause) {
+                      throw new AssertionError(
+                         explanation(itemA, itemB, cause.getMessage()),
+                         cause);
                     } catch (Throwable cause) {
-                        throw new AssertionError(
-                           explanation(itemA, itemB, cause.getMessage()));
+                      throw new AssertionError(
+                         explanation(itemA, itemB,
+                    "\nCAUSE     : An exception was caught"
+                       + "\n###########################"),
+                         cause);
                     }
                 }
             };
