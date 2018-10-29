@@ -3,6 +3,7 @@ package be.uclouvain.solvercheck.assertions.util;
 import be.uclouvain.solvercheck.assertions.Assertion;
 import be.uclouvain.solvercheck.generators.GenBuilder;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -144,7 +145,7 @@ public final class ForAllAssertion {
         private String explanation(final A a, final String cause) {
             final StringBuilder builder = new StringBuilder("\n");
             builder.append("########################### \n");
-            builder.append(genA.name()).append(" : ").append(a);
+            builder.append(genA.name()).append(" : ").append(describe(a));
             builder.append(cause);
             return builder.toString();
         }
@@ -257,10 +258,40 @@ public final class ForAllAssertion {
         private String explanation(final A a, final B b, final String cause) {
             final StringBuilder builder = new StringBuilder("\n");
             builder.append("########################### \n");
-            builder.append(genA.name()).append(" : ").append(a).append("\n");
-            builder.append(genB.name()).append(" : ").append(b);
+            builder.append(genA.name()).append(" : ").append(describe(a)).append("\n");
+            builder.append(genB.name()).append(" : ").append(describe(b));
             builder.append(cause);
             return builder.toString();
+        }
+    }
+
+    private static final <T> String describe(final T t) {
+        Class<T> clazz = (Class<T>) t.getClass();
+        if (clazz.isArray()) {
+            if (clazz.getComponentType().isPrimitive()) {
+                if (int[].class.equals(clazz)) {
+                    return Arrays.toString((int[]) t);
+                } else if (long[].class.equals(clazz)) {
+                    return Arrays.toString((long[]) t);
+                } else if (short[].class.equals(clazz)) {
+                    return Arrays.toString((short[]) t);
+                } else if (byte[].class.equals(clazz)) {
+                    return Arrays.toString((byte[]) t);
+                } else if (char[].class.equals(clazz)) {
+                    return Arrays.toString((char[]) t);
+                } else if (double[].class.equals(clazz)) {
+                    return Arrays.toString((double[]) t);
+                } else if (float[].class.equals(clazz)) {
+                    return Arrays.toString((float[]) t);
+                } else if (boolean[].class.equals(clazz)) {
+                    return Arrays.toString((boolean[]) t);
+                }
+                return "Unknown type ! (This should never happen)";
+            } else {
+                return Arrays.toString((Object[]) t);
+            }
+        } else {
+            return t.toString();
         }
     }
 }
