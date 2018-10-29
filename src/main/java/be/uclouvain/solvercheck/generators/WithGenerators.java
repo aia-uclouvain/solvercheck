@@ -22,7 +22,18 @@ public interface WithGenerators {
     default GeneratorsDSL.GenBoolBuilder booleans(final String name) {
         return GeneratorsDSL.booleans(name);
     }
-
+    default GeneratorsDSL.GenListBuilder lists() {
+        return GeneratorsDSL.lists();
+    }
+    default GeneratorsDSL.GenListBuilder lists(final String name) {
+        return GeneratorsDSL.lists(name);
+    }
+    default GeneratorsDSL.GenArrayBuilder arrays() {
+        return GeneratorsDSL.arrays();
+    }
+    default GeneratorsDSL.GenArrayBuilder arrays(final String name) {
+        return GeneratorsDSL.arrays(name);
+    }
     /**
      * @return a generator meant to produce random `Operator` instances
      */

@@ -57,6 +57,20 @@ public final class GeneratorsDSL {
         return new GenBoolBuilder(name);
     }
 
+    // --------- LISTS --------------------------------------------------------
+    public static GenListBuilder lists() {
+        return lists("List");
+    }
+    public static GenListBuilder lists(final String name) {
+        return new GenListBuilder(name);
+    }
+    public static GenArrayBuilder arrays() {
+        return arrays("Array");
+    }
+    public static GenArrayBuilder arrays(final String name) {
+        return new GenArrayBuilder(name);
+    }
+
     // --------- OPERATORS ----------------------------------------------------
     /**
      * @return  generator pseudo-randomly returns one of the existing operators
@@ -169,6 +183,202 @@ public final class GeneratorsDSL {
             };
         }
     }
+
+    /**
+     * A builder which acts as a micro DSL to produce generators of lists of
+     * integers.
+     */
+    public static final class GenListBuilder extends GenBuilder<List<Integer>> {
+
+        /**
+         * The minimum number of items in the list. (default: 0)
+         */
+        private int nbItemsMin = DEFAULT_NB_VARS_MIN;
+        /**
+         * The maximum number of items in the list. (default: 5)
+         */
+        private int nbItemsMax = DEFAULT_NB_VARS_MAX;
+        /**
+         * The minimum value that may occur in the list.
+         */
+        private int valueMin  = DEFAULT_VALUE_MIN;
+        /**
+         * The maximum value that may occur in the list.
+         */
+        private int valueMax  = DEFAULT_VALUE_MAX;
+
+        public GenListBuilder(final String name) {
+            super(name);
+        }
+
+        /**
+         * Tells that generator will produce lists having exactly n items.
+         *
+         * @param n the number of items in the generated list.
+         * @return this
+         */
+        public GenListBuilder ofSize(final int n) {
+            this.nbItemsMin = n;
+            this.nbItemsMax = n;
+            return this;
+        }
+        /**
+         * Tells that generator will produce lists having &lt;= n items.
+         *
+         * @param n the maximum number of items in the generated list
+         * @return this
+         */
+        public GenListBuilder ofSizeUpTo(final int n) {
+            this.nbItemsMin = 0;
+            this.nbItemsMax = n;
+            return this;
+        }
+        /**
+         * Tells that generator will produce lists having between from
+         * and to items.
+         *
+         * @param from a lower bound on the number of items in the list.
+         * @param to an upper bound on the number of items in the list.
+         *
+         * @return this
+         */
+        public GenListBuilder ofSizeBetween(final int from, final int to) {
+            this.nbItemsMin = from;
+            this.nbItemsMax = to;
+            return this;
+        }
+
+        /**
+         * Specifies the allowed range of value to be comprised between `from`
+         * and `to` (inclusive).
+         *
+         * @param from a lower bound on the possible values.
+         * @param to an upper bound on the possible values.
+         * @return this
+         */
+        public GenListBuilder withValuesRanging(final int from, final int to) {
+            this.valueMin = from;
+            this.valueMax = to;
+            return this;
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @return an assignment generator that corresponds to the
+         * configuration specified with the other methods
+         */
+        @Override
+        public Generator<List<Integer>> build() {
+            return new BaseGenerator<>(name()) {
+                /** {@inheritDoc} */
+                @Override
+                public Stream<List<Integer>> generate(final Randomness rnd) {
+                    return Generators
+                       .lists(rnd, nbItemsMin, nbItemsMax, valueMin, valueMax);
+                }
+            };
+        }
+    }
+
+    /**
+     * A builder which acts as a micro DSL to produce generators of lists of
+     * integers.
+     */
+    public static final class GenArrayBuilder extends GenBuilder<int[]> {
+
+        /**
+         * The minimum number of items in the list. (default: 0)
+         */
+        private int nbItemsMin = DEFAULT_NB_VARS_MIN;
+        /**
+         * The maximum number of items in the list. (default: 5)
+         */
+        private int nbItemsMax = DEFAULT_NB_VARS_MAX;
+        /**
+         * The minimum value that may occur in the list.
+         */
+        private int valueMin  = DEFAULT_VALUE_MIN;
+        /**
+         * The maximum value that may occur in the list.
+         */
+        private int valueMax  = DEFAULT_VALUE_MAX;
+
+        public GenArrayBuilder(final String name) {
+            super(name);
+        }
+
+        /**
+         * Tells that generator will produce lists having exactly n items.
+         *
+         * @param n the number of items in the generated list.
+         * @return this
+         */
+        public GenArrayBuilder ofSize(final int n) {
+            this.nbItemsMin = n;
+            this.nbItemsMax = n;
+            return this;
+        }
+        /**
+         * Tells that generator will produce lists having &lt;= n items.
+         *
+         * @param n the maximum number of items in the generated list
+         * @return this
+         */
+        public GenArrayBuilder ofSizeUpTo(final int n) {
+            this.nbItemsMin = 0;
+            this.nbItemsMax = n;
+            return this;
+        }
+        /**
+         * Tells that generator will produce arrays having between from
+         * and to items.
+         *
+         * @param from a lower bound on the number of items in the list.
+         * @param to an upper bound on the number of items in the list.
+         *
+         * @return this
+         */
+        public GenArrayBuilder ofSizeBetween(final int from, final int to) {
+            this.nbItemsMin = from;
+            this.nbItemsMax = to;
+            return this;
+        }
+
+        /**
+         * Specifies the allowed range of value to be comprised between `from`
+         * and `to` (inclusive).
+         *
+         * @param from a lower bound on the possible values.
+         * @param to an upper bound on the possible values.
+         * @return this
+         */
+        public GenArrayBuilder withValuesRanging(final int from, final int to) {
+            this.valueMin = from;
+            this.valueMax = to;
+            return this;
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @return an assignment generator that corresponds to the
+         * configuration specified with the other methods
+         */
+        @Override
+        public Generator<int[]> build() {
+            return new BaseGenerator<>(name()) {
+                /** {@inheritDoc} */
+                @Override
+                public Stream<int[]> generate(final Randomness rnd) {
+                    return Generators
+                       .lists(rnd, nbItemsMin, nbItemsMax, valueMin, valueMax)
+                       .map(lst -> lst.stream().mapToInt(Integer::intValue).toArray());
+                }
+            };
+        }
+    }
+
 
     public static final class GenOperatorBuilder extends GenBuilder<Operator> {
 
