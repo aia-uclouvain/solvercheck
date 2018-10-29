@@ -204,7 +204,7 @@ public final class StatelessProperties {
 
             // The above check hold of all assignment. Hence we check all items
             // from the cartesian product of the domains.
-            return CartesianProduct.of(domains).parallelStream()
+            return CartesianProduct.of(domains).stream()//.parallelStream()
                .map(partialAsn)
                .allMatch(isWeakerThanActual);
         };

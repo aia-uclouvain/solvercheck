@@ -7,15 +7,14 @@ import be.uclouvain.solvercheck.utils.collections.Range;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
-import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
-
 public final class SkewedPartialAssignmentDistribution {
 
     /** Utility class has no public constructor. */
     private SkewedPartialAssignmentDistribution() { }
 
 
-    public static Stream<PartialAssignment> stream(final int     szMin,
+    public static Stream<PartialAssignment> stream(final Randomness rand,
+                                                   final int     szMin,
                                                    final int     szMax,
                                                    final boolean allowErrors,
                                                    final int     domSzMax,
@@ -23,19 +22,19 @@ public final class SkewedPartialAssignmentDistribution {
                                                    final int     valMax) {
 
         final PartialAssignment minimum =
-           paFill(randomInt(szMin, szMax), Domain.from(valMin));
+           paFill(rand.randomInt(szMin, szMax), Domain.from(valMin));
 
         final PartialAssignment maximum =
-           paFill(randomInt(szMin, szMax), Domain.from(valMax));
+           paFill(rand.randomInt(szMin, szMax), Domain.from(valMax));
 
         final PartialAssignment simplest =
-           paFill(randomInt(szMin, szMax), Domain.from(0));
+           paFill(rand.randomInt(szMin, szMax), Domain.from(0));
 
         final PartialAssignment basic =
-           paFill(randomInt(szMin, szMax), Domain.from(valMin, valMax));
+           paFill(rand.randomInt(szMin, szMax), Domain.from(valMin, valMax));
 
         final PartialAssignment full =
-           paFill(randomInt(szMin, szMax), Domain.from(Range.between(valMin, valMax)));
+           paFill(rand.randomInt(szMin, szMax), Domain.from(Range.between(valMin, valMax)));
 
         Stream<PartialAssignment> extremal =
            Stream.of(minimum, maximum, basic, full);
@@ -46,7 +45,7 @@ public final class SkewedPartialAssignmentDistribution {
 
         final Stream<PartialAssignment> random =
            UniformPartialAssignmentDistribution
-              .stream(szMin, szMax, allowErrors, domSzMax, valMin, valMax);
+              .stream(rand, szMin, szMax, allowErrors, domSzMax, valMin, valMax);
 
         return Stream.concat(extremal, random);
     }

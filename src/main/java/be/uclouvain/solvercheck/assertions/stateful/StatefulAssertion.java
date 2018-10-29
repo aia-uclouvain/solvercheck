@@ -4,6 +4,7 @@ import be.uclouvain.solvercheck.assertions.Assertion;
 import be.uclouvain.solvercheck.assertions.util.AbstractFluentConfig;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
+import be.uclouvain.solvercheck.pbt.Randomness;
 
 import java.util.function.Predicate;
 
@@ -24,7 +25,7 @@ import static be.uclouvain.solvercheck.assertions.stateful.StatefulProperties.we
 @SuppressWarnings("checkstyle:hiddenfield")
 public final class StatefulAssertion
         extends AbstractFluentConfig<StatefulAssertion>
-        implements Predicate<PartialAssignment>, Assertion {
+        implements Assertion {
     /**
      * The number of 'dives' (branches that are explored until a leaf is
      * reached) explored by default when testing a stateful property.
@@ -143,23 +144,20 @@ public final class StatefulAssertion
 
     /** {@inheritDoc} */
     @Override
-    public void check() {
-        doCheckAssert(pa -> dive(pa).run());
+    public void check(final Randomness rnd) {
+        doCheckAssert(rnd, pa -> dive(rnd, pa).run());
     }
 
     /**
-     * Verifies the property for the one given test case.
-     * @param pa the test case for whichg to verify the property
+     * Verifies the property for one single partial assignment.
+     *
+     * @param rnd the source of randomness (for the search)
+     * @param pa the partial assignment for which to verify the property
+     * @return true iff the property is satisfied for the given `pa`
      */
-    public void check(final PartialAssignment pa) {
-        dive(pa).run();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean test(final PartialAssignment pa) {
+    public boolean test(final Randomness rnd, final PartialAssignment pa) {
         try {
-            dive(pa).run();
+            dive(rnd, pa).run();
             return true;
         } catch (AssertionError error) {
             return false;
@@ -174,7 +172,7 @@ public final class StatefulAssertion
      *             search tree explored by the dive.
      * @return a new Dive rooted at the given `root`.
      */
-    private Dive dive(final PartialAssignment root) {
-        return new Dive(property, nbDives, root);
+    private Dive dive(final Randomness rnd, final PartialAssignment root) {
+        return new Dive(rnd, property, nbDives, root);
     }
 }

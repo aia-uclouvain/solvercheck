@@ -30,15 +30,6 @@ public interface WithFluentConfig<T extends WithFluentConfig<T>> {
     T forAnyPartialAssignment();
 
     /**
-     * Configures the seed of the PRNG used to pseudo-randomly generate partial
-     * assignments, anchors and values.
-     *
-     * @param seed the seed to use to initialize the PRNG
-     * @return this
-     */
-    T withFixedSeed(long seed);
-
-    /**
      * Configures the desired number of anchors which are picked to seed a
      * round of partial assignment tests.
      *

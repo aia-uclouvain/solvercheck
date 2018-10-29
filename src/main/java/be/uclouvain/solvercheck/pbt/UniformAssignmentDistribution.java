@@ -5,26 +5,25 @@ import be.uclouvain.solvercheck.core.data.Assignment;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
-
 public final class UniformAssignmentDistribution {
 
     /** Utility class has no public constructor. */
     private UniformAssignmentDistribution() { }
 
-    public static Stream<Assignment> stream(final int szMin,
+    public static Stream<Assignment> stream(final Randomness randomness,
+                                            final int szMin,
                                             final int szMax,
                                             final int valMin,
                                             final int valMax) {
         return Stream.generate(() ->
            randomItem(
-              randomInt(szMin, szMax),
-              UniformIntDistribution.stream(valMin, valMax))
+              randomness.randomInt(szMin, szMax),
+              UniformIntDistribution.stream(randomness, valMin, valMax))
         );
     }
 
     private static Assignment randomItem(final int ofSize,
-                                         final IntStream source) {
-        return source.limit(ofSize).boxed().collect(Assignment.collector());
+                                         final Stream<Integer> source) {
+        return source.limit(ofSize).collect(Assignment.collector());
     }
 }

@@ -6,14 +6,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
-
 public final class SkewedTableDistribution {
 
     /** Utility class has no public constructor. */
     private SkewedTableDistribution() { }
 
-    public static Stream<List<Assignment>> stream(final int nbLinesMin,
+    public static Stream<List<Assignment>> stream(final Randomness rand,
+                                                  final int nbLinesMin,
                                                   final int nbLinesMax,
                                                   final int nbVarsMin,
                                                   final int nbVarsMax,
@@ -31,21 +30,21 @@ public final class SkewedTableDistribution {
             // Add the 'simplest' case if it is allowed
             if (0 > valMin && 0 < valMax) {
                 exceptions.add(
-                   List.of(aFill(randomInt(nbVarsMin, nbVarsMax),0)));
+                   List.of(aFill(rand.randomInt(nbVarsMin, nbVarsMax),0)));
             }
 
             // Add 'minimum'
             exceptions.add(
-               List.of(aFill(randomInt(nbVarsMin, nbVarsMax), valMin)));
+               List.of(aFill(rand.randomInt(nbVarsMin, nbVarsMax), valMin)));
 
             // Add 'maximum'
             exceptions.add(
-               List.of(aFill(randomInt(nbVarsMin, nbVarsMax), valMax)));
+               List.of(aFill(rand.randomInt(nbVarsMin, nbVarsMax), valMax)));
         }
 
         if (2 >= nbLinesMin && 2 <= nbLinesMax) {
             // Add a 'basic' case
-            final int basicSz = randomInt(nbVarsMin, nbVarsMax);
+            final int basicSz = rand.randomInt(nbVarsMin, nbVarsMax);
             exceptions.add(
                List.of(aFill(basicSz, valMin), aFill(basicSz, valMax)));
         }
@@ -53,8 +52,8 @@ public final class SkewedTableDistribution {
 
         return Stream.concat(
            exceptions.build(),
-           UniformTableDistribution
-              .stream(nbLinesMin, nbLinesMax, nbVarsMin, nbVarsMax, valMin, valMax)
+           UniformTableDistribution.stream(
+             rand, nbLinesMin, nbLinesMax, nbVarsMin, nbVarsMax, valMin, valMax)
         );
     }
 

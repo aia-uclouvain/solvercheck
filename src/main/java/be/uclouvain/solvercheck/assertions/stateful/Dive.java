@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Stack;
 import java.util.function.Function;
 
-import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
-
 /**
  * The purpose of this class is to actually run a 'dive' exploration of the
  * search tree rooted by some given partial assignment. It will explore nbDives
@@ -21,6 +19,9 @@ import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
  * or an error is encountered.
  */
 /* package */ final class Dive implements Runnable {
+    /** The source of randomness used to pick random values during search. */
+    private final Randomness randomness;
+
     /** The property being verified during this 'dive' check. */
     private final StatefulProperties.Property property;
 
@@ -79,18 +80,19 @@ import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
      *                 basis for the search tree explored by this dive check.
      */
     /* package */ Dive(
+       final Randomness randomness,
        final StatefulProperties.Property property,
        final int nbDives,
        final PartialAssignment  root) {
-
+        this.randomness = randomness;
         this.property   = property;
         this.nbDives    = nbDives;
         this.root       = root;
 
         this.variables  = variables(root);
         this.values     = values(root);
-        this.operators  = Generators.operators().iterator();
-        this.backtracks = Generators.booleans().iterator();
+        this.operators  = Generators.operators(randomness).iterator();
+        this.backtracks = Generators.booleans(randomness).iterator();
 
         this.history    = new ArrayList<>();
         this.decisions  = new Stack<>();
@@ -223,7 +225,8 @@ import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
      * distribution.
      */
     private Iterator<Integer> variables(final PartialAssignment forDomains) {
-        return Randomness.getInstance().ints(0, forDomains.size()).iterator();
+        return randomness
+           .ints(0, forDomains.size()).iterator();
     }
 
     /**
@@ -238,7 +241,7 @@ import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
     private Function<Integer, Integer> values(final PartialAssignment forDomains) {
         return xi -> {
             final Domain dxi = forDomains.get(xi);
-            return randomInt(dxi.minimum(), dxi.maximum());
+            return randomness.randomInt(dxi.minimum(), dxi.maximum());
         };
     }
 }

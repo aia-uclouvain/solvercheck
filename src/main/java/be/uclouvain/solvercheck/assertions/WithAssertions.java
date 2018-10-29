@@ -7,9 +7,9 @@ import be.uclouvain.solvercheck.assertions.util.ForAllAssertion;
 import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
+import be.uclouvain.solvercheck.generators.GenBuilder;
 
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 /**
  * This interface collects all the useful methods that let you plug
@@ -40,6 +40,15 @@ public interface WithAssertions {
      */
     default AssertionRunner given(final long timeout, final TimeUnit unit) {
         return AssertionDSL.given(timeout, unit);
+    }
+
+    /**
+     * Builds a runner for some assertion that will not timeout.
+     *
+     * @return a runner able to evaluate some assertion.
+     */
+    default AssertionRunner given() {
+        return AssertionDSL.given();
     }
 
     /**
@@ -159,7 +168,7 @@ public interface WithAssertions {
      * @param <A> the type of the parameter produced by the generator
      * @return a hook to conveniently express a 1-parametric assertion.
      */
-    default <A> ForAllAssertion.Forall1<A> forAll(final Stream<A> a) {
+    default <A> ForAllAssertion.Forall1<A> forAll(final GenBuilder<A> a) {
         return AssertionDSL.forAll(a);
     }
 
@@ -192,8 +201,8 @@ public interface WithAssertions {
      * @return a hook to conveniently express a 2-parametric assertion.
      */
     default <A, B> ForAllAssertion.Forall2<A, B> forAll(
-            final Stream<A> a,
-            final Stream<B> b) {
+            final GenBuilder<A> a,
+            final GenBuilder<B> b) {
 
         return AssertionDSL.forAll(a, b);
     }

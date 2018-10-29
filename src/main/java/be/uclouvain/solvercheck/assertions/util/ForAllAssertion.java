@@ -1,13 +1,13 @@
 package be.uclouvain.solvercheck.assertions.util;
 
 import be.uclouvain.solvercheck.assertions.Assertion;
+import be.uclouvain.solvercheck.generators.GenBuilder;
 
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 /**
  * This class implements an "higher order" assertion which checks that the
@@ -28,7 +28,7 @@ public final class ForAllAssertion {
      * @param <A> the type of the parameter produced by the generator
      * @return a hook to conveniently express a 1-parametric assertion.
      */
-    public static <A> Forall1<A> forAll(final Stream<A> genA) {
+    public static <A> Forall1<A> forAll(final GenBuilder<A> genA) {
         return new Forall1<>(genA);
     }
 
@@ -46,8 +46,8 @@ public final class ForAllAssertion {
      * @return a hook to conveniently express a 2-parametric assertion.
      */
     public static <A, B> Forall2<A, B> forAll(
-            final Stream<A> genA,
-            final Stream<B> genB) {
+            final GenBuilder<A> genA,
+            final GenBuilder<B> genB) {
 
         return new Forall2<>(genA, genB);
     }
@@ -61,7 +61,7 @@ public final class ForAllAssertion {
      */
     public static final class Forall1<A> {
         /** The generator creating the generated 1st argument. */
-        private final Stream<A> genA;
+        private final GenBuilder<A> genA;
         /**
          * A predicate encapsulating the assumptions used to filter out
          * parameter values which are not relevant for the test at hand.
@@ -79,7 +79,7 @@ public final class ForAllAssertion {
          *
          * @param genA the generator creating the generated 1st argument.
          */
-        public Forall1(final Stream<A> genA) {
+        public Forall1(final GenBuilder<A> genA) {
             this.genA = genA;
             this.examples = 10;
             this.assumptions = a -> true;
@@ -117,14 +117,15 @@ public final class ForAllAssertion {
          * @return the (parametric) assertion which can be checked.
          */
         public Assertion itIsTrueThat(final Function<A, Assertion> assertion) {
-            return () -> {
-                genA
+            return randomness -> {
+                genA.build()
+                   .generate(randomness)
                    .limit(examples)
                    .filter(assumptions)
-                   .parallel()
+                   //.parallel()
                    .forEach(a -> {
                        try {
-                           assertion.apply(a).check();
+                           assertion.apply(a).check(randomness);
                        } catch (AssertionError cause) {
                             throw new AssertionError(
                                explanation(a, cause.getMessage()),
@@ -143,7 +144,7 @@ public final class ForAllAssertion {
         private String explanation(final A a, final String cause) {
             final StringBuilder builder = new StringBuilder("\n");
             builder.append("########################### \n");
-            builder.append("CONTEXT A : ").append(a);
+            builder.append(genA.name()).append(" : ").append(a);
             builder.append(cause);
             return builder.toString();
         }
@@ -159,9 +160,9 @@ public final class ForAllAssertion {
      */
     public static final class Forall2<A, B> {
         /** The generator creating the generated 1st argument. */
-        private final Stream<A> genA;
+        private final GenBuilder<A> genA;
         /** The generator creating the generated 2nd argument. */
-        private final Stream<B> genB;
+        private final GenBuilder<B> genB;
         /**
          * The number of inputs that will be auto generated
          */
@@ -180,8 +181,8 @@ public final class ForAllAssertion {
          * @param genB the generator creating the generated 2nd argument.
          */
         public Forall2(
-                final Stream<A> genA,
-                final Stream<B> genB) {
+                final GenBuilder<A> genA,
+                final GenBuilder<B> genB) {
 
             this.genA = genA;
             this.genB = genB;
@@ -221,9 +222,9 @@ public final class ForAllAssertion {
          * @return the (parametric) assertion which can be checked.
          */
         public Assertion itIsTrueThat(final BiFunction<A, B, Assertion> assertion) {
-            return () -> {
-                Iterator<A> iterA = genA.iterator();
-                Iterator<B> iterB = genB.iterator();
+            return randomness -> {
+                Iterator<A> iterA = genA.build().generate(randomness).iterator();
+                Iterator<B> iterB = genB.build().generate(randomness).iterator();
 
                 int counter = 0;
                 while (counter < examples) {
@@ -237,7 +238,7 @@ public final class ForAllAssertion {
                             counter++;
                         }
 
-                        assertion.apply(itemA, itemB).check();
+                        assertion.apply(itemA, itemB).check(randomness);
                     } catch (AssertionError cause) {
                       throw new AssertionError(
                          explanation(itemA, itemB, cause.getMessage()),
@@ -256,8 +257,8 @@ public final class ForAllAssertion {
         private String explanation(final A a, final B b, final String cause) {
             final StringBuilder builder = new StringBuilder("\n");
             builder.append("########################### \n");
-            builder.append("CONTEXT A : ").append(a).append("\n");
-            builder.append("CONTEXT B : ").append(b);
+            builder.append(genA.name()).append(" : ").append(a).append("\n");
+            builder.append(genB.name()).append(" : ").append(b);
             builder.append(cause);
             return builder.toString();
         }

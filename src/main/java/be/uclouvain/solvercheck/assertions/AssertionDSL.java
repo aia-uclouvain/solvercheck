@@ -7,9 +7,9 @@ import be.uclouvain.solvercheck.assertions.util.ForAllAssertion;
 import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
+import be.uclouvain.solvercheck.generators.GenBuilder;
 
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 /**
  * This class provides some utility methods to instanciate CP-level test cases.
@@ -30,6 +30,15 @@ public final class AssertionDSL {
      */
     public static AssertionRunner given(final long timeout, final TimeUnit unit) {
         return new AssertionRunner(timeout, unit);
+    }
+
+    /**
+     * Builds a runner for some assertion that will not timeout.
+     *
+     * @return a runner able to evaluate some assertion.
+     */
+    public static AssertionRunner given() {
+        return new AssertionRunner();
     }
 
     /**
@@ -149,7 +158,7 @@ public final class AssertionDSL {
      * @param <A> the type of the parameter produced by the generator
      * @return a hook to conveniently express a 1-parametric assertion.
      */
-    public static <A> ForAllAssertion.Forall1<A> forAll(final Stream<A> a) {
+    public static <A> ForAllAssertion.Forall1<A> forAll(final GenBuilder<A> a) {
         return ForAllAssertion.forAll(a);
     }
 
@@ -180,8 +189,8 @@ public final class AssertionDSL {
      * @return a hook to conveniently express a 2-parametric assertion.
      */
     public static <A, B> ForAllAssertion.Forall2<A, B> forAll(
-            final Stream<A> a,
-            final Stream<B> b) {
+            final GenBuilder<A> a,
+            final GenBuilder<B> b) {
 
         return ForAllAssertion.forAll(a, b);
     }

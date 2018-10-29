@@ -1,6 +1,7 @@
 package be.uclouvain.solvercheck.assertions.util;
 
 import be.uclouvain.solvercheck.assertions.Assertion;
+import be.uclouvain.solvercheck.pbt.Randomness;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -17,6 +18,7 @@ public final class AssertionRunner {
     private long     duration;
     private TimeUnit unit;
     private boolean  failOnTimeout;
+    private long     seed;
 
     public AssertionRunner() {
         this(Long.MAX_VALUE, TimeUnit.DAYS);
@@ -26,6 +28,12 @@ public final class AssertionRunner {
         this.duration      = duration;
         this.unit          = unit;
         this.failOnTimeout = false;
+        this.seed          = System.currentTimeMillis();
+    }
+
+    public AssertionRunner randomSeed(final long seed) {
+        this.seed = seed;
+        return this;
     }
 
     public AssertionRunner failingOnTimeout() {
@@ -34,7 +42,9 @@ public final class AssertionRunner {
     }
 
     public void assertThat(final Assertion assertion) {
-        Future<?> future = EXECUTOR.submit(assertion::check);
+        Future<?> future = EXECUTOR.submit(() -> {
+            assertion.check(new Randomness(seed));
+        });
 
         try {
             future.get(duration, unit);

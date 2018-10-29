@@ -4,10 +4,12 @@ import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
+import be.uclouvain.solvercheck.pbt.BaseGenerator;
+import be.uclouvain.solvercheck.pbt.Generator;
 import be.uclouvain.solvercheck.pbt.Generators;
+import be.uclouvain.solvercheck.pbt.Randomness;
 
 import java.util.List;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -40,21 +42,30 @@ public final class GeneratorsDSL {
     private GeneratorsDSL() { }
 
     // --------- INTEGERS -----------------------------------------------------
-    public static IntStream ints(final int from, final int to) {
-        return Generators.ints(from, to);
+    public static GenIntBuilder ints() {
+        return ints("Integer");
+    }
+    public static GenIntBuilder ints(final String name) {
+        return new GenIntBuilder(name);
     }
 
     // --------- BOOLEANS -----------------------------------------------------
-    public static Stream<Boolean> booleans() {
-        return Generators.booleans();
+    public static GenBoolBuilder booleans() {
+        return booleans("Bool");
+    }
+    public static GenBoolBuilder booleans(final String name) {
+        return new GenBoolBuilder(name);
     }
 
     // --------- OPERATORS ----------------------------------------------------
     /**
      * @return  generator pseudo-randomly returns one of the existing operators
      */
-    public static Stream<Operator> operators() {
-        return Generators.operators();
+    public static GenOperatorBuilder operators() {
+        return operators("Operator");
+    }
+    public static GenOperatorBuilder operators(final String name) {
+        return new GenOperatorBuilder(name);
     }
 
     // --------- DOMAINS ------------------------------------------------------
@@ -64,7 +75,10 @@ public final class GeneratorsDSL {
      * generators that produce random domains.
      */
     public static GenDomainBuilder domains() {
-        return new GenDomainBuilder();
+        return domains("Domain");
+    }
+    public static GenDomainBuilder domains(final String name) {
+        return new GenDomainBuilder(name);
     }
 
     // --------- PARTIAL-ASSIGNMENT -------------------------------------------
@@ -73,7 +87,10 @@ public final class GeneratorsDSL {
      * generators that produce random partial assignments.
      */
     public static GenPartialAssignmentBuilder partialAssignments() {
-        return new GenPartialAssignmentBuilder();
+        return partialAssignments("Partial Assignment");
+    }
+    public static GenPartialAssignmentBuilder partialAssignments(final String name) {
+        return new GenPartialAssignmentBuilder(name);
     }
 
     // --------- ASSIGNMENT ---------------------------------------------------
@@ -82,7 +99,10 @@ public final class GeneratorsDSL {
      * generators that produce random assignments.
      */
     public static GenAssignmentBuilder assignments() {
-        return new GenAssignmentBuilder();
+        return assignments("Assignment");
+    }
+    public static GenAssignmentBuilder assignments(final String name) {
+        return new GenAssignmentBuilder(name);
     }
 
     // --------- TABLES -------------------------------------------------------
@@ -91,25 +111,81 @@ public final class GeneratorsDSL {
      * generators that produce random table constraints.
      */
     public static GenTableBuilder tables() {
-        return new GenTableBuilder();
+        return tables("Table");
+    }
+    public static GenTableBuilder tables(final String name) {
+        return new GenTableBuilder(name);
     }
 
     // --------- BUILDERS -----------------------------------------------------
 
-    /**
-     * This abstract class serves as a basis for the implementation of
-     * fluent generator builders.
-     *
-     * @param <T> the type of the objects to generate.
-     */
-    private abstract static class GenBuilder<T> {
-        /**
-         * Returns the actual generator (stream) instance, based on the current
-         * configuration state.
-         *
-         * @return the actual generator.
-         */
-        protected abstract Stream<T> build();
+    public static final class GenIntBuilder extends GenBuilder<Integer> {
+        private int low  = Integer.MIN_VALUE;
+        private int high = Integer.MAX_VALUE;
+
+
+        public GenIntBuilder(final String name) {
+            super(name);
+        }
+
+        public GenIntBuilder positive() {
+            this.low = 0;
+            this.high = Integer.MAX_VALUE;
+            return this;
+        }
+
+        public GenIntBuilder between(final int low, final int high) {
+            this.low  = low;
+            this.high = high;
+            return this;
+        }
+
+        @Override
+        public Generator<Integer> build() {
+            return new BaseGenerator<>(name()) {
+                /** @inheritDoc} */
+                @Override
+                public Stream<Integer> generate(final Randomness rnd) {
+                    return Generators.ints(rnd, low, high);
+                }
+            };
+        }
+    }
+
+    public static final class GenBoolBuilder extends GenBuilder<Boolean> {
+
+        public GenBoolBuilder(final String name) {
+            super(name);
+        }
+
+        @Override
+        public Generator<Boolean> build() {
+            return new BaseGenerator<>(name()) {
+                /** @inheritDoc} */
+                @Override
+                public Stream<Boolean> generate(final Randomness rnd) {
+                    return Generators.booleans(rnd);
+                }
+            };
+        }
+    }
+
+    public static final class GenOperatorBuilder extends GenBuilder<Operator> {
+
+        public GenOperatorBuilder(final String name) {
+            super(name);
+        }
+
+        @Override
+        public Generator<Operator> build() {
+            return new BaseGenerator<>(name()) {
+                /** @inheritDoc} */
+                @Override
+                public Stream<Operator> generate(final Randomness rnd) {
+                    return Generators.operators(rnd);
+                }
+            };
+        }
     }
 
     /**
@@ -127,6 +203,10 @@ public final class GeneratorsDSL {
         private int minValue = DEFAULT_VALUE_MIN;
         /** the highest value that can be contained in the domain. */
         private int maxValue = DEFAULT_VALUE_MAX;
+
+        public GenDomainBuilder(final String name) {
+            super(name);
+        }
 
         /**
          * Configures the builder to create stream of domains which may be
@@ -168,8 +248,14 @@ public final class GeneratorsDSL {
 
         /** {@inheritDoc} */
         @Override
-        public Stream<Domain> build() {
-            return Generators.domains(allowErrors, nbValMax, minValue, maxValue);
+        public Generator<Domain> build() {
+          return new BaseGenerator<>(name()) {
+             /** @inheritDoc} */
+             @Override
+             public Stream<Domain> generate(final Randomness rnd) {
+                 return Generators.domains(rnd, allowErrors, nbValMax, minValue, maxValue);
+             }
+          };
         }
     }
 
@@ -200,6 +286,10 @@ public final class GeneratorsDSL {
         private int minValue = DEFAULT_VALUE_MIN;
         /** the highest value that can be contained in the domain. */
         private int maxValue = DEFAULT_VALUE_MAX;
+
+        public GenPartialAssignmentBuilder(final String name) {
+            super(name);
+        }
 
         /**
          * Tells that generator will produce partial assignments having
@@ -275,9 +365,17 @@ public final class GeneratorsDSL {
 
         /** {@inheritDoc} */
         @Override
-        public Stream<PartialAssignment> build() {
-            return Generators.partialAssignments(
-               nbVarsMin, nbVarsMax, allowErrors, domSzMax, minValue, maxValue);
+        public Generator<PartialAssignment> build() {
+            return new BaseGenerator<>(name()) {
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public Stream<PartialAssignment> generate(final Randomness rnd) {
+                    return Generators.partialAssignments(
+                       rnd, nbVarsMin, nbVarsMax, allowErrors, domSzMax, minValue, maxValue);
+                }
+            };
         }
     }
 
@@ -304,6 +402,10 @@ public final class GeneratorsDSL {
          * The maximum value of a variable in the assignment. (default: 10)
          */
         private int valueMax  = DEFAULT_VALUE_MAX;
+
+        public GenAssignmentBuilder(final String name) {
+            super(name);
+        }
 
         /**
          * Tells that generator will produce assignments having exactly n
@@ -371,9 +473,15 @@ public final class GeneratorsDSL {
          * configuration specified with the other methods
          */
         @Override
-        public Stream<Assignment> build() {
-            return Generators
-               .assignments(nbVarsMin, nbVarsMax, valueMin, valueMax);
+        public Generator<Assignment> build() {
+            return new BaseGenerator<>(name()) {
+                /** {@inheritDoc} */
+                @Override
+                public Stream<Assignment> generate(final Randomness rnd) {
+                  return Generators
+                    .assignments(rnd, nbVarsMin, nbVarsMax, valueMin, valueMax);
+                }
+            };
         }
     }
 
@@ -404,6 +512,10 @@ public final class GeneratorsDSL {
          * The maximum value of a variable in the assignment. (default: 10)
          */
         private int valueMax  = DEFAULT_VALUE_MAX;
+
+        public GenTableBuilder(final String name) {
+            super(name);
+        }
 
         /**
          * Tells that generator will produce tables made of assignments having
@@ -482,9 +594,15 @@ public final class GeneratorsDSL {
          * configuration specified with the other methods.
          */
         @Override
-        public Stream<List<Assignment>> build() {
-            return Generators.tables(
-              nbLinesMin, nbLinesMax, nbVarsMin, nbVarsMax, valueMin, valueMax);
+        public Generator<List<Assignment>> build() {
+            return new BaseGenerator<>(name()) {
+                /** {@inheritDoc} */
+                @Override
+                public Stream<List<Assignment>> generate(final Randomness rnd) {
+                    return Generators
+                       .tables(rnd, nbLinesMin, nbLinesMax, nbVarsMin, nbVarsMax, valueMin, valueMax);
+                }
+            };
         }
     }
 }

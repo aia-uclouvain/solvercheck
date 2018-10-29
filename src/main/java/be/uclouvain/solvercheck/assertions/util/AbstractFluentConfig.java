@@ -2,14 +2,11 @@ package be.uclouvain.solvercheck.assertions.util;
 
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.generators.GeneratorsDSL;
-import be.uclouvain.solvercheck.pbt.Generators;
 import be.uclouvain.solvercheck.pbt.Randomness;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.MIN_VALUE;
@@ -28,7 +25,7 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      * The default number of `anchor values` which designate the 'center' of
      * the values distributions in a partial assignment.
      */
-    private static final int DEFAULT_ANCHOR_SAMPLES = 10;
+    private static final int DEFAULT_ANCHOR_SAMPLES = 100;
     /**
      * The default number of partial assignment generated (and tested) for each
      * anchor value.
@@ -139,13 +136,6 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
 
     /** {@inheritDoc} */
     @Override
-    public final T withFixedSeed(final long seed) {
-        Randomness.seed(seed);
-        return getThis();
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public final T withExamples(final int n) {
         this.examples = n;
         return getThis();
@@ -228,17 +218,20 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      *
      * @param test a predicate whose validity is being tested.
      */
-    protected final void doCheck(final Predicate<PartialAssignment> test) {
+    protected final void doCheck(final Randomness rnd,
+                                 final Predicate<PartialAssignment> test) {
         Optional<PartialAssignment> failure = anchors()
+           .build()
+           .generate(rnd)
            .limit(anchorSamples)
-           .mapToObj(a  -> partialAssignments(a).limit(examples))
+           .map(a  -> partialAssignments(a).build().generate(rnd).limit(examples))
            .flatMap(pas -> pas.filter(assumptions).filter(pa -> !test.test(pa)))
-           .parallel()
+           //.parallel()
            .findAny();
 
         if (failure.isPresent()) {
             throw new AssertionError(
-               explanation(failure.get(), "Property violated")
+               explanation(rnd, failure.get(), "Property violated")
             );
         }
     }
@@ -254,21 +247,24 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      * @param test an assertion snippet testing the validity of some property
      *            depending on partial assignment.
      */
-    protected final void doCheckAssert(final Consumer<PartialAssignment> test) {
+    protected final void doCheckAssert(final Randomness rnd,
+                                       final Consumer<PartialAssignment> test) {
         anchors()
+           .build()
+           .generate(rnd)
            .limit(anchorSamples)
-           .mapToObj(a  -> partialAssignments(a).limit(examples))
+           .map(a  -> partialAssignments(a).build().generate(rnd).limit(examples))
            .flatMap(pas -> pas.filter(assumptions))
-           .parallel()
+           //.parallel()
            .forEach(pa -> {
                try {
                  test.accept(pa);
                } catch (AssertionError cause) {
                  throw new AssertionError(
-                      explanation(pa, cause.getMessage()), cause);
+                      explanation(rnd, pa, cause.getMessage()), cause);
                } catch (Throwable cause) {
                  throw new AssertionError(
-                      explanation(pa,
+                      explanation(rnd, pa,
                       "\nCAUSE     : An exception was caught"
                          + "\n###########################"),
                       cause);
@@ -276,13 +272,14 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
            });
     }
 
-    protected String explanation(final PartialAssignment pa,
+    protected String explanation(final Randomness rnd,
+                                 final PartialAssignment pa,
                                  final String cause) {
 
         final StringBuilder builder = new StringBuilder("\n");
         builder.append("########################### \n");
         builder.append("WITNESS   : ").append(pa).append("\n");
-        builder.append("SEED      : ").append(Randomness.seed()).append("\n");
+        builder.append("SEED      : ").append(Long.toHexString(rnd.getSeed())).append("\n");
         builder.append("CAUSE     : ").append(cause).append("\n");
         builder.append("########################### \n");
 
@@ -296,20 +293,19 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      * @param anchor the anchor value
      * @return a generator of partial assignment.
      */
-    private Stream<PartialAssignment> partialAssignments(final int anchor) {
+    private GeneratorsDSL.GenPartialAssignmentBuilder partialAssignments(final int anchor) {
         return GeneratorsDSL.partialAssignments()
                 .withVariablesBetween(nbVarMin, nbVarMax)
                 .withDomainsOfSizeUpTo(maxDomSize)
-                .withValuesRanging(lowerBound(anchor), upperBound(anchor))
-                .build();
+                .withValuesRanging(lowerBound(anchor), upperBound(anchor));
     }
 
     /**
      * @return a generator producing the anchors used during a check or
      * checkAssert phase.
      */
-    private IntStream anchors() {
-        return Generators.ints(anchorMin(), anchorMax());
+    private GeneratorsDSL.GenIntBuilder anchors() {
+        return GeneratorsDSL.ints().between(anchorMin(), anchorMax());
     }
 
     /**

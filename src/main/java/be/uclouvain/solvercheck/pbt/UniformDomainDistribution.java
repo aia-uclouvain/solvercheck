@@ -5,14 +5,13 @@ import be.uclouvain.solvercheck.core.data.Domain;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static be.uclouvain.solvercheck.pbt.Randomness.randomInt;
-
 public final class UniformDomainDistribution {
 
     /** Utility class has no public constructor. */
     private UniformDomainDistribution() { }
 
-    public static Stream<Domain> stream(final boolean canBeEmpty,
+    public static Stream<Domain> stream(final Randomness randomness,
+                                        final boolean canBeEmpty,
                                         final int     szMax,
                                         final int     valMin,
                                         final int     valMax) {
@@ -25,14 +24,14 @@ public final class UniformDomainDistribution {
 
         return Stream.generate(() ->
            randomItem(
-              randomInt(szMin, szMax),
-              UniformIntDistribution.stream(valMin, valMax))
+              randomness.randomInt(szMin, szMax),
+              UniformIntDistribution.stream(randomness, valMin, valMax))
         );
     }
 
 
     private static Domain randomItem(final int ofSize,
-                                     final IntStream source) {
-        return source.limit(ofSize).boxed().collect(Domain.collector());
+                                     final Stream<Integer> source) {
+        return source.limit(ofSize).collect(Domain.collector());
     }
 }
