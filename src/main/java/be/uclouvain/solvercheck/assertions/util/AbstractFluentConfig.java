@@ -6,6 +6,7 @@ import be.uclouvain.solvercheck.pbt.Randomness;
 
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.lang.Integer.MAX_VALUE;
@@ -104,6 +105,13 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      * assumptions.
      */
     private Predicate<PartialAssignment> assumptions;
+    /**
+     * A function parsing a partial assignment to make an intelligible
+     * explanation (description) out of it. This is particularly appropriate
+     * for the constraints having different groups of arguments like i.e. the
+     * element constraint.
+     */
+    private Function<PartialAssignment, String> description;
 
     /**
      * Creates a new instance with all fields initialized to their default
@@ -120,6 +128,7 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
         this.maxDomSize    = DEFAULT_MAX_DOM_SIZE;
 
         this.assumptions   = pa -> true;
+        this.description   = PartialAssignment::toString;
     }
 
     /**
@@ -131,6 +140,13 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
     /** {@inheritDoc} */
     @Override
     public final T forAnyPartialAssignment() {
+        return getThis();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public final T describedAs(final Function<PartialAssignment, String> description) {
+        this.description = description;
         return getThis();
     }
 
@@ -278,9 +294,9 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
 
         final StringBuilder builder = new StringBuilder("\n");
         builder.append("########################### \n");
-        builder.append("WITNESS   : ").append(pa).append("\n");
         builder.append("SEED      : ").append(Long.toHexString(rnd.getSeed())).append("\n");
         builder.append("CAUSE     : ").append(cause).append("\n");
+        builder.append("WITNESS   : ").append(description.apply(pa)).append("\n");
         builder.append("########################### \n");
 
         return builder.toString();

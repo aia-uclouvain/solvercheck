@@ -2,6 +2,7 @@ package be.uclouvain.solvercheck.assertions.util;
 
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -28,6 +29,17 @@ public interface WithFluentConfig<T extends WithFluentConfig<T>> {
      * @return this.
      */
     T forAnyPartialAssignment();
+
+    /**
+     * A function parsing some given partial assignment to make an intelligible
+     * explanation (description) out of it. This is particularly appropriate
+     * for the constraints having different groups of arguments like i.e. the
+     * element constraint.
+     *
+     * @param description the description function.
+     * @return this
+     */
+    T describedAs(Function<PartialAssignment, String> description);
 
     /**
      * Configures the desired number of anchors which are picked to seed a
