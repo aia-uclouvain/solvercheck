@@ -21,6 +21,12 @@ public final class SkewedPartialAssignmentDistribution {
                                                    final int     valMin,
                                                    final int     valMax) {
 
+        if (domSzMax < 1) {
+            return Stream.generate(() ->
+                paFill(rand.randomInt(szMin, szMax), Domain.from())
+            );
+        }
+
         final PartialAssignment minimum =
            paFill(rand.randomInt(szMin, szMax), Domain.from(valMin));
 

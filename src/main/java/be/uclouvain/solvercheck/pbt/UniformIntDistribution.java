@@ -12,6 +12,6 @@ public final class UniformIntDistribution {
     public static Stream<Integer> stream(final Randomness randomness,
                                 final int from,
                                 final int to) {
-        return randomness.ints(from, to).boxed();
+        return randomness.intsBetween(from, to).boxed();
     }
 }

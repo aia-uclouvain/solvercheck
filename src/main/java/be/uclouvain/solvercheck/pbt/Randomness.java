@@ -1,6 +1,7 @@
 package be.uclouvain.solvercheck.pbt;
 
 import java.util.Random;
+import java.util.stream.IntStream;
 
 public final class Randomness extends Random {
     /** The seed used to initialize the prng */
@@ -13,6 +14,12 @@ public final class Randomness extends Random {
 
     public int randomInt(final int from, final int to) {
         return nextInt((to - from) + 1) + from;
+    }
+
+    public IntStream intsBetween(final int lowerBound, final int upperBound) {
+        return super
+           .longs((long)lowerBound,  1L + (long) upperBound)
+           .mapToInt(l -> (int) l);
     }
 
     public long getSeed() {

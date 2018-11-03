@@ -22,7 +22,7 @@ public final class Generators {
 
     public static Stream<Boolean> booleans(final Randomness randomness) {
         return randomness
-           .ints(0, 1)
+           .intsBetween(0, 1)
            .mapToObj(i -> i % 2 == 0);
     }
 

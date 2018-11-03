@@ -11,7 +11,7 @@ public final class UniformOperatorDistribution {
 
     public static Stream<Operator> stream(final Randomness randomness) {
         return UniformIntDistribution
-           .stream(randomness, 0, Operator.values().length)
+           .stream(randomness, 0, Operator.values().length - 1)
            .map(i -> Operator.values()[i]);
     }
 }

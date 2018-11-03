@@ -226,7 +226,8 @@ import java.util.function.Function;
      */
     private Iterator<Integer> variables(final PartialAssignment forDomains) {
         return randomness
-           .ints(0, forDomains.size()).iterator();
+           .intsBetween(0, forDomains.size() - 1)
+           .iterator();
     }
 
     /**
