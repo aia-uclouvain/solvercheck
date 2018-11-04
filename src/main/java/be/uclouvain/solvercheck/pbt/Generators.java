@@ -6,7 +6,7 @@ import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public final class Generators {
@@ -34,6 +34,16 @@ public final class Generators {
 
         return SkewedListDistribution
            .stream(randomness, szMin, szMax, valMin, valMax);
+    }
+
+    public static Stream<Set<Integer>> sets(final Randomness randomness,
+                                            final boolean canBeEmpty,
+                                            final int     szMax,
+                                            final int     valMin,
+                                            final int     valMax) {
+
+        return SkewedSetDistribution
+           .stream(randomness, canBeEmpty, szMax, valMin, valMax);
     }
 
     public static Stream<Assignment> assignments(final Randomness randomness,

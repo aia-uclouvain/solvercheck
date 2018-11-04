@@ -34,6 +34,12 @@ public interface WithGenerators {
     default GeneratorsDSL.GenArrayBuilder arrays(final String name) {
         return GeneratorsDSL.arrays(name);
     }
+    default GeneratorsDSL.GenSetBuilder sets() {
+        return GeneratorsDSL.sets();
+    }
+    default GeneratorsDSL.GenSetBuilder sets(final String name) {
+        return GeneratorsDSL.sets(name);
+    }
     /**
      * @return a generator meant to produce random `Operator` instances
      */

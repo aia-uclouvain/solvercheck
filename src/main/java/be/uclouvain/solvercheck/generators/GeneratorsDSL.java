@@ -10,6 +10,7 @@ import be.uclouvain.solvercheck.pbt.Generators;
 import be.uclouvain.solvercheck.pbt.Randomness;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -69,6 +70,13 @@ public final class GeneratorsDSL {
     }
     public static GenArrayBuilder arrays(final String name) {
         return new GenArrayBuilder(name);
+    }
+    // --------- SETS --------------------------------------------------------
+    public static GenSetBuilder sets() {
+        return sets("Set");
+    }
+    public static GenSetBuilder sets(final String name) {
+        return new GenSetBuilder(name);
     }
 
     // --------- OPERATORS ----------------------------------------------------
@@ -378,6 +386,77 @@ public final class GeneratorsDSL {
             };
         }
     }
+
+    /**
+     * A builder which acts as a micro DSL to produce generators of domains.
+     */
+    public static final class GenSetBuilder extends GenBuilder<Set<Integer>> {
+        /**
+         * a flag telling whether or not we allow the generator to produce
+         * empty sets.
+         */
+        private boolean allowEmpty = false;
+        /** the maximum number of different values a domain should contain. */
+        private int nbValMax = DEFAULT_NB_VAL_MAX;
+        /** the lowest value that can be contained in the domain. */
+        private int minValue = DEFAULT_VALUE_MIN;
+        /** the highest value that can be contained in the domain. */
+        private int maxValue = DEFAULT_VALUE_MAX;
+
+        public GenSetBuilder(final String name) {
+            super(name);
+        }
+
+        /**
+         * Configures the builder to create stream of sets which may be empty.
+         *
+         * @return this
+         */
+        public GenSetBuilder possiblyEmpty() {
+            allowEmpty = true;
+            return this;
+        }
+
+        /**
+         * Sets the size range of the generated sets (from 0, to n).
+         *
+         * @param n the maximum number of different values a generated
+         *           set should hold
+         * @return this
+         */
+        public GenSetBuilder ofSizeUpTo(final int n) {
+            nbValMax = n;
+
+            return this;
+        }
+
+        /**
+         * Sets the values range of the generated sets.
+         *
+         * @param from the minimum value that a generated set can hold
+         * @param to the maximum value that a generated set can hold
+         * @return this
+         */
+        public GenSetBuilder withValuesBetween(final int from, final int to) {
+            minValue = from;
+            maxValue = to;
+
+            return this;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Generator<Set<Integer>> build() {
+            return new BaseGenerator<>(name()) {
+                /** @inheritDoc} */
+                @Override
+                public Stream<Set<Integer>> generate(final Randomness rnd) {
+                    return Generators.sets(rnd, allowEmpty, nbValMax, minValue, maxValue);
+                }
+            };
+        }
+    }
+
 
 
     public static final class GenOperatorBuilder extends GenBuilder<Operator> {
