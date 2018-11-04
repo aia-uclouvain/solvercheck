@@ -117,7 +117,36 @@ public final class ForAllAssertion {
          *                  its abstract parameter.
          * @return the (parametric) assertion which can be checked.
          */
-        public Assertion itIsTrueThat(final Function<A, Assertion> assertion) {
+        public Assertion itIsTrueThat(final Predicate<A> assertion) {
+            return assertThat(a -> rnd -> {
+                    if (!assertion.test(a)) {
+                        throw new AssertionError();
+                    }
+                }
+            );
+        }
+
+        /**
+         * Lets you express the parametric assertion in terms of its actual
+         * parameters.
+         *
+         * @param assertion the parametric assertion expressed in terms of
+         *                  its abstract parameter.
+         * @return the (parametric) assertion which can be checked.
+         */
+        public Assertion itIsFalseThat(final Predicate<A> assertion) {
+            return itIsTrueThat(assertion.negate());
+        }
+
+        /**
+         * Lets you express the parametric assertion in terms of its actual
+         * parameters.
+         *
+         * @param assertion the parametric assertion expressed in terms of
+         *                  its abstract parameter.
+         * @return the (parametric) assertion which can be checked.
+         */
+        public Assertion assertThat(final Function<A, Assertion> assertion) {
             return randomness -> {
                 genA.build()
                    .generate(randomness)
@@ -219,10 +248,39 @@ public final class ForAllAssertion {
          * parameters.
          *
          * @param assertion the parametric assertion expressed in terms of
+         *                  its abstract parameter.
+         * @return the (parametric) assertion which can be checked.
+         */
+        public Assertion itIsTrueThat(final BiPredicate<A, B> assertion) {
+            return assertThat((a, b) -> rnd -> {
+                   if (!assertion.test(a, b)) {
+                       throw new AssertionError();
+                   }
+               }
+            );
+        }
+
+        /**
+         * Lets you express the parametric assertion in terms of its actual
+         * parameters.
+         *
+         * @param assertion the parametric assertion expressed in terms of
+         *                  its abstract parameter.
+         * @return the (parametric) assertion which can be checked.
+         */
+        public Assertion itIsFalseThat(final BiPredicate<A, B> assertion) {
+            return itIsTrueThat(assertion.negate());
+        }
+
+        /**
+         * Lets you express the parametric assertion in terms of its actual
+         * parameters.
+         *
+         * @param assertion the parametric assertion expressed in terms of
          *                  its abstract parameters.
          * @return the (parametric) assertion which can be checked.
          */
-        public Assertion itIsTrueThat(final BiFunction<A, B, Assertion> assertion) {
+        public Assertion assertThat(final BiFunction<A, B, Assertion> assertion) {
             return randomness -> {
                 Iterator<A> iterA = genA.build().generate(randomness).iterator();
                 Iterator<B> iterB = genB.build().generate(randomness).iterator();

@@ -67,7 +67,7 @@ public class TestConsistencyUtil implements WithSolverCheck, WithGenerators {
                integers("X").between(0, 10),
                integers("Y").between(0, 10))
             .assuming((x, y) -> x <= y )
-            .itIsTrueThat((x, y) -> randomness ->
+            .assertThat((x, y) -> randomness ->
                 forAnyPartialAssignment(partialAssignment -> {
                     boolean ok = true;
                     int arity = partialAssignment.size();
@@ -141,7 +141,7 @@ public class TestConsistencyUtil implements WithSolverCheck, WithGenerators {
         assertThat(
             forAnyPartialAssignment()
                .assuming(assumptions)
-               .itIsTrueThat(pa -> rnd -> actual.test(pa))
+               .assertThat(pa -> rnd -> actual.test(pa))
         );
     }
 

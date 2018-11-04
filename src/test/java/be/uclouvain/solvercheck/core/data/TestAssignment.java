@@ -17,7 +17,7 @@ public class TestAssignment implements WithSolverCheck {
     @Test
     public void testSize() {
         assertThat(
-           forAll(lists()).itIsTrueThat(a -> rnd ->
+           forAll(lists()).assertThat(a -> rnd ->
             assertEquals(a.size(), Assignment.from(a).size())
            )
         );
@@ -28,7 +28,7 @@ public class TestAssignment implements WithSolverCheck {
         assertThat(
            forAll(lists(), integers().between(0, 10))
            .assuming((a, i) -> isValidIndex(i, a.size()))
-           .itIsTrueThat((a, i) -> rnd ->
+           .assertThat((a, i) -> rnd ->
               assertEquals(a.get(i), Assignment.from(a).get(i))
            )
         );
@@ -39,7 +39,7 @@ public class TestAssignment implements WithSolverCheck {
         assertThat(
            forAll(assignments(), integers().between(0, 10))
               .assuming((a, i) -> !isValidIndex(i, a.size()))
-              .itIsTrueThat((a, i) -> rnd ->
+              .assertThat((a, i) -> rnd ->
                  assertTrue(
                     failsThrowing(
                        IndexOutOfBoundsException.class,
@@ -53,7 +53,7 @@ public class TestAssignment implements WithSolverCheck {
     public void testEqualsAllValuesMatch() {
         assertThat(
            forAll(lists(), lists())
-              .itIsTrueThat((a, b) -> rnd ->
+              .assertThat((a, b) -> rnd ->
                  assertEquals(
                     a.equals(b),
                     Assignment.from(a).equals(Assignment.from(b)))
@@ -65,7 +65,7 @@ public class TestAssignment implements WithSolverCheck {
     public void testHashCode() {
        assertThat(
           forAll(assignments(), assignments())
-          .itIsTrueThat((a, b) -> rnd ->
+          .assertThat((a, b) -> rnd ->
              assertTrue(!a.equals(b) || (a.hashCode() == (b.hashCode())))
           )
         );
@@ -83,7 +83,7 @@ public class TestAssignment implements WithSolverCheck {
     public void testFromList() {
         assertThat(
           forAll(lists())
-          .itIsTrueThat(lst -> rnd ->
+          .assertThat(lst -> rnd ->
              assertEquals(lst, Assignment.from(lst))
           )
         );
@@ -93,7 +93,7 @@ public class TestAssignment implements WithSolverCheck {
     public void testFromArray() {
         assertThat(
            forAll(arrays())
-              .itIsTrueThat(lst -> rnd ->
+              .assertThat(lst -> rnd ->
                  assertEquals(
                     Arrays.stream(lst).boxed().collect(toList()),
                     Assignment.from(lst))
@@ -106,7 +106,7 @@ public class TestAssignment implements WithSolverCheck {
         assertThat(
            forAnyPartialAssignment()
            .assuming(pa -> pa.isComplete())
-           .itIsTrueThat(partialAssignment -> rnd ->
+           .assertThat(partialAssignment -> rnd ->
             assertEquals(
                partialAssignment.asAssignment(),
                Assignment.from(partialAssignment))
@@ -119,7 +119,7 @@ public class TestAssignment implements WithSolverCheck {
         assertThat(
            forAnyPartialAssignment()
               .assuming(pa -> !pa.isComplete())
-              .itIsTrueThat(partialAssignment -> rnd ->
+              .assertThat(partialAssignment -> rnd ->
                  assertTrue(
                     failsThrowing(
                         IllegalStateException.class,
@@ -132,7 +132,7 @@ public class TestAssignment implements WithSolverCheck {
     @Test
     public void testCollector() {
         assertThat(
-           forAll(lists()).itIsTrueThat(lst -> rnd ->
+           forAll(lists()).assertThat(lst -> rnd ->
              assertEquals(lst, lst.stream().collect(Assignment.collector()))
            )
         );

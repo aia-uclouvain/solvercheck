@@ -150,7 +150,7 @@ public final class AssertionDSL {
      *    <pre>
      *    assertThat(
      *       forAll(ints(0, 10))
-     *          .itIsTrueThat(b -&gt; ... ) )))
+     *          .assertThat(b -&gt; ... ) )))
      *    </pre>
      *
      *
@@ -178,7 +178,7 @@ public final class AssertionDSL {
      *   <pre>
      *    assertThat(
      *       forAll(ints(0, 10), ints(0, 20))
-     *            .itIsTrueThat((b, i) -&gt; ... ) )))
+     *            .assertThat((b, i) -&gt; ... ) )))
      *    </pre>
      *
      *

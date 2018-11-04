@@ -155,7 +155,7 @@ public interface WithAssertions {
      *   <pre>
      *    assertThat(
      *       forAll(tables())
-     *         .itIsTrueThat(table -&gt;
+     *         .assertThat(table -&gt;
      *              propagator(arcConsistent(table(t))
      *             .isStrongerThan(boundZConsistent(table(t)))
      *         )
@@ -188,7 +188,7 @@ public interface WithAssertions {
      *   <pre>
      *    assertThat(
      *       forAll(ints(0, 10), ints(20, 30))
-     *         .itIsTrueThat((b, i) -&gt; ... ) )
+     *         .assertThat((b, i) -&gt; ... ) )
      *       )
      *    )
      *    </pre>

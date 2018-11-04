@@ -46,7 +46,7 @@ public class TestForwardChecking implements WithSolverCheck {
     @Test
     public void itMustBeWeaklyMonotonic() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> randomness -> {
+           forAnyPartialAssignment().assertThat(pa -> randomness -> {
                PartialAssignment filtered = filter.filter(pa);
 
                // subseteq test
@@ -61,7 +61,7 @@ public class TestForwardChecking implements WithSolverCheck {
     @Test
     public void itRemovesNoSolution() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> randomness -> {
+           forAnyPartialAssignment().assertThat(pa -> randomness -> {
                PartialAssignment filtered = filter.filter(pa);
 
                PartialAssignment solutions =
@@ -87,7 +87,7 @@ public class TestForwardChecking implements WithSolverCheck {
     @Test
     public void isIsOnlyEffectiveWhenAllButOneVariablesAreFixed() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> randomness -> {
+           forAnyPartialAssignment().assertThat(pa -> randomness -> {
                final long nbUnassigned =
                   pa.stream().filter(dom -> dom.size() > 1).count();
 

@@ -1,12 +1,10 @@
 package be.uclouvain.solvercheck.core.data;
 
 import be.uclouvain.solvercheck.WithSolverCheck;
-import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 import static java.util.stream.Collectors.toList;
@@ -18,7 +16,7 @@ public class TestAssignmentFactory implements WithSolverCheck {
     @Test
     public void testFromList() {
         assertThat(
-           forAll(lists()).itIsTrueThat(lst -> rnd ->
+           forAll(lists()).assertThat(lst -> rnd ->
              assertEquals(lst, AssignmentFactory.from(lst))
            )
         );
@@ -27,7 +25,7 @@ public class TestAssignmentFactory implements WithSolverCheck {
     @Test
     public void testFromArray() {
         assertThat(
-           forAll(arrays()).itIsTrueThat(a -> rnd ->
+           forAll(arrays()).assertThat(a -> rnd ->
               assertEquals(
                  Arrays.stream(a).boxed().collect(toList()),
                  AssignmentFactory.from(a))
@@ -40,7 +38,7 @@ public class TestAssignmentFactory implements WithSolverCheck {
         assertThat(
            forAnyPartialAssignment().withDomainsOfSizeUpTo(1)
            .assuming(PartialAssignment::isComplete)
-           .itIsTrueThat(partialAssignment -> rnd -> {
+           .assertThat(partialAssignment -> rnd -> {
                assertEquals(
                   partialAssignment.asAssignment(),
                   AssignmentFactory.from(partialAssignment));
@@ -53,7 +51,7 @@ public class TestAssignmentFactory implements WithSolverCheck {
         assertThat(
            forAnyPartialAssignment()
            .assuming(pa -> !pa.isComplete())
-           .itIsTrueThat(partialAssignment -> rnd ->
+           .assertThat(partialAssignment -> rnd ->
             assertTrue(
                failsThrowing(
                   IllegalStateException.class,
@@ -66,7 +64,7 @@ public class TestAssignmentFactory implements WithSolverCheck {
     @Test
     public void testCollector() {
         assertThat(
-          forAll(lists()).itIsTrueThat(lst -> rnd ->
+          forAll(lists()).assertThat(lst -> rnd ->
            assertEquals(lst, lst.stream().collect(AssignmentFactory.collector()))
           )
         );

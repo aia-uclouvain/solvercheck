@@ -154,12 +154,12 @@ public class TestHybridConsistency implements WithSolverCheck {
         assertThat(
            forAnyPartialAssignment()
               .assuming(assumptions)
-              .itIsTrueThat(pa ->
+              .assertThat(pa ->
                  forAll(
                      lists("Filters")
                         .ofSize(pa.size())
                         .withValuesRanging(0, DOMAIN_FILTERS.size() - 1))
-                 .itIsTrueThat(data -> rnd -> {
+                 .assertThat(data -> rnd -> {
                      DomainFilterProducer[] domainFilters = data.stream()
                            .map(i -> DOMAIN_FILTERS.get(i))
                            .toArray(DomainFilterProducer[]::new);

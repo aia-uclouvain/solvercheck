@@ -2,9 +2,7 @@ package be.uclouvain.solvercheck.checkers;
 
 import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.Assignment;
-import be.uclouvain.solvercheck.pbt.Randomness;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -20,26 +18,15 @@ import static be.uclouvain.solvercheck.core.data.Operator.NE;
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 
 public class TestCheckers implements WithSolverCheck {
 
-    private Randomness rnd;
-
-    @Before
-    public void setUp() {
-        rnd = new Randomness(System.currentTimeMillis());
-    }
-
     @Test
     public void testAllDiff(){
         assertThat(
-          forAll(assignments()).itIsTrueThat(a -> rnd ->
-            assertEquals(
-              a.stream().distinct().count() == a.size(), allDiff().test(a)
-            )
+          forAll(assignments()).itIsTrueThat(a ->
+             allDiff().test(a) == (a.stream().distinct().count() == a.size())
           )
         );
     }
@@ -47,8 +34,8 @@ public class TestCheckers implements WithSolverCheck {
     @Test
     public void testAlwaysFalse(){
         assertThat(
-           forAll(assignments()).itIsTrueThat(a -> rnd ->
-              assertFalse(alwaysFalse().test(a))
+           forAll(assignments()).itIsFalseThat(a ->
+              alwaysFalse().test(a)
            )
         );
     }
@@ -56,8 +43,8 @@ public class TestCheckers implements WithSolverCheck {
     @Test
     public void testAlwaysTrue(){
         assertThat(
-           forAll(assignments()).itIsTrueThat(a -> rnd ->
-              assertTrue(alwaysTrue().test(a))
+           forAll(assignments()).itIsTrueThat(a ->
+              alwaysTrue().test(a)
            )
         );
     }
@@ -67,7 +54,7 @@ public class TestCheckers implements WithSolverCheck {
         assertThat(
            forAll(assignments().withVariablesBetween(3, 5))
            .assuming(a -> !isValidIndex(a.get(a.size()-2), a.size()-2))
-           .itIsTrueThat(a -> rnd -> assertFalse(element().test(a)))
+           .itIsFalseThat(a -> element().test(a))
         );
     }
 
@@ -76,11 +63,8 @@ public class TestCheckers implements WithSolverCheck {
         assertThat(
            forAll(assignments().withVariablesBetween(3, 5))
             .assuming(a -> isValidIndex(a.get(a.size()-2), a.size()-2))
-            .itIsTrueThat(a -> rnd ->
-               assertEquals(
-                  a.get(a.get(a.size()-2)).equals(a.get(a.size()-1)),
-                  element().test(a)
-               )
+            .itIsTrueThat(a ->
+               element().test(a) == a.get(a.get(a.size()-2)).equals(a.get(a.size()-1))
             )
         );
     }
@@ -90,11 +74,11 @@ public class TestCheckers implements WithSolverCheck {
     public void testGccIsTrueIffAllValuesOccurWithGivenCardinality() {
         assertThat(
             forAll(sets("VALUES").possiblyEmpty().withValuesBetween(-10, 10))
-           .itIsTrueThat(values ->
+           .assertThat(values ->
             forAll(
                lists("CARDDINALITIES").withValuesRanging(0, 10).ofSize(values.size()),
                assignments("ASSIGNMENT").withValuesRanging(-10, 10))
-           .itIsTrueThat((cards, asn) -> randomness -> {
+           .assertThat((cards, asn) -> randomness -> {
                List<Integer> vals = new ArrayList<>(values);
                boolean isGcc = gcc(cards, vals).test(asn);
 
@@ -110,6 +94,8 @@ public class TestCheckers implements WithSolverCheck {
                    verif &= (counted == expectedCount);
                    assertEquals(verif, isGcc);
                }
+
+               assertEquals(verif, isGcc);
            }))
         );
     }
@@ -126,14 +112,14 @@ public class TestCheckers implements WithSolverCheck {
       assertThat(
          forAll(lists("VALUES").withValuesRanging(-10, 10).ofSizeBetween(0, 10))
         .assuming(vals -> vals.size() == new HashSet<>(vals).size())
-        .itIsTrueThat(values -> rnd -> {
+        .assertThat(values -> rnd -> {
             int nbVarsMin = values.size();
 
             assertThat(
                 forAll(assignments()
                    .withVariablesBetween(nbVarsMin,3*(1+nbVarsMin))
                    .withValuesRanging(0, 10)
-                ).itIsTrueThat(ass -> randomness -> {
+                ).assertThat(ass -> randomness -> {
                     boolean isGcc = gccVar(values).test(ass);
 
                     List<Integer> vars =
@@ -168,13 +154,13 @@ public class TestCheckers implements WithSolverCheck {
     public void gccShouldFailWheneverTheValuesCannotDirectlyBeMappedOntoASet() {
         assertThat(
            forAll(integers("SIZE").between(2, 100))
-          .itIsTrueThat(S ->
+          .assertThat(S ->
            forAll(
               lists("VALUES").withValuesRanging(0, 10).ofSize(S),
               lists("CARDS ").withValuesRanging(0, 10).ofSize(S)
            )
           .assuming((vals, cards) -> vals.size() != new HashSet<>(vals).size())
-          .itIsTrueThat((vals, cards) -> randomness ->
+          .itIsTrueThat((vals, cards) ->
             failsThrowing(
                IllegalArgumentException.class,
                () -> gcc(cards, vals)
@@ -190,7 +176,7 @@ public class TestCheckers implements WithSolverCheck {
               .ofSizeBetween(1, 100)
               .withValuesRanging(0, 100))
           .assuming(vals -> vals.size() != new HashSet<>(vals).size())
-          .itIsTrueThat(vals -> randomness ->
+          .itIsTrueThat(vals ->
              failsThrowing(
                 IllegalArgumentException.class,
                 () -> gccVar(vals))
@@ -206,7 +192,7 @@ public class TestCheckers implements WithSolverCheck {
              lists("CARD").ofSizeBetween(0, 100).withValuesRanging(0, 10)
            )
           .assuming((vals, cards) -> vals.size() != cards.size())
-          .itIsTrueThat((vals, cards) -> randomness ->
+          .itIsTrueThat((vals, cards) ->
               failsThrowing(
                  IllegalArgumentException.class,
                  () -> gcc(cards, vals))
@@ -222,7 +208,7 @@ public class TestCheckers implements WithSolverCheck {
               assignments("ASN").withUpToVariables(100)
            )
           .assuming((vals, ass) -> vals.size() > ass.size())
-          .itIsTrueThat((vals, ass) -> randomness ->
+          .itIsTrueThat((vals, ass) ->
              failsThrowing(
                 IllegalArgumentException.class,
                 () -> gccVar(vals).test(ass))
@@ -234,7 +220,7 @@ public class TestCheckers implements WithSolverCheck {
     public void testSumEQ(){
         assertThat(
            forAll(assignments("ASN"), integers("RHS"))
-          .itIsTrueThat((a, c) -> randomness ->
+          .assertThat((a, c) -> randomness ->
              assertEquals(
                a.stream().mapToLong(Integer::longValue).sum() == c,
                 sum(EQ, c).test(a)
@@ -246,7 +232,7 @@ public class TestCheckers implements WithSolverCheck {
     public void testSumNE(){
         assertThat(
            forAll(assignments("ASN"), integers("RHS"))
-              .itIsTrueThat((a, c) -> randomness ->
+              .assertThat((a, c) -> randomness ->
                  assertEquals(
                     a.stream().mapToLong(Integer::longValue).sum() != c,
                     sum(NE, c).test(a)
@@ -258,7 +244,7 @@ public class TestCheckers implements WithSolverCheck {
     public void testSumLT(){
         assertThat(
            forAll(assignments("ASN"), integers("RHS"))
-              .itIsTrueThat((a, c) -> randomness ->
+              .assertThat((a, c) -> randomness ->
                  assertEquals(
                     a.stream().mapToLong(Integer::longValue).sum() < c,
                     sum(LT, c).test(a)
@@ -270,7 +256,7 @@ public class TestCheckers implements WithSolverCheck {
     public void testSumLE(){
         assertThat(
            forAll(assignments("ASN"), integers("RHS"))
-              .itIsTrueThat((a, c) -> randomness ->
+              .assertThat((a, c) -> randomness ->
                  assertEquals(
                     a.stream().mapToLong(Integer::longValue).sum() <= c,
                     sum(LE, c).test(a)
@@ -282,7 +268,7 @@ public class TestCheckers implements WithSolverCheck {
     public void testSumGT(){
         assertThat(
            forAll(assignments("ASN"), integers("RHS"))
-              .itIsTrueThat((a, c) -> randomness ->
+              .assertThat((a, c) -> randomness ->
                  assertEquals(
                     a.stream().mapToLong(Integer::longValue).sum() > c,
                     sum(GT, c).test(a)
@@ -294,7 +280,7 @@ public class TestCheckers implements WithSolverCheck {
     public void testSumGE(){
         assertThat(
            forAll(assignments("ASN"), integers("RHS"))
-              .itIsTrueThat((a, c) -> randomness ->
+              .assertThat((a, c) -> randomness ->
                  assertEquals(
                     a.stream().mapToLong(Integer::longValue).sum() >= c,
                     sum(GE, c).test(a)
@@ -308,7 +294,7 @@ public class TestCheckers implements WithSolverCheck {
         assertThat(
            forAll(assignments("ASN"), integers("RHS"))
               .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
-              .itIsTrueThat((assignment, rhs) -> randomness -> {
+              .assertThat((assignment, rhs) -> randomness -> {
                   long sumL =
                      assignment.stream().mapToLong(Integer::longValue).sum();
 
@@ -323,7 +309,7 @@ public class TestCheckers implements WithSolverCheck {
         assertThat(
            forAll(assignments("ASN"), integers("RHS"))
               .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
-              .itIsTrueThat((assignment, rhs) -> randomness -> {
+              .assertThat((assignment, rhs) -> randomness -> {
                   long sumL =
                      assignment.stream().mapToLong(Integer::longValue).sum();
 
@@ -338,7 +324,7 @@ public class TestCheckers implements WithSolverCheck {
         assertThat(
            forAll(assignments("ASN"), integers("RHS"))
               .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
-              .itIsTrueThat((assignment, rhs) -> randomness -> {
+              .assertThat((assignment, rhs) -> randomness -> {
                   long sumL =
                      assignment.stream().mapToLong(Integer::longValue).sum();
 
@@ -353,7 +339,7 @@ public class TestCheckers implements WithSolverCheck {
         assertThat(
            forAll(assignments("ASN"), integers("RHS"))
               .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
-              .itIsTrueThat((assignment, rhs) -> randomness -> {
+              .assertThat((assignment, rhs) -> randomness -> {
                   long sumL =
                      assignment.stream().mapToLong(Integer::longValue).sum();
 
@@ -368,7 +354,7 @@ public class TestCheckers implements WithSolverCheck {
         assertThat(
            forAll(assignments("ASN"), integers("RHS"))
               .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
-              .itIsTrueThat((assignment, rhs) -> randomness -> {
+              .assertThat((assignment, rhs) -> randomness -> {
                   long sumL =
                      assignment.stream().mapToLong(Integer::longValue).sum();
 
@@ -383,7 +369,7 @@ public class TestCheckers implements WithSolverCheck {
         assertThat(
            forAll(assignments("ASN"), integers("RHS"))
               .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
-              .itIsTrueThat((assignment, rhs) -> randomness -> {
+              .assertThat((assignment, rhs) -> randomness -> {
                   long sumL =
                      assignment.stream().mapToLong(Integer::longValue).sum();
 
@@ -398,7 +384,7 @@ public class TestCheckers implements WithSolverCheck {
     public void testTable() {
         assertThat(
            forAll(tables(), assignments())
-           .itIsTrueThat((t, a) -> randomness ->
+           .assertThat((t, a) -> randomness ->
               assertEquals(t.contains(a), table(t).test(a))
            )
         );

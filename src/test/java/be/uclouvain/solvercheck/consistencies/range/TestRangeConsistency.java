@@ -44,7 +44,7 @@ public class TestRangeConsistency implements WithSolverCheck {
     @Test
     public void itMustBeWeaklyMonotonic() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> randomness -> {
+           forAnyPartialAssignment().assertThat(pa -> randomness -> {
                  PartialAssignment filtered = filter.filter(pa);
 
                  // subseteq test
@@ -61,7 +61,7 @@ public class TestRangeConsistency implements WithSolverCheck {
     @Test
     public void itMustBeTheLeastFixpoint() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> randomness -> {
+           forAnyPartialAssignment().assertThat(pa -> randomness -> {
                PartialAssignment filtered = filter.filter(pa);
                PartialAssignment filtered2 = filter.filter(filtered);
 
@@ -76,7 +76,7 @@ public class TestRangeConsistency implements WithSolverCheck {
     @Test
     public void itRemovesNoSolution() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> randomness -> {
+           forAnyPartialAssignment().assertThat(pa -> randomness -> {
 
                PartialAssignment filtered = filter.filter(pa);
 
@@ -103,7 +103,7 @@ public class TestRangeConsistency implements WithSolverCheck {
     @Test
     public void testConsistencyDefinition() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> randomness -> {
+           forAnyPartialAssignment().assertThat(pa -> randomness -> {
                 PartialAssignment filtered  = filter.filter(pa);
 
                 CartesianProduct<Integer> possibilities =

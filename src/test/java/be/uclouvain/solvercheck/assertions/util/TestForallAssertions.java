@@ -13,7 +13,7 @@ public class TestForallAssertions implements WithSolverCheck {
 
         assertThat(
             forAll(integers().between(0, 10))
-                .itIsTrueThat(i -> rand -> {
+                .assertThat(i -> rand -> {
                     cnt.inc();
                     Assert.assertTrue(0 <= i && i <= 10);
                 })
@@ -29,7 +29,7 @@ public class TestForallAssertions implements WithSolverCheck {
         assertThat(
                 forAll(integers().between(0, 10))
                         .assuming(i -> i <= 5)
-                        .itIsTrueThat(i -> rand -> {
+                        .assertThat(i -> rand -> {
                             cnt.inc();
                             Assert.assertTrue(0 <= i && i <= 5);
                         })
@@ -46,7 +46,7 @@ public class TestForallAssertions implements WithSolverCheck {
                         .assuming(i -> i <= 5)
                         .assuming(i -> i > 3)
                         .withExamples(10000)
-                        .itIsTrueThat(i -> rand -> {
+                        .assertThat(i -> rand -> {
                             cnt.inc();
                             Assert.assertTrue(3 < i && i <= 5);
                         })
@@ -62,7 +62,7 @@ public class TestForallAssertions implements WithSolverCheck {
 
         assertThat(
                 forAll(integers().between(0, 10), integers().between(11, 20))
-                        .itIsTrueThat((x, y) -> rand -> {
+                        .assertThat((x, y) -> rand -> {
                             cnt.inc();
                             Assert.assertTrue(0 <= x && x <= 10);
                             Assert.assertTrue(11 <= y && y <= 20);
@@ -79,7 +79,7 @@ public class TestForallAssertions implements WithSolverCheck {
         assertThat(
                 forAll(integers().between(0, 10), integers().between(11, 20))
                         .assuming((x, y) -> x <= 5)
-                        .itIsTrueThat((x, y) -> rand -> {
+                        .assertThat((x, y) -> rand -> {
                             cnt.inc();
                             Assert.assertTrue(0 <= x && x <= 5);
                             Assert.assertTrue(11 <= y && y <= 20);
@@ -96,7 +96,7 @@ public class TestForallAssertions implements WithSolverCheck {
                 forAll(integers().between(0, 10), integers().between(11, 20))
                         .assuming((x, y) -> x <= 5)
                         .assuming((x, y) -> y > 15)
-                        .itIsTrueThat((x, y) -> rand -> {
+                        .assertThat((x, y) -> rand -> {
                             cnt.inc();
                             Assert.assertTrue(0 <= x && x <= 5);
                             Assert.assertTrue(15 < y && y <= 20);

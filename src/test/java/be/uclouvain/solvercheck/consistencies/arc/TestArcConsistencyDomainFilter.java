@@ -43,7 +43,7 @@ public class TestArcConsistencyDomainFilter implements WithSolverCheck {
     @Test
     public void itMustBeWeaklyMonotonic() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> rnd -> {
+           forAnyPartialAssignment().assertThat(pa -> rnd -> {
               for (int var = 0; var < pa.size(); var++) {
                   Domain filtered = filter.filter(var, pa);
 
@@ -60,7 +60,7 @@ public class TestArcConsistencyDomainFilter implements WithSolverCheck {
     @Test
     public void itRemovesNoSolution() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> rnd -> {
+           forAnyPartialAssignment().assertThat(pa -> rnd -> {
               PartialAssignment solutions =
                 PartialAssignment.unionOf(pa.size(),
                   CartesianProduct.of(pa)
@@ -82,7 +82,7 @@ public class TestArcConsistencyDomainFilter implements WithSolverCheck {
     @Test
     public void testConsistencyDefinition() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> rnd -> {
+           forAnyPartialAssignment().assertThat(pa -> rnd -> {
 
               CartesianProduct<Integer> possibilities = CartesianProduct.of(pa);
 

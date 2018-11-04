@@ -44,7 +44,7 @@ public class TestArcConsistency
     @Test
     public void itMustBeWeaklyMonotonic() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> rnd -> {
+           forAnyPartialAssignment().assertThat(pa -> rnd -> {
                PartialAssignment filtered = filter.filter(pa);
 
                // subseteq test
@@ -60,7 +60,7 @@ public class TestArcConsistency
     @Test
     public void itMustBeTheLeastFixpoint() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> rnd -> {
+           forAnyPartialAssignment().assertThat(pa -> rnd -> {
               PartialAssignment filtered  = filter.filter(pa);
               PartialAssignment filtered2 = filter.filter(filtered);
 
@@ -75,7 +75,7 @@ public class TestArcConsistency
     @Test
     public void itRemovesNoSolution() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> rnd -> {
+           forAnyPartialAssignment().assertThat(pa -> rnd -> {
               PartialAssignment filtered = filter.filter(pa);
 
               PartialAssignment solutions =
@@ -101,7 +101,7 @@ public class TestArcConsistency
     @Test
     public void testConsistencyDefinition() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> rnd -> {
+           forAnyPartialAssignment().assertThat(pa -> rnd -> {
               PartialAssignment filtered  = filter.filter(pa);
 
               CartesianProduct<Integer> possibilities =

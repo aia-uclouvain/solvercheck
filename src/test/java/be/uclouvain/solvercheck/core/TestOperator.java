@@ -37,7 +37,7 @@ public class TestOperator implements WithSolverCheck {
     public void testCheckEQ() {
         assertThat(
            forAll(integers("X"), integers("Y"))
-           .itIsTrueThat((x, y) -> rnd ->
+           .assertThat((x, y) -> rnd ->
               assertEquals((x.equals(y)), EQ.check(x, y))
            )
         );
@@ -46,7 +46,7 @@ public class TestOperator implements WithSolverCheck {
     public void testCheckNE() {
         assertThat(
            forAll(integers("X"), integers("Y"))
-              .itIsTrueThat((x, y) -> rnd ->
+              .assertThat((x, y) -> rnd ->
                  assertEquals((!x.equals(y)), NE.check(x,y))
               )
         );
@@ -55,7 +55,7 @@ public class TestOperator implements WithSolverCheck {
     public void testCheckLT() {
         assertThat(
            forAll(integers("X"), integers("Y"))
-              .itIsTrueThat((x, y) -> rnd ->
+              .assertThat((x, y) -> rnd ->
                  assertEquals((x.compareTo(y) < 0), LT.check(x,y))
               )
         );
@@ -64,7 +64,7 @@ public class TestOperator implements WithSolverCheck {
     public void testCheckLE() {
         assertThat(
            forAll(integers("X"), integers("Y"))
-              .itIsTrueThat((x, y) -> rnd ->
+              .assertThat((x, y) -> rnd ->
                  assertEquals((x.compareTo(y) <= 0), LE.check(x,y))
               )
         );
@@ -73,7 +73,7 @@ public class TestOperator implements WithSolverCheck {
     public void testCheckGT() {
         assertThat(
            forAll(integers("X"), integers("Y"))
-              .itIsTrueThat((x, y) -> rnd ->
+              .assertThat((x, y) -> rnd ->
                  assertEquals((x.compareTo(y) > 0), GT.check(x,y))
               )
         );
@@ -82,7 +82,7 @@ public class TestOperator implements WithSolverCheck {
     public void testCheckGE() {
         assertThat(
            forAll(integers("X"), integers("Y"))
-              .itIsTrueThat((x, y) -> rnd ->
+              .assertThat((x, y) -> rnd ->
                  assertEquals((x.compareTo(y) >= 0), GE.check(x,y))
               )
         );

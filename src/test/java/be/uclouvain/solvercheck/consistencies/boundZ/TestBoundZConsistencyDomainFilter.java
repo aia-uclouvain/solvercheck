@@ -46,7 +46,7 @@ public class TestBoundZConsistencyDomainFilter implements WithSolverCheck {
     @Test
     public void itMustBeWeaklyMonotonic() throws Exception {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> randomness -> {
+           forAnyPartialAssignment().assertThat(pa -> randomness -> {
               for (int var = 0; var < pa.size(); var++) {
                   Domain filtered = filter.filter(var, pa);
 
@@ -63,7 +63,7 @@ public class TestBoundZConsistencyDomainFilter implements WithSolverCheck {
     @Test
     public void itRemovesNoSolution() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> randomness -> {
+           forAnyPartialAssignment().assertThat(pa -> randomness -> {
                    PartialAssignment solutions =
                       PartialAssignment.unionOf(pa.size(),
                          CartesianProduct.of(pa)
@@ -85,7 +85,7 @@ public class TestBoundZConsistencyDomainFilter implements WithSolverCheck {
     @Test
     public void testConsistencyDefinition() {
         assertThat(
-           forAnyPartialAssignment().itIsTrueThat(pa -> randomness -> {
+           forAnyPartialAssignment().assertThat(pa -> randomness -> {
                    CartesianProduct<Integer> boundSupports =
                            CartesianProduct.of(
                                pa.stream().map(d ->
