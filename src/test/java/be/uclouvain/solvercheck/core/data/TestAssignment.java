@@ -1,54 +1,74 @@
 package be.uclouvain.solvercheck.core.data;
 
-import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
-import be.uclouvain.solvercheck.generators.WithGenerators;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import org.junit.Test;
-import org.quicktheories.WithQuickTheories;
-import org.quicktheories.core.Gen;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class TestAssignment
-        implements WithQuickTheories, WithGenerators {
+public class TestAssignment implements WithSolverCheck {
 
     @Test
     public void testSize() {
-        qt().forAll(listOfInt()).check(a ->
-                a.size() == Assignment.from(a).size()
+        assertThat(
+           forAll(lists()).itIsTrueThat(a -> rnd ->
+            assertEquals(a.size(), Assignment.from(a).size())
+           )
         );
     }
 
     @Test
     public void getReturnsTheIthElementIffItsAValidIndex(){
-        qt().withGenerateAttempts(10000)
-            .forAll(listOfInt(), integers().between(0, 10))
-            .assuming((a, i) -> isValidIndex(i, a.size()))
-            .check   ((a, i) -> a.get(i).equals(Assignment.from(a).get(i)));
+        assertThat(
+           forAll(lists(), integers().between(0, 10))
+           .assuming((a, i) -> isValidIndex(i, a.size()))
+           .itIsTrueThat((a, i) -> rnd ->
+              assertEquals(a.get(i), Assignment.from(a).get(i))
+           )
+        );
     }
 
     @Test
     public void getFailsWithExceptionWhenItsNotAValidIndex() {
-        qt().withGenerateAttempts(10000)
-            .forAll(assignments(), integers().between(0, 10))
-            .assuming((a, i) -> !isValidIndex(i, a.size()))
-            .check   ((a, i) -> failsThrowing(IndexOutOfBoundsException.class, () -> a.get(i) ));
+        assertThat(
+           forAll(assignments(), integers().between(0, 10))
+              .assuming((a, i) -> !isValidIndex(i, a.size()))
+              .itIsTrueThat((a, i) -> rnd ->
+                 assertTrue(
+                    failsThrowing(
+                       IndexOutOfBoundsException.class,
+                       () -> a.get(i) )
+                 )
+              )
+        );
     }
 
     @Test
     public void testEqualsAllValuesMatch() {
-        qt().forAll(listOfInt(), listOfInt())
-            .check ((a, b) -> a.equals(b) == Assignment.from(a).equals(Assignment.from(b)));
+        assertThat(
+           forAll(lists(), lists())
+              .itIsTrueThat((a, b) -> rnd ->
+                 assertEquals(
+                    a.equals(b),
+                    Assignment.from(a).equals(Assignment.from(b)))
+              )
+        );
     }
 
     @Test
     public void testHashCode() {
-        qt().forAll(assignments(), assignments())
-                .check ((a, b) -> a.equals(b) == (a.hashCode() == b.hashCode()));
+       assertThat(
+          forAll(assignments(), assignments())
+          .itIsTrueThat((a, b) -> rnd ->
+             assertTrue(!a.equals(b) || (a.hashCode() == (b.hashCode())))
+          )
+        );
     }
 
     @Test
@@ -61,54 +81,61 @@ public class TestAssignment
 
     @Test
     public void testFromList() {
-        qt().forAll(lists().of(integers().all()).ofSizeBetween(0, 1000))
-            .check(lst ->
-                lst.equals(Assignment.from(lst))
-            );
+        assertThat(
+          forAll(lists())
+          .itIsTrueThat(lst -> rnd ->
+             assertEquals(lst, Assignment.from(lst))
+          )
+        );
     }
 
     @Test
     public void testFromArray() {
-        qt().forAll(
-           arrays().ofIntegers(integers().all()).withLengthBetween(0, 1000))
-           .check(array -> {
-               int[] values =
-                  Arrays.stream(array).mapToInt(Integer::intValue).toArray();
-               return Arrays.asList(array).equals(Assignment.from(values));
-           });
+        assertThat(
+           forAll(arrays())
+              .itIsTrueThat(lst -> rnd ->
+                 assertEquals(
+                    Arrays.stream(lst).boxed().collect(toList()),
+                    Assignment.from(lst))
+              )
+        );
     }
 
     @Test
     public void testFromPartialAssignmentEqualsAsAssignmentWhenCompete() {
-        new ForAnyPartialAssignment()
-            .assuming(PartialAssignment::isComplete)
-            .check(partialAssignment ->
-                partialAssignment.asAssignment()
-                    .equals(Assignment.from(partialAssignment))
-            );
+        assertThat(
+           forAnyPartialAssignment()
+           .assuming(pa -> pa.isComplete())
+           .itIsTrueThat(partialAssignment -> rnd ->
+            assertEquals(
+               partialAssignment.asAssignment(),
+               Assignment.from(partialAssignment))
+           )
+        );
     }
 
     @Test
     public void testFromPartialAssignmentFailsWhenNotCompete() {
-        new ForAnyPartialAssignment()
-            .assuming(partialAssignment -> !partialAssignment.isComplete())
-            .check(partialAssignment ->
-                failsThrowing(
+        assertThat(
+           forAnyPartialAssignment()
+              .assuming(pa -> !pa.isComplete())
+              .itIsTrueThat(partialAssignment -> rnd ->
+                 assertTrue(
+                    failsThrowing(
                         IllegalStateException.class,
-                        () -> Assignment.from(partialAssignment))
-            );
+                        ()  -> Assignment.from(partialAssignment))
+                 )
+              )
+        );
     }
 
     @Test
     public void testCollector() {
-        qt().forAll(lists().of(integers().all()).ofSizeBetween(0, 1000))
-            .check(lst ->
-                lst.equals(lst.stream().collect(Assignment.collector()))
-            );
-    }
-
-    private Gen<List<Integer>> listOfInt() {
-        return lists().of(integers().all()).ofSizeBetween(0, 100);
+        assertThat(
+           forAll(lists()).itIsTrueThat(lst -> rnd ->
+             assertEquals(lst, lst.stream().collect(Assignment.collector()))
+           )
+        );
     }
 
 }
