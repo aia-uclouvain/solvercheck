@@ -1,18 +1,14 @@
 package be.uclouvain.solvercheck.consistencies.forwardChecking;
 
-import be.uclouvain.solvercheck.checkers.WithCheckers;
-import be.uclouvain.solvercheck.consistencies.WithConsistencies;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.task.Filter;
-import be.uclouvain.solvercheck.generators.WithGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
-import org.quicktheories.WithQuickTheories;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,20 +19,13 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
 /**
  * This class tests the forward checking consistency propagator.
  */
-public class TestForwardChecking
-            implements WithQuickTheories,
-   WithGenerators,
-                       WithCheckers,
-                       WithConsistencies {
+public class TestForwardChecking implements WithSolverCheck {
 
-
-    private QuickTheory qt;
     private Checker checker;
     private Filter filter;
 
     @Before
     public void setUp() {
-        qt = qt().withGenerateAttempts(10000);
         checker= allDiff();
         filter = forwardChecking(checker);
     }
@@ -56,14 +45,14 @@ public class TestForwardChecking
      */
     @Test
     public void itMustBeWeaklyMonotonic() {
-        qt.forAll(partialAssignments())
-           .assuming(pa -> !pa.isError())
-           .checkAssert(pa -> {
+        assertThat(
+           forAnyPartialAssignment().itIsTrueThat(pa -> randomness -> {
                PartialAssignment filtered = filter.filter(pa);
 
                // subseteq test
                Assert.assertTrue(List.of(STRONGER, EQUIVALENT).contains(filtered.compareWith(pa)));
-           });
+           })
+        );
     }
 
     /**
@@ -71,9 +60,8 @@ public class TestForwardChecking
      */
     @Test
     public void itRemovesNoSolution() {
-        qt.forAll(partialAssignments())
-           .assuming(pa -> !pa.isError())
-           .checkAssert(pa -> {
+        assertThat(
+           forAnyPartialAssignment().itIsTrueThat(pa -> randomness -> {
                PartialAssignment filtered = filter.filter(pa);
 
                PartialAssignment solutions =
@@ -89,7 +77,8 @@ public class TestForwardChecking
                   .contains(solutions.compareWith(filtered));
 
                Assert.assertTrue(error || solsOk);
-           });
+           })
+        );
     }
 
     /**
@@ -97,9 +86,8 @@ public class TestForwardChecking
      */
     @Test
     public void isIsOnlyEffectiveWhenAllButOneVariablesAreFixed() {
-        qt.forAll(partialAssignments())
-           .assuming(pa -> !pa.isError())
-           .checkAssert(pa -> {
+        assertThat(
+           forAnyPartialAssignment().itIsTrueThat(pa -> randomness -> {
                final long nbUnassigned =
                   pa.stream().filter(dom -> dom.size() > 1).count();
 
@@ -112,6 +100,7 @@ public class TestForwardChecking
                    expected = arcConsistent(checker).filter(pa);
                }
                Assert.assertEquals(expected, actual);
-           });
+           })
+        );
     }
 }

@@ -90,7 +90,7 @@ public class TestCheckers implements WithSolverCheck {
     public void testGccIsTrueIffAllValuesOccurWithGivenCardinality() {
         assertThat(
             forAll(sets("VALUES").possiblyEmpty().withValuesBetween(-10, 10))
-           .itIsTrueThat(values -> rnd ->
+           .itIsTrueThat(values ->
             forAll(
                lists("CARDDINALITIES").withValuesRanging(0, 10).ofSize(values.size()),
                assignments("ASSIGNMENT").withValuesRanging(-10, 10))
@@ -168,7 +168,7 @@ public class TestCheckers implements WithSolverCheck {
     public void gccShouldFailWheneverTheValuesCannotDirectlyBeMappedOntoASet() {
         assertThat(
            forAll(integers("SIZE").between(2, 100))
-          .itIsTrueThat(S -> rnd ->
+          .itIsTrueThat(S ->
            forAll(
               lists("VALUES").withValuesRanging(0, 10).ofSize(S),
               lists("CARDS ").withValuesRanging(0, 10).ofSize(S)

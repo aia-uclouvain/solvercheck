@@ -1,19 +1,15 @@
 package be.uclouvain.solvercheck.consistencies.boundD;
 
-import be.uclouvain.solvercheck.checkers.WithCheckers;
-import be.uclouvain.solvercheck.consistencies.WithConsistencies;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.task.DomainFilter;
-import be.uclouvain.solvercheck.generators.WithGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
-import org.quicktheories.WithQuickTheories;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,19 +17,13 @@ import java.util.stream.Collectors;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
 
-public class TestBoundDConsistencyDomainFilter
-        implements WithQuickTheories,
-   WithGenerators,
-                   WithConsistencies,
-                   WithCheckers {
+public class TestBoundDConsistencyDomainFilter implements WithSolverCheck {
 
-    private QuickTheory qt;
     private Checker checker;
     private DomainFilter filter;
 
     @Before
     public void setUp() {
-        qt = qt().withGenerateAttempts(10000);
         checker= allDiff();
         filter = bcDDomain().apply(checker);
     }
@@ -52,16 +42,16 @@ public class TestBoundDConsistencyDomainFilter
      */
     @Test
     public void itMustBeWeaklyMonotonic() {
-        qt.forAll(partialAssignments())
-          .assuming(pa -> !pa.isError())
-          .checkAssert(pa -> {
+        assertThat(
+           forAnyPartialAssignment().itIsTrueThat(pa -> rnd -> {
               for (int var = 0; var < pa.size(); var++) {
                   Domain filtered = filter.filter(var, pa);
 
                   Assert.assertTrue(List.of(STRONGER, EQUIVALENT)
                         .contains(filtered.compareWith(pa.get(var))));
               }
-          });
+          })
+        );
     }
 
     /**
@@ -69,9 +59,8 @@ public class TestBoundDConsistencyDomainFilter
      */
     @Test
     public void itRemovesNoSolution() {
-        qt.forAll(partialAssignments())
-          .assuming(pa -> !pa.isError())
-          .checkAssert(pa -> {
+        assertThat(
+           forAnyPartialAssignment().itIsTrueThat(pa -> rnd -> {
               PartialAssignment solutions =
                  PartialAssignment.unionOf(pa.size(),
                    CartesianProduct.of(pa)
@@ -83,7 +72,8 @@ public class TestBoundDConsistencyDomainFilter
                   Domain filtered = filter.filter(i, pa);
                   Assert.assertTrue(filtered.containsAll(solutions.get(i)));
               }
-          });
+          })
+        );
     }
 
     /**
@@ -91,9 +81,8 @@ public class TestBoundDConsistencyDomainFilter
      */
     @Test
     public void testConsistencyDefinition() {
-        qt.forAll(partialAssignments())
-          .assuming(pa -> !pa.isError())
-          .checkAssert(pa -> {
+        assertThat(
+           forAnyPartialAssignment().itIsTrueThat(pa -> rnd -> {
 
               CartesianProduct<Integer> possibilities = CartesianProduct.of(pa);
 
@@ -117,6 +106,7 @@ public class TestBoundDConsistencyDomainFilter
                       Assert.assertTrue(maxHasSupport);
                   }
               }
-          });
+          })
+        );
     }
 }
