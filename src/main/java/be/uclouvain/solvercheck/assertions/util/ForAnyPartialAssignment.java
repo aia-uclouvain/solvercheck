@@ -38,7 +38,9 @@ public final class ForAnyPartialAssignment
     public Assertion itIsTrueThat(final Predicate<PartialAssignment> assertion) {
         return assertThat(pa -> rnd -> {
                if (!assertion.test(pa)) {
-                   throw new AssertionError();
+                   throw new AssertionError(
+                      "\nCAUSE     : Property violated"
+                   );
                }
            }
         );

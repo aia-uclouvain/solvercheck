@@ -120,7 +120,9 @@ public final class ForAllAssertion {
         public Assertion itIsTrueThat(final Predicate<A> assertion) {
             return assertThat(a -> rnd -> {
                     if (!assertion.test(a)) {
-                        throw new AssertionError();
+                        throw new AssertionError(
+                           "\nCAUSE     : Property violated"
+                        );
                     }
                 }
             );
@@ -254,7 +256,9 @@ public final class ForAllAssertion {
         public Assertion itIsTrueThat(final BiPredicate<A, B> assertion) {
             return assertThat((a, b) -> rnd -> {
                    if (!assertion.test(a, b)) {
-                       throw new AssertionError();
+                       throw new AssertionError(
+                          "\nCAUSE     : Property violated"
+                       );
                    }
                }
             );
