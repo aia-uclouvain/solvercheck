@@ -5,6 +5,7 @@ import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.utils.collections.Range;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 public final class SkewedPartialAssignmentDistribution {
@@ -27,33 +28,37 @@ public final class SkewedPartialAssignmentDistribution {
             );
         }
 
-        final PartialAssignment minimum =
-           paFill(rand.randomInt(szMin, szMax), Domain.from(valMin));
+        List<PartialAssignment> extreme = new ArrayList<>();
 
-        final PartialAssignment maximum =
-           paFill(rand.randomInt(szMin, szMax), Domain.from(valMax));
-
-        final PartialAssignment simplest =
-           paFill(rand.randomInt(szMin, szMax), Domain.from(0));
-
-        final PartialAssignment basic =
-           paFill(rand.randomInt(szMin, szMax), Domain.from(valMin, valMax));
-
-        final PartialAssignment full =
-           paFill(rand.randomInt(szMin, szMax), Domain.from(Range.between(valMin, valMax)));
-
-        Stream<PartialAssignment> extremal =
-           Stream.of(minimum, maximum, basic, full);
-
+        // simplest
         if (0 > valMin && 0 < valMax) {
-            extremal = Stream.of(simplest, minimum, maximum, basic, full);
+            extreme.add(
+               paFill(rand.randomInt(szMin, szMax), Domain.from(0)));
+        }
+
+        // minimum
+        extreme.add(
+           paFill(rand.randomInt(szMin, szMax), Domain.from(valMin)));
+
+        // maximum
+        extreme.add(
+           paFill(rand.randomInt(szMin, szMax), Domain.from(valMax)));
+
+        // basic
+        extreme.add(
+           paFill(rand.randomInt(szMin, szMax), Domain.from(valMin, valMax)));
+
+        // full. This check prevents blowing up memory
+        if (((long) valMax - (long) valMin) <= domSzMax) {
+            extreme.add(
+                paFill(rand.randomInt(szMin, szMax), Domain.from(Range.between(valMin, valMax))));
         }
 
         final Stream<PartialAssignment> random =
            UniformPartialAssignmentDistribution
               .stream(rand, szMin, szMax, allowErrors, domSzMax, valMin, valMax);
 
-        return Stream.concat(extremal, random);
+        return Stream.concat(extreme.stream(), random);
     }
 
     private static PartialAssignment paFill(final int sz, final Domain dom) {

@@ -1,63 +1,67 @@
 package be.uclouvain.solvercheck.core.data;
 
-import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.impl.PartialAssignmentFactory;
-import be.uclouvain.solvercheck.generators.WithGenerators;
+import be.uclouvain.solvercheck.generators.GenBuilder;
+import be.uclouvain.solvercheck.pbt.Generator;
+import be.uclouvain.solvercheck.pbt.Randomness;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Test;
-import org.quicktheories.WithQuickTheories;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
+import static java.util.stream.Collectors.toList;
 
-public class TestPartialAssignmentFactory
-        implements WithQuickTheories, WithGenerators {
+public class TestPartialAssignmentFactory implements WithSolverCheck {
 
     // FROM
     @Test
     public void testFromList() {
-        qt().forAll(lists().of(domains()).ofSizeBetween(0, 1000))
-            .check(lst ->
-                lst.equals(PartialAssignmentFactory.from(lst))
-            );
+        assertThat(forAll(listsOfDomains()).itIsTrueThat(lst ->
+            lst.equals(PartialAssignmentFactory.from(lst))
+        ));
     }
     @Test
     public void testFromArray() {
-        qt().forAll(
-           arrays().ofClass(domains(), Domain.class).withLengthBetween(0, 1000))
-           .check(array ->
-              Arrays.asList(array).equals(PartialAssignmentFactory.from(array))
-           );
+        assertThat(forAll(listsOfDomains()).itIsTrueThat(lst -> {
+            Domain[] array = lst.toArray(new Domain[0]);
+            return Arrays.asList(array).equals(PartialAssignmentFactory.from(array));
+        }));
     }
 
     // ERROR
     @Test
     public void testError() {
-        qt().forAll(integers().between(0, 1000))
-           .check(arity -> {
-               PartialAssignment result = PartialAssignmentFactory.error(arity);
+        assertThat(forAll(integers("arity").between(0, 100))
+       .itIsTrueThat(arity -> {
+           PartialAssignment result = PartialAssignmentFactory.error(arity);
 
-               return result.size() == arity
-                   && result.stream().allMatch(Domain::isEmpty);
-           });
+           return result.size() == arity
+               && result.stream().allMatch(Domain::isEmpty);
+       }));
     }
+
     @Test
     public void errorMustRejectNegativeArity() {
-        qt().forAll(integers().between(-1000, -1))
-           .check(arity ->
+        assertThat(forAll(integers("arity").between(-100, -1))
+        .itIsTrueThat(arity ->
               failsThrowing(
                  IllegalArgumentException.class,
-                 () -> PartialAssignmentFactory.error(arity)));
+                 () -> PartialAssignmentFactory.error(arity)))
+        );
     }
 
     // RESTRICT
     @Test
     public void testRestrict() {
-        qt().forAll(operators(), integers().all()).checkAssert((op, value) ->
-          new ForAnyPartialAssignment().check(partialAssignment -> {
+        assertThat(
+           forAll(operators("op"), integers("value"))
+           .assertThat((op, value) -> forAnyPartialAssignment().itIsTrueThat(
+              partialAssignment -> {
 
              int arity = partialAssignment.size();
 
@@ -77,8 +81,7 @@ public class TestPartialAssignmentFactory
              }
 
              return ok;
-          })
-        );
+          })));
     }
 
     private boolean satisfiesRestriction(
@@ -104,30 +107,27 @@ public class TestPartialAssignmentFactory
     // COLLECTOR
     @Test
     public void testCollector() {
-        qt().forAll(lists().of(domains()).ofSizeBetween(0, 100))
-            .check(lst -> {
-                PartialAssignment d = lst.stream().collect(PartialAssignmentFactory.collector());
+        assertThat(forAll(listsOfDomains()).itIsTrueThat(lst -> {
+            PartialAssignment d = lst.stream().collect(PartialAssignmentFactory.collector());
 
-                return d.containsAll(lst) && lst.containsAll(d);
-            });
+            return d.containsAll(lst) && lst.containsAll(d);
+        }));
     }
 
     // UNION OF
     @Test
     public void unionOfTheCartesianProductMustEqualOriginalPartialAssignmentWhenNoDomainIsEmpty() {
-        qt().forAll(partialAssignments().build())
-            .assuming(x -> x.stream().noneMatch(Domain::isEmpty))
-            .check   (x ->
-                x.equals(PartialAssignment.unionOf(
-                        x.size(),
-                        CartesianProduct.of(x)))
-            );
+        assertThat(forAll(partialAssignments())
+        .assuming(x -> x.stream().noneMatch(Domain::isEmpty))
+        .itIsTrueThat(x ->
+            x.equals(PartialAssignment.unionOf(x.size(),CartesianProduct.of(x)))
+        ));
     }
     @Test
     public void unionOfTheCartesianProductMustYieldAnEmptyPartialAssignmentOfTheGivenAriry() {
-        new ForAnyPartialAssignment()
+        assertThat(forAnyPartialAssignment()
             .assuming(PartialAssignment::isError)
-            .check(partialAssignment -> {
+            .itIsTrueThat(partialAssignment -> {
                     CartesianProduct<Integer> cp =
                         CartesianProduct.of(partialAssignment);
 
@@ -139,6 +139,32 @@ public class TestPartialAssignmentFactory
 
                     return sameSize && allEmpty;
                 }
-            );
+            ));
+    }
+
+
+    private GenBuilder<List<Domain>> listsOfDomains() {
+        return new GenBuilder<List<Domain>>("List of domains") {
+            @Override
+            public Generator<List<Domain>> build() {
+                return new Generator<List<Domain>>() {
+                    @Override
+                    public String name() {
+                        return null;
+                    }
+
+                    @Override
+                    public Stream<List<Domain>> generate(Randomness randomness) {
+                        return randomness.intsBetween(0, 10)
+                           .mapToObj(size ->
+                              domains()
+                                 .build()
+                                 .generate(randomness)
+                                 .limit(size)
+                                 .collect(toList()));
+                    }
+                };
+            }
+        };
     }
 }
