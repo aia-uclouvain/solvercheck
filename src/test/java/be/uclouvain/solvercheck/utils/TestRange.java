@@ -1,47 +1,47 @@
 package be.uclouvain.solvercheck.utils;
 
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.utils.collections.Range;
 import org.junit.Assert;
 import org.junit.Test;
-import org.quicktheories.WithQuickTheories;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
+import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 
-public class TestRange implements WithQuickTheories {
+public class TestRange implements WithSolverCheck {
 
     @Test
     public void oneCannotCreateANegativeRange(){
-        qt().withGenerateAttempts(100000)
-            .forAll(integers().all(), integers().all())
+        assertThat(
+            forAll(integers(), integers())
             .assuming((from, to) -> from > to)
-            .checkAssert((from, to) ->
-                assertThat(catchThrowable(()-> Range.between(from, to)))
-                    .isInstanceOf(IllegalArgumentException.class)
+            .itIsTrueThat((from, to) ->
+                failsThrowing(IllegalArgumentException.class,
+                   () -> Range.between(from, to)))
             );
     }
 
     @Test
     public void testRangeSize(){
-        qt().withGenerateAttempts(100000)
-            .forAll(integers().between(0, 1000), integers().between(0, 1000))
-            .assuming((from, to) -> from <= to)
-            .check((from, to) ->
-                Range.between(from, to).size() == (int) Range.between(from, to).stream().count()
-            );
+        assertThat(
+        forAll(integers().between(0, 1000), integers().between(0, 1000))
+        .assuming((from, to) -> from <= to)
+        .itIsTrueThat((from, to) ->
+            Range.between(from, to).size() == (int) Range.between(from, to).stream().count()
+        ));
     }
 
     @Test
     public void testRangeIterator() {
-        qt().withGenerateAttempts(100000)
-            .forAll(integers().between(0, 1000), integers().between(0, 1000))
+        assertThat(
+            forAll(integers().between(0, 1000), integers().between(0, 1000))
             .assuming((from, to) -> from <= to)
-            .checkAssert((from, to) -> {
+            .itIsTrueThat((from, to) -> {
                 Range tested = Range.between(from, to);
                 for(int i = from; i < to; i++) {
                     Assert.assertTrue(tested.contains(i));
                 }
-            });
+                return true;
+            }));
     }
 
     @Test

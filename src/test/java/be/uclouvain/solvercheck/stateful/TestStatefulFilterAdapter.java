@@ -34,24 +34,27 @@ public class TestStatefulFilterAdapter implements WithSolverCheck {
 
     @Test
     public void setupPerformsAFirstFiltering() {
+        assertThat(
         forAnyPartialAssignment()
         .assuming(pa -> !pa.isError())
-        .checkAssert(pa -> {
+        .itIsTrueThat(pa -> {
             tested.setup(pa);
 
             verify(filter, times(1)).filter(pa);
             reset(filter);
-        });
+            return true; // fails before in case of problem
+        }));
     }
 
 
     @Test
     public void pushPopRestoresTheState() {
+        assertThat(
         forAnyPartialAssignment()
            .withValuesBetween(10, 100)
            .ofSizeBetween(1, 5)
            .assuming(pa -> !pa.isError())
-           .checkAssert(pa -> {
+           .itIsTrueThat(pa -> {
                PartialAssignment restricted =
                        PartialAssignment.restrict(pa, 0, Operator.EQ, 4);
 
@@ -72,17 +75,19 @@ public class TestStatefulFilterAdapter implements WithSolverCheck {
                assertSame(pa1, tested.currentState());
 
                reset(filter);
-           });
+               return true;
+           }));
     }
 
     @Test
     public void popWillNotGoOverTheRoot() {
+        assertThat(
         forAnyPartialAssignment()
                 //.withFixedSeed(39822486463804555L)
                 .withValuesBetween(10, 100)
                 .ofSizeBetween(1, 5)
                 .assuming(pa -> !pa.isError())
-                .checkAssert(pa -> {
+                .itIsTrueThat(pa -> {
                     when(filter.filter(pa))
                             .thenReturn(PartialAssignment.unionOf(pa.size(), List.of()));
 
@@ -95,23 +100,26 @@ public class TestStatefulFilterAdapter implements WithSolverCheck {
                     }
 
                     reset(filter);
-                });
+                    return true;
+                }));
     }
 
     @Test
     public void whenCurrentStateIsErrorItReturnsAnErrorPa() {
+        assertThat(
         forAnyPartialAssignment()
            .withValuesBetween(10, 100)
            .ofSizeBetween(1, 5)
            .assuming(PartialAssignment::isError)
-           .checkAssert(pa -> {
+           .itIsTrueThat(pa -> {
                when(filter.filter(pa))
                   .thenReturn(PartialAssignment.unionOf(pa.size(), List.of()));
                
                tested.setup(pa);
 
                Assert.assertEquals(PartialAssignment.error(pa.size()), tested.currentState());
-           });
+               return true;
+           }));
     }
 
 }
