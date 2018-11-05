@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.stream.Collector;
 
 import static be.uclouvain.solvercheck.core.data.Operator.GT;
-import static be.uclouvain.solvercheck.core.data.Operator.NE;
 import static be.uclouvain.solvercheck.core.data.Operator.LT;
+import static be.uclouvain.solvercheck.core.data.Operator.NE;
 
 /**
  * The point of this factory is to create domain instances, potentially using
@@ -115,9 +115,9 @@ public final class DomainFactory {
      *              (iff it was present in `dom`)
      * @return $dom \cap {value}$
      */
-    private static Domain filterEq(final Domain dom, final int value) {
+    private static Domain filterEq(final Domain dom, final long value) {
         if (dom.contains(value)) {
-            return from(value);
+            return from((int) value);
         } else {
             return EmptyDomain.getInstance();
         }
@@ -127,7 +127,7 @@ public final class DomainFactory {
      * @param value the only value we want to remove from `dom` in the filtered
      *              domain
      * @return $dom \setminus {value}$ */
-    private static Domain filterNe(final Domain dom, final int value) {
+    private static Domain filterNe(final Domain dom, final long value) {
         if (!dom.contains(value)) {
             return dom;
         } else {
@@ -144,8 +144,8 @@ public final class DomainFactory {
      *              filtered domain.
      * @return ${ x | x \in dom \wedge x <= value}$
      */
-    private static Domain filterLe(final Domain dom, final int value) {
-        return filterLt(dom, value + 1);
+    private static Domain filterLe(final Domain dom, final long value) {
+        return filterLt(dom, value + 1L);
     }
     /**
      * Implements a specialized filtering which keeps only values of `dom`
@@ -156,7 +156,7 @@ public final class DomainFactory {
      *              filtered domain.
      * @return ${ x | x \in dom \wedge x <  value}$
      */
-    private static Domain filterLt(final Domain dom, final int value) {
+    private static Domain filterLt(final Domain dom, final long value) {
         if (dom.minimum() >= value) {
             return EmptyDomain.getInstance();
         }
@@ -175,8 +175,8 @@ public final class DomainFactory {
      *              filtered domain.
      * @return ${ x | x \in dom \wedge x >= value}$
      */
-    private static Domain filterGe(final Domain dom, final int value) {
-        return filterGt(dom, value - 1);
+    private static Domain filterGe(final Domain dom, final long value) {
+        return filterGt(dom, value - 1L);
     }
     /**
      * Implements a specialized filtering which keeps only values of `dom`
@@ -187,7 +187,7 @@ public final class DomainFactory {
      *              filtered domain.
      * @return ${ x | x \in dom \wedge x >  value}$
      */
-    private static Domain filterGt(final Domain dom, final int value) {
+    private static Domain filterGt(final Domain dom, final long value) {
         if (dom.maximum() <= value) {
             return EmptyDomain.getInstance();
         }
@@ -209,7 +209,7 @@ public final class DomainFactory {
     private static Domain filterDefault(
             final Domain dom,
             final Operator op,
-            final int value) {
+            final long value) {
 
         return dom.stream()
                 .filter(x -> op.check(x, value))
