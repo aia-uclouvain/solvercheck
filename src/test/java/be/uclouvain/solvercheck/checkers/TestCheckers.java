@@ -78,7 +78,7 @@ public class TestCheckers implements WithSolverCheck {
             forAll(
                lists("CARDDINALITIES").withValuesRanging(0, 10).ofSize(values.size()),
                assignments("ASSIGNMENT").withValuesRanging(-10, 10))
-           .assertThat((cards, asn) -> randomness -> {
+           .itIsTrueThat((cards, asn) -> {
                List<Integer> vals = new ArrayList<>(values);
                boolean isGcc = gcc(cards, vals).test(asn);
 
@@ -92,10 +92,9 @@ public class TestCheckers implements WithSolverCheck {
                       .count();
 
                    verif &= (counted == expectedCount);
-                   assertEquals(verif, isGcc);
                }
 
-               assertEquals(verif, isGcc);
+               return verif == isGcc;
            }))
         );
     }
