@@ -2,7 +2,7 @@ package be.uclouvain.solvercheck.assertions.util;
 
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.generators.GeneratorsDSL;
-import be.uclouvain.solvercheck.pbt.Randomness;
+import be.uclouvain.solvercheck.fuzzing.Randomness;
 
 import java.util.Optional;
 import java.util.function.Consumer;

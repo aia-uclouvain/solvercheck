@@ -4,7 +4,7 @@ import be.uclouvain.solvercheck.assertions.Assertion;
 import be.uclouvain.solvercheck.assertions.util.AbstractFluentConfig;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
-import be.uclouvain.solvercheck.pbt.Randomness;
+import be.uclouvain.solvercheck.fuzzing.Randomness;
 
 import java.util.function.Predicate;
 

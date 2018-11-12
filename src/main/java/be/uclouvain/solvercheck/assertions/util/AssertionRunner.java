@@ -1,7 +1,7 @@
 package be.uclouvain.solvercheck.assertions.util;
 
 import be.uclouvain.solvercheck.assertions.Assertion;
-import be.uclouvain.solvercheck.pbt.Randomness;
+import be.uclouvain.solvercheck.fuzzing.Randomness;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;

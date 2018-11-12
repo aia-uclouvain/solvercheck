@@ -1,6 +1,6 @@
 package be.uclouvain.solvercheck.assertions;
 
-import be.uclouvain.solvercheck.pbt.Randomness;
+import be.uclouvain.solvercheck.fuzzing.Randomness;
 
 /** Interface of an assertion. */
 @FunctionalInterface

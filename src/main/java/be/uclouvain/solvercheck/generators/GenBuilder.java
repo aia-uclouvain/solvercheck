@@ -1,6 +1,6 @@
 package be.uclouvain.solvercheck.generators;
 
-import be.uclouvain.solvercheck.pbt.Generator;
+import be.uclouvain.solvercheck.fuzzing.Generator;
 
 /**
  * This abstract class serves as a basis for the implementation of

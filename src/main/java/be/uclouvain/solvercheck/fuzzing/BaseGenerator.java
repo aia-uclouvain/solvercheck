@@ -1,4 +1,4 @@
-package be.uclouvain.solvercheck.pbt;
+package be.uclouvain.solvercheck.fuzzing;
 
 /**
  * Base class for a named generator. Encapsulates the logic relative to the

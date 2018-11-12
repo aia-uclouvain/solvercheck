@@ -1,4 +1,4 @@
-package be.uclouvain.solvercheck.pbt;
+package be.uclouvain.solvercheck.fuzzing;
 
 import be.uclouvain.solvercheck.core.data.Domain;
 

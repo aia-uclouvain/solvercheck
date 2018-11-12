@@ -1,4 +1,4 @@
-package be.uclouvain.solvercheck.pbt;
+package be.uclouvain.solvercheck.fuzzing;
 
 import java.util.List;
 import java.util.stream.Collectors;

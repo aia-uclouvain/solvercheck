@@ -3,8 +3,8 @@ package be.uclouvain.solvercheck.assertions.stateful;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.pbt.Generators;
-import be.uclouvain.solvercheck.pbt.Randomness;
+import be.uclouvain.solvercheck.fuzzing.Generators;
+import be.uclouvain.solvercheck.fuzzing.Randomness;
 
 import java.util.ArrayList;
 import java.util.Iterator;

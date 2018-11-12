@@ -3,8 +3,8 @@ package be.uclouvain.solvercheck.core.data;
 import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.impl.PartialAssignmentFactory;
 import be.uclouvain.solvercheck.generators.GenBuilder;
-import be.uclouvain.solvercheck.pbt.Generator;
-import be.uclouvain.solvercheck.pbt.Randomness;
+import be.uclouvain.solvercheck.fuzzing.Generator;
+import be.uclouvain.solvercheck.fuzzing.Randomness;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Test;
 

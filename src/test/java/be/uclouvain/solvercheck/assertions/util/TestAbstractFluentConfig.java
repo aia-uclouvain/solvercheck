@@ -1,8 +1,7 @@
 package be.uclouvain.solvercheck.assertions.util;
 
-import be.uclouvain.solvercheck.assertions.util.AbstractFluentConfig;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.pbt.Randomness;
+import be.uclouvain.solvercheck.fuzzing.Randomness;
 import org.junit.Before;
 import org.junit.Test;
 

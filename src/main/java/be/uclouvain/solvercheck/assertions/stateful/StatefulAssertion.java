@@ -4,7 +4,7 @@ import be.uclouvain.solvercheck.assertions.Assertion;
 import be.uclouvain.solvercheck.assertions.util.AbstractFluentConfig;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
-import be.uclouvain.solvercheck.pbt.Randomness;
+import be.uclouvain.solvercheck.fuzzing.Randomness;
 
 import static be.uclouvain.solvercheck.assertions.stateful.StatefulProperties.equivalentTo;
 import static be.uclouvain.solvercheck.assertions.stateful.StatefulProperties.strictlyStrongerThan;

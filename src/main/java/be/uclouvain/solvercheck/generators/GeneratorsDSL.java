@@ -4,10 +4,10 @@ import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.pbt.BaseGenerator;
-import be.uclouvain.solvercheck.pbt.Generator;
-import be.uclouvain.solvercheck.pbt.Generators;
-import be.uclouvain.solvercheck.pbt.Randomness;
+import be.uclouvain.solvercheck.fuzzing.BaseGenerator;
+import be.uclouvain.solvercheck.fuzzing.Generator;
+import be.uclouvain.solvercheck.fuzzing.Generators;
+import be.uclouvain.solvercheck.fuzzing.Randomness;
 
 import java.util.List;
 import java.util.Set;
