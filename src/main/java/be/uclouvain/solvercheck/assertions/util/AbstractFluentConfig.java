@@ -9,8 +9,14 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.MIN_VALUE;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_ANCHOR_SAMPLES;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_EXAMPLES;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_MIN_VALUE;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_MAX_VALUE;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_SPREAD;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_NB_VARS_MIN;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_NB_VARS_MAX;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_MAX_DOM_SIZE;
 
 /**
  * This class provides the basic services to create classes of assertions that
@@ -21,48 +27,6 @@ import static java.lang.Integer.MIN_VALUE;
  */
 public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
         implements WithFluentConfig<T> {
-
-    /**
-     * The default number of `anchor values` which designate the 'center' of
-     * the values distributions in a partial assignment.
-     */
-    private static final int DEFAULT_ANCHOR_SAMPLES = 100;
-    /**
-     * The default number of partial assignment generated (and tested) for each
-     * anchor value.
-     */
-    private static final int DEFAULT_EXAMPLES = 10;
-    /**
-     * The default minimal value that may appear in a generated partial
-     * assignment.
-     */
-    private static final int DEFAULT_MIN_VALUE = MIN_VALUE;
-    /**
-     * The default maximal value that may appear in a generated partial
-     * assignment.
-     */
-    private static final int DEFAULT_MAX_VALUE = MAX_VALUE;
-    /**
-     * The default maximum difference between any two values occurring in a
-     * partial assignment.
-     */
-    private static final int DEFAULT_SPREAD = 10;
-    /**
-     * The default minimum number of variables constituting a partial
-     * assignment.
-     */
-    private static final int DEFAULT_NB_VARS_MIN = 0;
-    /**
-     * The default maximum number of variables constituting a partial
-     * assignment.
-     */
-    private static final int DEFAULT_NB_VARS_MAX = 5;
-    /**
-     * The default maximum number of values in a domain constitutive of a
-     * partial assignment.
-     */
-    private static final int DEFAULT_MAX_DOM_SIZE = 5;
-
     /**
      * The number of `anchor values` which designate the 'center' of the
      * values distributions in a partial assignment.
@@ -144,7 +108,7 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
     }
 
     /** {@inheritDoc} */
-    @Override
+    @Override @SuppressWarnings("checkstyle:hiddenfield")
     public final T describedAs(final Function<PartialAssignment, String> description) {
         this.description = description;
         return getThis();
@@ -232,6 +196,7 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      *     This is the core of the utility of this class.
      * </div>
      *
+     * @param rnd the source of randomness used for the fuzzing.
      * @param test a predicate whose validity is being tested.
      */
     protected final void doCheck(final Randomness rnd,
@@ -260,6 +225,7 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      *     This is the core of the utility of this class.
      * </div>
      *
+     * @param rnd the source of randomness used for the fuzzing.
      * @param test an assertion snippet testing the validity of some property
      *            depending on partial assignment.
      */
@@ -288,15 +254,25 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
            });
     }
 
-    protected String explanation(final Randomness rnd,
-                                 final PartialAssignment pa,
-                                 final String cause) {
+    /**
+     * Creates an intelligible error report which can be used to reproduce an
+     * investigate an error witness.
+     *
+     * @param rnd the source of randomness used for the fuzzing.
+     * @param pa the partial assignment
+     * @param cause an explanatory message about why the violation occurred.
+     * @return An error message giving the details of the witnessed
+     * property violation.
+     */
+    protected final String explanation(final Randomness rnd,
+                                       final PartialAssignment pa,
+                                       final String cause) {
 
         final StringBuilder builder = new StringBuilder("\n");
         builder.append("########################### \n");
-        builder.append("SEED      : ").append(Long.toHexString(rnd.getSeed())).append("\n");
-        builder.append("CAUSE     : ").append(cause).append("\n");
-        builder.append("WITNESS   : ").append(description.apply(pa)).append("\n");
+        builder.append("SEED    : ").append(Long.toHexString(rnd.getSeed())).append("\n");
+        builder.append("CAUSE   : ").append(cause).append("\n");
+        builder.append("WITNESS : ").append(description.apply(pa)).append("\n");
         builder.append("########################### \n");
 
         return builder.toString();

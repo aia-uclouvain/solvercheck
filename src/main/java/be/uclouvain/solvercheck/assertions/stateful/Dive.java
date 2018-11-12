@@ -73,6 +73,7 @@ import java.util.function.Function;
     /**
      * Configures and instanciates a new runnable dive.
      *
+     * @param randomness the source of randomness used for the fuzzing.
      * @param property the property being verified during this 'dive' check.
      * @param nbDives  the number of branches to explore until a leaf is
      *                 reached.

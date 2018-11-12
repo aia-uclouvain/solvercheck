@@ -156,6 +156,7 @@ public final class GeneratorsDSL {
             return this;
         }
 
+        @SuppressWarnings("checkstyle:hiddenfield")
         public GenIntBuilder between(final int low, final int high) {
             this.low  = low;
             this.high = high;
@@ -889,7 +890,10 @@ public final class GeneratorsDSL {
                 @Override
                 public Stream<List<Assignment>> generate(final Randomness rnd) {
                     return Generators
-                       .tables(rnd, nbLinesMin, nbLinesMax, nbVarsMin, nbVarsMax, valueMin, valueMax);
+                       .tables(rnd,
+                               nbLinesMin, nbLinesMax,
+                               nbVarsMin, nbVarsMax,
+                               valueMin, valueMax);
                 }
             };
         }

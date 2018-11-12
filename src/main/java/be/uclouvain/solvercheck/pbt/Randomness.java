@@ -4,7 +4,7 @@ import java.util.Random;
 import java.util.stream.IntStream;
 
 public final class Randomness extends Random {
-    /** The seed used to initialize the prng */
+    /** The seed used to initialize the prng. */
     private long seed;
 
     public Randomness(final long seed) {
@@ -18,7 +18,7 @@ public final class Randomness extends Random {
 
     public IntStream intsBetween(final int lowerBound, final int upperBound) {
         return super
-           .longs((long)lowerBound,  1L + (long) upperBound)
+           .longs((long) lowerBound,  1L + (long) upperBound)
            .mapToInt(l -> (int) l);
     }
 

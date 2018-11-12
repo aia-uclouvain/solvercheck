@@ -53,7 +53,9 @@ public final class SkewedPartialAssignmentDistribution {
         // full. This check prevents blowing up memory
         if (((long) valMax - (long) valMin) <= domSzMax) {
             extreme.add(
-                paFill(rand.randomInt(szMin, szMax), Domain.from(Range.between(valMin, valMax))));
+                paFill(
+                   rand.randomInt(szMin, szMax),
+                   Domain.from(Range.between(valMin, valMax))));
         }
 
         final Stream<PartialAssignment> random =

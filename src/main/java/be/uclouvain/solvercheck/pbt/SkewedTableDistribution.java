@@ -30,7 +30,7 @@ public final class SkewedTableDistribution {
             // Add the 'simplest' case if it is allowed
             if (0 > valMin && 0 < valMax) {
                 exceptions.add(
-                   List.of(aFill(rand.randomInt(nbVarsMin, nbVarsMax),0)));
+                   List.of(aFill(rand.randomInt(nbVarsMin, nbVarsMax), 0)));
             }
 
             // Add 'minimum'

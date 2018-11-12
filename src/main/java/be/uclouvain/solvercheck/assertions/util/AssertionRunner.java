@@ -31,6 +31,7 @@ public final class AssertionRunner {
         this.seed          = System.currentTimeMillis();
     }
 
+    @SuppressWarnings("checkstyle:hiddenfield")
     public AssertionRunner randomSeed(final long seed) {
         this.seed = seed;
         return this;

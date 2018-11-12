@@ -6,8 +6,6 @@ import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
 import be.uclouvain.solvercheck.pbt.Randomness;
 
-import java.util.function.Predicate;
-
 import static be.uclouvain.solvercheck.assertions.stateful.StatefulProperties.equivalentTo;
 import static be.uclouvain.solvercheck.assertions.stateful.StatefulProperties.strictlyStrongerThan;
 import static be.uclouvain.solvercheck.assertions.stateful.StatefulProperties.strictlyWeakerThan;
@@ -168,6 +166,7 @@ public final class StatefulAssertion
      * Instanciate a new Dive rooted at the given `root`, using `strategy` to
      * generate functions picking values from predefined data distributions.
      *
+     * @param rnd  the source of randomness used for the fuzzing.
      * @param root the value of the variables domains at the root of the
      *             search tree explored by the dive.
      * @return a new Dive rooted at the given `root`.
