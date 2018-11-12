@@ -9,8 +9,19 @@ import be.uclouvain.solvercheck.fuzzing.Generator;
  * @param <T> the type of the objects to generate.
  */
 public abstract class GenBuilder<T> {
+    /**
+     * The name (description) of the items to be generated. This is useful to
+     * be able to provide a meaningful information in the error reports.
+     */
     private String name;
 
+    /**
+     * Creates a new Generator builder with the given name.
+     *
+     * @param name the name (description) of the items to be generated. This
+     *             is useful to be able to provide a meaningful information
+     *             in the error reports.
+     */
     public GenBuilder(final String name) {
         this.name = name;
     }
@@ -23,6 +34,7 @@ public abstract class GenBuilder<T> {
      */
     public abstract Generator<T> build();
 
+    /** @return the name (description) of this generator builder */
     public final String name() {
         return name;
     }

@@ -175,6 +175,16 @@ public final class ForAllAssertion {
             };
         }
 
+        /**
+         * Creates an intelligible error report which can be used to reproduce
+         * and investigate an error witness.
+         *
+         * @param a the generated object for which a counterexample of th
+         *          property has been found.
+         * @param cause an explanatory message about why the violation occurred.
+         * @return An error message giving the details of the witnessed
+         * property violation.
+         */
         private String explanation(final A a, final String cause) {
             final StringBuilder builder = new StringBuilder("\n");
             builder.append("########################### \n");
@@ -317,6 +327,18 @@ public final class ForAllAssertion {
             };
         }
 
+        /**
+         * Creates an intelligible error report which can be used to reproduce
+         * and investigate an error witness.
+         *
+         * @param a the 1st generated object for which a counterexample of the
+         *          property has been found.
+         * @param b the 2nd generated object for which a counterexample of the
+         *          property has been found.
+         * @param cause an explanatory message about why the violation occurred.
+         * @return An error message giving the details of the witnessed
+         * property violation.
+         */
         private String explanation(final A a, final B b, final String cause) {
             final StringBuilder builder = new StringBuilder("\n");
             builder.append("########################### \n");
@@ -327,6 +349,15 @@ public final class ForAllAssertion {
         }
     }
 
+    /**
+     * Returns a string representation of the given object `t`. Usually, a
+     * call to this method boils down to a call to `t.toString()`, but this
+     * method gracefully handles (unidimentional) arrays too.
+     *
+     * @param t the object to describe
+     * @param <T> the type of the object to describe
+     * @return an intelligible string representation of `t`.
+     */
     private static <T> String describe(final T t) {
         Class<T> clazz = (Class<T>) t.getClass();
         if (clazz.isArray()) {
