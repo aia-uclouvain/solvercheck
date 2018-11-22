@@ -3,17 +3,14 @@ package be.uclouvain.solvercheck.assertions.stateful;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.generators.Generators;
-import org.quicktheories.core.Strategy;
-import org.quicktheories.generators.SourceDSL;
-import org.quicktheories.impl.Distribution;
-import org.quicktheories.impl.Distributions;
+import be.uclouvain.solvercheck.fuzzing.Generators;
+import be.uclouvain.solvercheck.fuzzing.Randomness;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * The purpose of this class is to actually run a 'dive' exploration of the
@@ -22,6 +19,9 @@ import java.util.function.Supplier;
  * or an error is encountered.
  */
 /* package */ final class Dive implements Runnable {
+    /** The source of randomness used to pick random values during search. */
+    private final Randomness randomness;
+
     /** The property being verified during this 'dive' check. */
     private final StatefulProperties.Property property;
 
@@ -33,7 +33,7 @@ import java.util.function.Supplier;
      * variables distribution. In some way, this is the variable decision
      * heuristic used in the dive tests.
      */
-    private final Supplier<Integer>  variables;
+    private final Iterator<Integer> variables;
     /**
      * This is the supplier used to randomly pick a value from the domain of a
      * variable. In some way, this is the variable decision heuristic used in
@@ -44,12 +44,12 @@ import java.util.function.Supplier;
      * This is the supplier used to randomly chose an operator to apply to
      * restrict variable domains.
      */
-    private final Supplier<Operator> operators;
+    private final Iterator<Operator> operators;
     /**
      * This is the supplier used to randomly generate the booleans that are
      * used in determining the backtrack depth.
      */
-    private final Supplier<Boolean>  backtracks;
+    private final Iterator<Boolean>  backtracks;
 
     /**
      * This is a complete history (all operations are logged) of the
@@ -73,30 +73,27 @@ import java.util.function.Supplier;
     /**
      * Configures and instanciates a new runnable dive.
      *
+     * @param randomness the source of randomness used for the fuzzing.
      * @param property the property being verified during this 'dive' check.
      * @param nbDives  the number of branches to explore until a leaf is
      *                 reached.
-     * @param strategy the ongoing strategy used by the underlying
-     *                 QuickTheories layer. It is used to generate the
-     *                 appropriate distributions from generators seeded with
-     *                 the same seed as QuickTheories.
-     * @param root the initial value of all the variables domains used as a
-     *             basis for the search tree explored by this dive check.
+     * @param root     the initial value of all the variables domains used as a
+     *                 basis for the search tree explored by this dive check.
      */
     /* package */ Dive(
-            final StatefulProperties.Property property,
-            final int nbDives,
-            final Strategy strategy,
-            final PartialAssignment  root) {
-
+       final Randomness randomness,
+       final StatefulProperties.Property property,
+       final int nbDives,
+       final PartialAssignment  root) {
+        this.randomness = randomness;
         this.property   = property;
         this.nbDives    = nbDives;
         this.root       = root;
 
-        this.variables  = variablesSupplier(strategy, root);
-        this.values     = valuesSupplier(strategy, root);
-        this.operators  = operatorSupplier(strategy);
-        this.backtracks = backtrackSupplier(strategy);
+        this.variables  = variables(root);
+        this.values     = values(root);
+        this.operators  = Generators.operators(randomness).iterator();
+        this.backtracks = Generators.booleans(randomness).iterator();
 
         this.history    = new ArrayList<>();
         this.decisions  = new Stack<>();
@@ -145,9 +142,9 @@ import java.util.function.Supplier;
      * and records it in the history.
      */
     private void doDecide() {
-        int variable = variables.get();
+        int variable = variables.next();
         int value    = values.apply(variable);
-        Operator op  = operators.get();
+        Operator op  = operators.next();
 
         Branching branch = new Branching(variable, op, value);
         history.add(branch);
@@ -172,7 +169,7 @@ import java.util.function.Supplier;
      * and expand an other one.
      */
     private void doBacktrack() {
-        while (!decisions.isEmpty() && backtracks.get()) {
+        while (!decisions.isEmpty() && backtracks.next()) {
             history.add(Pop.getInstance());
             property.popState();
             decisions.pop();
@@ -223,95 +220,30 @@ import java.util.function.Supplier;
      * Instanciates a supplier to pick variable identifiers from a boundary
      * skewed distribution.
      *
-     * @param strategy the configuration of the underlying QuickTheories
-     *                 layer. It is used to configure the data distributions
-     *                 from which values are chosen.
      * @param forDomains the value of the variables domains at the root of the
      *                  search tree explored by the dive.
      * @return a supplier to pick variable identifiers from a boundary skewed
      * distribution.
      */
-    private Supplier<Integer> variablesSupplier(
-            final Strategy strategy,
-            final PartialAssignment forDomains) {
-
-        final Distribution<Integer> distrib =
-                Distributions.boundarySkewed(
-                        strategy,
-                        SourceDSL.integers().between(0, forDomains.size() - 1));
-
-        return () -> Distributions.nextValue(distrib);
+    private Iterator<Integer> variables(final PartialAssignment forDomains) {
+        return randomness
+           .intsBetween(0, forDomains.size() - 1)
+           .iterator();
     }
+
     /**
      * Instanciates a function to pick variable value from a
      * random distribution, given the identifier of some variable.
      *
-     * @param strategy the configuration of the underlying QuickTheories
-     *                 layer. It is used to configure the data distributions
-     *                 from which values are chosen.
      * @param forDomains the value of the variables domains at the root of the
      *                  search tree explored by the dive.
      * @return a supplier to pick variable identifiers from a random
      * distribution.
      */
-    private Function<Integer, Integer> valuesSupplier(
-            final Strategy strategy,
-            final PartialAssignment forDomains) {
-
-        return xi -> Distributions.nextValue(
-                valuesDistrib(strategy, forDomains, xi));
-    }
-
-    /**
-     * Creates the value distribution relative to some identified vaiable `xi`.
-     *
-     * @param strategy the configuration of the underlying QuickTheories
-     *                 layer. It is used to configure the data distributions
-     *                 from which values are chosen.
-     * @param inDomains the value of the variables domains at the root of the
-     *                  search tree explored by the dive.
-     * @param xi the identifier of the variable for wchich to create a value
-     *           distribution.
-     * @return a function that maps a variable identifier with a random
-     * distribution of the values in the domain of that variable.
-     */
-    private Distribution<Integer> valuesDistrib(
-            final Strategy strategy,
-            final PartialAssignment inDomains,
-            final int xi) {
-
-        Domain dxi = inDomains.get(xi);
-        return Distributions.random(
-                strategy,
-                SourceDSL.integers().between(dxi.minimum(), dxi.maximum()));
-    }
-    /**
-     * Instanciates a supplier to pick an operator from a random distribution.
-     *
-     * @param strategy the configuration of the underlying QuickTheories
-     *                 layer. It is used to configure the data distributions
-     *                 from which values are chosen.
-     * @return a supplier to pick an operator from a random distribution.
-     */
-    private Supplier<Operator> operatorSupplier(final Strategy strategy) {
-        final Distribution<Operator> distrib =
-                Distributions.random(strategy, Generators.operators());
-
-        return () -> Distributions.nextValue(distrib);
-    }
-    /**
-     * Instanciates a supplier that generates random booleans. These booleans
-     * are used to determine the level up to which some dive should backtrack.
-     *
-     * @param strategy the configuration of the underlying QuickTheories
-     *                 layer. It is used to configure the data distributions
-     *                 from which values are chosen.
-     * @return a supplier to pick a random boolean.
-     */
-    private Supplier<Boolean> backtrackSupplier(final Strategy strategy) {
-        final Distribution<Boolean> distrib =
-                Distributions.random(strategy, SourceDSL.booleans().all());
-
-        return () -> Distributions.nextValue(distrib);
+    private Function<Integer, Integer> values(final PartialAssignment forDomains) {
+        return xi -> {
+            final Domain dxi = forDomains.get(xi);
+            return randomness.randomInt(dxi.minimum(), dxi.maximum());
+        };
     }
 }

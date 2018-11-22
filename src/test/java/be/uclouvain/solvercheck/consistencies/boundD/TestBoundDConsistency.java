@@ -1,19 +1,15 @@
 package be.uclouvain.solvercheck.consistencies.boundD;
 
-import be.uclouvain.solvercheck.checkers.WithCheckers;
-import be.uclouvain.solvercheck.consistencies.WithConsistencies;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.task.Filter;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
-import org.quicktheories.WithQuickTheories;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,19 +17,13 @@ import java.util.stream.Collectors;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
 
-public class TestBoundDConsistency
-        implements WithQuickTheories,
-                   WithCpGenerators,
-                   WithConsistencies,
-                   WithCheckers {
+public class TestBoundDConsistency implements WithSolverCheck {
 
-    private QuickTheory qt;
     private Checker checker;
     private Filter  filter;
 
     @Before
     public void setUp() {
-        qt = qt().withGenerateAttempts(10000);
         checker= allDiff();
         filter = boundDConsistent(checker);
     }
@@ -52,14 +42,14 @@ public class TestBoundDConsistency
      */
     @Test
     public void itMustBeWeaklyMonotonic() {
-        qt.forAll(partialAssignments())
-          .assuming(pa -> !pa.isError())
-          .checkAssert(pa -> {
+        assertThat(
+           forAnyPartialAssignment().assertThat(pa -> rnd -> {
               PartialAssignment filtered = filter.filter(pa);
 
               // subseteq test
               Assert.assertTrue(List.of(STRONGER, EQUIVALENT).contains(filtered.compareWith(pa)));
-          });
+          })
+        );
     }
 
     /**
@@ -68,14 +58,14 @@ public class TestBoundDConsistency
      */
     @Test
     public void itMustBeTheLeastFixpoint() {
-        qt.forAll(partialAssignments())
-          .assuming(pa -> !pa.isError())
-          .checkAssert(pa -> {
+        assertThat(
+           forAnyPartialAssignment().assertThat(pa -> rnd -> {
               PartialAssignment filtered  = filter.filter(pa);
               PartialAssignment filtered2 = filter.filter(filtered);
 
                Assert.assertEquals(EQUIVALENT, filtered.compareWith(filtered2));
-          });
+          })
+        );
     }
 
     /**
@@ -83,9 +73,8 @@ public class TestBoundDConsistency
      */
     @Test
     public void itRemovesNoSolution() {
-        qt.forAll(partialAssignments())
-                .assuming(pa -> !pa.isError())
-                .checkAssert(pa -> {
+        assertThat(
+           forAnyPartialAssignment().assertThat(pa -> rnd -> {
                     PartialAssignment filtered = filter.filter(pa);
 
                     PartialAssignment solutions =
@@ -101,7 +90,8 @@ public class TestBoundDConsistency
                             .contains(solutions.compareWith(filtered));
 
                     Assert.assertTrue(error || solsOk);
-                });
+                })
+        );
     }
 
 
@@ -111,9 +101,8 @@ public class TestBoundDConsistency
      */
     @Test
     public void testConsistencyDefinition() {
-        qt.forAll(partialAssignments())
-          .assuming(pa -> !pa.isError())
-          .checkAssert(pa -> {
+        assertThat(
+           forAnyPartialAssignment().assertThat(pa -> rnd -> {
               PartialAssignment filtered  = filter.filter(pa);
 
               CartesianProduct<Integer> possibilities =
@@ -139,6 +128,7 @@ public class TestBoundDConsistency
                       Assert.assertTrue(maxHasSupport);
                   }
               }
-          });
+          })
+        );
     }
 }

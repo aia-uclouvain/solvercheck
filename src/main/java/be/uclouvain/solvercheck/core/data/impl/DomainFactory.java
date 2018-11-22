@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.stream.Collector;
 
 import static be.uclouvain.solvercheck.core.data.Operator.GT;
-import static be.uclouvain.solvercheck.core.data.Operator.NE;
 import static be.uclouvain.solvercheck.core.data.Operator.LT;
+import static be.uclouvain.solvercheck.core.data.Operator.NE;
 
 /**
  * The point of this factory is to create domain instances, potentially using
@@ -145,7 +145,11 @@ public final class DomainFactory {
      * @return ${ x | x \in dom \wedge x <= value}$
      */
     private static Domain filterLe(final Domain dom, final int value) {
-        return filterLt(dom, value + 1);
+        if (value == Integer.MAX_VALUE) {
+            return dom;
+        } else {
+            return filterLt(dom, value + 1);
+        }
     }
     /**
      * Implements a specialized filtering which keeps only values of `dom`
@@ -176,7 +180,11 @@ public final class DomainFactory {
      * @return ${ x | x \in dom \wedge x >= value}$
      */
     private static Domain filterGe(final Domain dom, final int value) {
-        return filterGt(dom, value - 1);
+        if (value == Integer.MIN_VALUE) {
+            return dom;
+        } else {
+            return filterGt(dom, value - 1);
+        }
     }
     /**
      * Implements a specialized filtering which keeps only values of `dom`

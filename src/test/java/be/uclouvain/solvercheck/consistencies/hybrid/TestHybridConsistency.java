@@ -1,41 +1,31 @@
 package be.uclouvain.solvercheck.consistencies.hybrid;
 
-import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
-import be.uclouvain.solvercheck.checkers.WithCheckers;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.consistencies.ArcConsitency;
 import be.uclouvain.solvercheck.consistencies.BoundDConsistency;
 import be.uclouvain.solvercheck.consistencies.BoundZConsistency;
 import be.uclouvain.solvercheck.consistencies.RangeConsistency;
-import be.uclouvain.solvercheck.consistencies.WithConsistencies;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.task.DomainFilter;
 import be.uclouvain.solvercheck.core.task.Filter;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Before;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
-import org.quicktheories.WithQuickTheories;
-import org.quicktheories.core.Gen;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TestHybridConsistency
-        implements WithQuickTheories,
-        WithCpGenerators,
-        WithConsistencies,
-        WithCheckers {
+public class TestHybridConsistency implements WithSolverCheck {
 
     private static final List<DomainFilterProducer> DOMAIN_FILTERS =
         List.of(
@@ -45,12 +35,10 @@ public class TestHybridConsistency
            new ProducerAdapter("Range", RangeConsistency::domainFilter)
         );
 
-    private QuickTheory qt;
     private Checker checker;
 
     @Before
     public void setUp() {
-        qt = qt().withGenerateAttempts(10000);
         checker= allDiff();
     }
 
@@ -163,27 +151,23 @@ public class TestHybridConsistency
     private void testHCWithAssumptions(
             final Predicate<PartialAssignment> assumptions,
             final HybridConsistencyCheck actual) {
-        new ForAnyPartialAssignment()
-             .assuming(assumptions)
-             .checkAssert(partialAssignment ->
-                qt//.withFixedSeed(23691073021520L)
-                  .withExamples(10)
-                  .forAll(
-                     lists()
-                       .of(domainFilters())
-                       .ofSize(partialAssignment.size()))
-                  .checkAssert(domainFilters ->
-                     actual.test(
-                       domainFilters.toArray(new DomainFilterProducer[0]),
-                       partialAssignment)
-                  )
-             );
-    }
+        assertThat(
+           forAnyPartialAssignment()
+              .assuming(assumptions)
+              .assertThat(pa ->
+                 forAll(
+                     lists("Filters")
+                        .ofSize(pa.size())
+                        .withValuesRanging(0, DOMAIN_FILTERS.size() - 1))
+                 .assertThat(data -> rnd -> {
+                     DomainFilterProducer[] domainFilters = data.stream()
+                           .map(i -> DOMAIN_FILTERS.get(i))
+                           .toArray(DomainFilterProducer[]::new);
 
-    private Gen<DomainFilterProducer> domainFilters() {
-        return integers()
-                .between(0, DOMAIN_FILTERS.size()-1)
-                .map(DOMAIN_FILTERS::get);
+                     actual.test(domainFilters, pa);
+                 })
+             )
+        );
     }
 
     private PartialAssignment allSolutions(PartialAssignment pa) {
@@ -191,14 +175,14 @@ public class TestHybridConsistency
                     CartesianProduct.of(pa)
                         .stream()
                         .filter(a -> checker.test(Assignment.from(a)))
-                        .collect(Collectors.toList()));
+                        .collect(toList()));
     }
 
     @FunctionalInterface
     private interface HybridConsistencyCheck {
         void test(
-                DomainFilterProducer[] filters,
-                PartialAssignment pa);
+           DomainFilterProducer[] filters,
+           PartialAssignment pa);
     }
 
     @FunctionalInterface

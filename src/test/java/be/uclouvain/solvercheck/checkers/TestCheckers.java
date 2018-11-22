@@ -1,15 +1,9 @@
 package be.uclouvain.solvercheck.checkers;
 
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.Assignment;
-import be.uclouvain.solvercheck.core.data.Domain;
-import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.generators.Generators;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
-import org.quicktheories.WithQuickTheories;
-import org.quicktheories.core.Gen;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,87 +15,88 @@ import static be.uclouvain.solvercheck.core.data.Operator.GT;
 import static be.uclouvain.solvercheck.core.data.Operator.LE;
 import static be.uclouvain.solvercheck.core.data.Operator.LT;
 import static be.uclouvain.solvercheck.core.data.Operator.NE;
-import static be.uclouvain.solvercheck.generators.Generators.tables;
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
+import static org.junit.Assert.assertEquals;
 
-public class TestCheckers implements WithQuickTheories, WithCheckers {
 
-    private QuickTheory qt;
-
-    @Before
-    public void setUp() {
-        qt = qt().withGenerateAttempts(10000);
-    }
+public class TestCheckers implements WithSolverCheck {
 
     @Test
     public void testAllDiff(){
-        qt.forAll(assignments())
-            .check(a -> allDiff().test(a) == (a.stream().distinct().count() == a.size()));
+        assertThat(
+          forAll(assignments()).itIsTrueThat(a ->
+             allDiff().test(a) == (a.stream().distinct().count() == a.size())
+          )
+        );
     }
 
     @Test
     public void testAlwaysFalse(){
-        qt.forAll(assignments())
-            .check(a -> !alwaysFalse().test(a));
+        assertThat(
+           forAll(assignments()).itIsFalseThat(a ->
+              alwaysFalse().test(a)
+           )
+        );
     }
+
     @Test
     public void testAlwaysTrue(){
-        qt.forAll(assignments())
-            .check(a -> alwaysTrue().test(a));
+        assertThat(
+           forAll(assignments()).itIsTrueThat(a ->
+              alwaysTrue().test(a)
+           )
+        );
     }
 
     @Test
     public void testElementIsFalseWhenGivenAnInfeasibleIndex(){
-        qt.withGenerateAttempts(10000)
-            .forAll(assignmentWithAtLeast(3))
-            .assuming(a -> !isValidIndex(a.get(a.size()-2), a.size()-2))
-            .check   (a -> !element().test(a));
+        assertThat(
+           forAll(assignments().withVariablesBetween(3, 5))
+           .assuming(a -> !isValidIndex(a.get(a.size()-2), a.size()-2))
+           .itIsFalseThat(a -> element().test(a))
+        );
     }
 
     @Test
     public void testElementChecksValueOfIthElement(){
-        qt.withGenerateAttempts(10000)
-            .forAll(assignmentWithAtLeast(3))
+        assertThat(
+           forAll(assignments().withVariablesBetween(3, 5))
             .assuming(a -> isValidIndex(a.get(a.size()-2), a.size()-2))
-            .check   (a -> element().test(a) == (a.get(a.get(a.size()-2)).equals(a.get(a.size()-1))));
+            .itIsTrueThat(a ->
+               element().test(a) == a.get(a.get(a.size()-2)).equals(a.get(a.size()-1))
+            )
+        );
     }
+
 
     @Test
     public void testGccIsTrueIffAllValuesOccurWithGivenCardinality() {
-        qt.withExamples(10)
-            .forAll(integers().between(0, 10).describedAs(s -> "SIZE("+s+")"))
-            .checkAssert(S ->
-                qt.withExamples(10)
-                    .forAll(Generators.setsOfUpTo(S,integers().between(-10,10)).describedAs(s -> "VALUES("+s+")"))
-                    .checkAssert(values ->
-                        qt.withExamples(10)
-                            .forAll(lists().of(integers().between(0, 10)).ofSize(values.size()).describedAs(s -> "CARDS("+s+")"))
-                            .checkAssert(cards ->
-                                qt.withExamples(10)
-                                    .forAll(Generators.assignments().withValuesRanging(-10, 10).describedAs(a -> "ASSIGNMENT("+a+")"))
-                                    .check(ass -> {
+        assertThat(
+            forAll(sets("VALUES").possiblyEmpty().withValuesBetween(-10, 10))
+           .assertThat(values ->
+            forAll(
+               lists("CARDDINALITIES").withValuesRanging(0, 10).ofSize(values.size()),
+               assignments("ASSIGNMENT").withValuesRanging(-10, 10))
+           .itIsTrueThat((cards, asn) -> {
+               List<Integer> vals = new ArrayList<>(values);
+               boolean isGcc = gcc(cards, vals).test(asn);
 
-                     List<Integer> vals = new ArrayList<>(values);
-                     boolean isGcc = gcc(cards, vals).test(ass);
+               boolean verif = true;
+               for(int i = 0; i < vals.size(); i++) {
+                   final int idx = i;
 
-                     boolean verif = true;
-                     for(int i = 0; i < vals.size(); i++) {
-                         final int idx = i;
+                   int expectedCount = cards.get(i);
+                   long counted = asn.stream()
+                      .filter(x -> x.equals(vals.get(idx)))
+                      .count();
 
-                         int expectedCount = cards.get(i);
-                         long counted = ass.stream()
-                                        .filter(x -> x.equals(vals.get(idx)))
-                                        .count();
+                   verif &= (counted == expectedCount);
+               }
 
-                         verif &= (counted == expectedCount);
-                     }
-
-                     return isGcc == verif;
-
-                            })
-                    )
-            ));
+               return verif == isGcc;
+           }))
+        );
     }
 
     @Test
@@ -113,242 +108,285 @@ public class TestCheckers implements WithQuickTheories, WithCheckers {
 
     @Test
     public void testGccVarIsTrueIffAllValuesOccurWithGivenCardinality() {
-      qt.forAll(lists().of(integers().between(-10, 10)).ofSizeBetween(0, 10))
-          .assuming(vals -> vals.size() == new HashSet<>(vals).size())
-          .checkAssert(values -> {
-              int nbVarsMin = values.size();
-              qt.forAll(
-                      Generators.assignments()
-                                .withVariablesBetween(nbVarsMin,3*(1+nbVarsMin))
-                                .withValuesRanging(0, 10)
-                    )
-                  .check(ass -> {
-                      boolean isGcc = gccVar(values).test(ass);
+      assertThat(
+         forAll(lists("VALUES").withValuesRanging(-10, 10).ofSizeBetween(0, 10))
+        .assuming(vals -> vals.size() == new HashSet<>(vals).size())
+        .assertThat(values -> rnd -> {
+            int nbVarsMin = values.size();
 
-                      List<Integer> vars =
-                              ass.subList(0, ass.size()-values.size());
+            assertThat(
+                forAll(assignments()
+                   .withVariablesBetween(nbVarsMin,3*(1+nbVarsMin))
+                   .withValuesRanging(0, 10)
+                ).assertThat(ass -> randomness -> {
+                    boolean isGcc = gccVar(values).test(ass);
 
-                      List<Integer> cards =
-                              ass.subList(ass.size()-values.size(), ass.size());
+                    List<Integer> vars =
+                       ass.subList(0, ass.size()-values.size());
 
-                      int sumOfCards=
-                              cards.stream().mapToInt(Integer::intValue).sum();
+                    List<Integer> cards =
+                       ass.subList(ass.size()-values.size(), ass.size());
 
-                      boolean verif = vars.size() >= sumOfCards;
+                    int sumOfCards=
+                       cards.stream().mapToInt(Integer::intValue).sum();
 
-                      for(int i = 0; i < values.size(); i++) {
-                          final int idx = i;
+                    boolean verif = vars.size() >= sumOfCards;
 
-                          int expectedCount = cards.get(i);
-                          long counted = vars.stream()
-                                  .filter(x -> x.equals(values.get(idx)))
-                                  .count();
+                    for(int i = 0; i < values.size(); i++) {
+                        final int idx = i;
 
-                          verif &= (counted == expectedCount);
-                      }
+                        int expectedCount = cards.get(i);
+                        long counted = vars.stream()
+                           .filter(x -> x.equals(values.get(idx)))
+                           .count();
 
-                      return isGcc == verif;
-                  });
-          });
+                        verif &= (counted == expectedCount);
+                    }
+
+                    assertEquals(verif, isGcc);
+                })
+            );
+        }));
     }
 
     @Test
     public void gccShouldFailWheneverTheValuesCannotDirectlyBeMappedOntoASet() {
-        qt.forAll(integers().between(2, 100).describedAs(s -> "SIZE("+s+")"))
-            .checkAssert(S ->
-              qt.withGenerateAttempts(10000)
-                  .forAll(
-                      lists()
-                          .of(integers().between(0, 10))
-                          .ofSize(S)
-                          .describedAs(v ->"VALS("+v+")"),
-                      lists()
-                          .of(integers().between(0, 10))
-                          .ofSize(S)
-                          .describedAs(c ->"CARDS("+c+")"))
-                  .assuming((vals, cards) -> vals.size() != new HashSet<>(vals).size())
-                  .check((vals, cards) ->
-                    failsThrowing(
-                        IllegalArgumentException.class,
-                        () -> gcc(cards, vals)))
-            );
+        assertThat(
+           forAll(integers("SIZE").between(2, 100))
+          .assertThat(S ->
+           forAll(
+              lists("VALUES").withValuesRanging(0, 10).ofSize(S),
+              lists("CARDS ").withValuesRanging(0, 10).ofSize(S)
+           )
+          .assuming((vals, cards) -> vals.size() != new HashSet<>(vals).size())
+          .itIsTrueThat((vals, cards) ->
+            failsThrowing(
+               IllegalArgumentException.class,
+               () -> gcc(cards, vals)
+            )
+          ))
+        );
     }
 
     @Test
     public void gccVarShouldFailWheneverTheValuesCannotDirectlyBeMappedOntoASet() {
-        qt.forAll(
-            lists()
-                .of(integers().between(0, 100))
-                .ofSizeBetween(2, 100)
-                .describedAs(v ->"VALS("+v+")"))
-            .assuming(vals -> vals.size() != new HashSet<>(vals).size())
-            .check(vals ->
-                failsThrowing(
-                    IllegalArgumentException.class,
-                    () -> gccVar(vals)));
+        assertThat(
+           forAll(lists("VALUES")
+              .ofSizeBetween(1, 100)
+              .withValuesRanging(0, 100))
+          .assuming(vals -> vals.size() != new HashSet<>(vals).size())
+          .itIsTrueThat(vals ->
+             failsThrowing(
+                IllegalArgumentException.class,
+                () -> gccVar(vals))
+          )
+        );
     }
 
     @Test
     public void gccShouldFailWhenValuesAndCardinalitieDontHaveTheSameSize() {
-        qt.withGenerateAttempts(10000)
-            .forAll(
-                lists()
-                    .of(integers().between(0, 10))
-                    .ofSizeBetween(0, 100)
-                    .describedAs(v ->"VALS("+v+")"),
-                lists()
-                    .of(integers().between(0, 10))
-                    .ofSizeBetween(0, 100)
-                    .describedAs(c ->"CARDS("+c+")"))
-            .assuming((vals, cards) -> vals.size() != cards.size())
-            .check((vals, cards) ->
-                    failsThrowing(
-                            IllegalArgumentException.class,
-                            () -> gcc(cards, vals)));
+        assertThat(
+           forAll(
+             lists("VAL ").ofSizeBetween(0, 100).withValuesRanging(0, 10),
+             lists("CARD").ofSizeBetween(0, 100).withValuesRanging(0, 10)
+           )
+          .assuming((vals, cards) -> vals.size() != cards.size())
+          .itIsTrueThat((vals, cards) ->
+              failsThrowing(
+                 IllegalArgumentException.class,
+                 () -> gcc(cards, vals))
+          )
+        );
     }
 
     @Test
     public void gccVardShouldFailWhenCardinalitiesCantCoverValues() {
-        qt.withGenerateAttempts(10000)
-                .forAll(
-                        lists()
-                                .of(integers().between(0, 10))
-                                .ofSizeBetween(0, 100)
-                                .describedAs(v ->"VALS("+v+")"),
-                        Generators.assignments()
-                                .withUpToVariables(100)
-                                .describedAs(a -> "ASSIGNMENT("+a+")"))
-                .assuming((vals, ass) -> vals.size() > ass.size())
-                .check((vals, ass) ->
-                        failsThrowing(
-                                IllegalArgumentException.class,
-                                () -> gccVar(vals).test(ass)));
+        assertThat(
+           forAll(
+              lists("VALS").ofSizeBetween(0, 100).withValuesRanging(0, 10),
+              assignments("ASN").withUpToVariables(100)
+           )
+          .assuming((vals, ass) -> vals.size() > ass.size())
+          .itIsTrueThat((vals, ass) ->
+             failsThrowing(
+                IllegalArgumentException.class,
+                () -> gccVar(vals).test(ass))
+          )
+        );
     }
 
     @Test
     public void testSumEQ(){
-        qt.forAll(assignments(), integers().all())
-          .check((a, c) -> sum(EQ, c).test(a) == (a.stream().mapToLong(Integer::longValue).sum() == c) );
+        assertThat(
+           forAll(assignments("ASN"), integers("RHS"))
+          .assertThat((a, c) -> randomness ->
+             assertEquals(
+               a.stream().mapToLong(Integer::longValue).sum() == c,
+                sum(EQ, c).test(a)
+             )
+          )
+        );
     }
     @Test
     public void testSumNE(){
-        qt.forAll(assignments(), integers().all())
-          .check((a, c) -> sum(NE, c).test(a) == (a.stream().mapToLong(Integer::longValue).sum() != c) );
+        assertThat(
+           forAll(assignments("ASN"), integers("RHS"))
+              .assertThat((a, c) -> randomness ->
+                 assertEquals(
+                    a.stream().mapToLong(Integer::longValue).sum() != c,
+                    sum(NE, c).test(a)
+                 )
+              )
+        );
     }
     @Test
     public void testSumLT(){
-        qt.forAll(assignments(), integers().all())
-          .check((a, c) -> sum(LT, c).test(a) == (a.stream().mapToLong(Integer::longValue).sum() < c) );
+        assertThat(
+           forAll(assignments("ASN"), integers("RHS"))
+              .assertThat((a, c) -> randomness ->
+                 assertEquals(
+                    a.stream().mapToLong(Integer::longValue).sum() < c,
+                    sum(LT, c).test(a)
+                 )
+              )
+        );
     }
     @Test
     public void testSumLE(){
-        qt.forAll(assignments(), integers().all())
-          .check((a, c) -> sum(LE, c).test(a) == (a.stream().mapToLong(Integer::longValue).sum() <= c) );
+        assertThat(
+           forAll(assignments("ASN"), integers("RHS"))
+              .assertThat((a, c) -> randomness ->
+                 assertEquals(
+                    a.stream().mapToLong(Integer::longValue).sum() <= c,
+                    sum(LE, c).test(a)
+                 )
+              )
+        );
     }
     @Test
     public void testSumGT(){
-        qt.forAll(assignments(), integers().all())
-          .check((a, c) -> sum(GT, c).test(a) == (a.stream().mapToLong(Integer::longValue).sum() > c) );
+        assertThat(
+           forAll(assignments("ASN"), integers("RHS"))
+              .assertThat((a, c) -> randomness ->
+                 assertEquals(
+                    a.stream().mapToLong(Integer::longValue).sum() > c,
+                    sum(GT, c).test(a)
+                 )
+              )
+        );
     }
     @Test
     public void testSumGE(){
-        qt.forAll(assignments(), integers().all())
-          .check((a, c) -> sum(GE, c).test(a) == (a.stream().mapToLong(Integer::longValue).sum() >= c) );
+        assertThat(
+           forAll(assignments("ASN"), integers("RHS"))
+              .assertThat((a, c) -> randomness ->
+                 assertEquals(
+                    a.stream().mapToLong(Integer::longValue).sum() >= c,
+                    sum(GE, c).test(a)
+                 )
+              )
+        );
     }
 
     @Test
     public void testSumLeIsNotSubjectToOverflows() {
-        qt.forAll(
-           assignments().describedAs(a -> "ASSIGNMENT(" + a + ")"),
-           integers().all().describedAs(rhs -> "RHS(" + rhs + ")"))
-           .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
-           .check((assignment, rhs) -> {
-               long sumL =
-                  assignment.stream().mapToLong(Integer::longValue).sum();
+        assertThat(
+           forAll(assignments("ASN"), integers("RHS"))
+              .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
+              .assertThat((assignment, rhs) -> randomness -> {
+                  long sumL =
+                     assignment.stream().mapToLong(Integer::longValue).sum();
 
-               return sum(LE, rhs).test(assignment) == (sumL <= (long) rhs);
-           });
+                  assertEquals(
+                     (sumL <= (long) rhs),
+                     sum(LE, rhs).test(assignment));
+              })
+        );
     }
     @Test
     public void testSumLtIsNotSubjectToOverflows() {
-        qt.forAll(
-               assignments().describedAs(a -> "ASSIGNMENT(" + a + ")"),
-               integers().all().describedAs(rhs -> "RHS(" + rhs + ")"))
-           .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
-           .check((assignment, rhs) -> {
-               long sumL =
-                  assignment.stream().mapToLong(Integer::longValue).sum();
+        assertThat(
+           forAll(assignments("ASN"), integers("RHS"))
+              .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
+              .assertThat((assignment, rhs) -> randomness -> {
+                  long sumL =
+                     assignment.stream().mapToLong(Integer::longValue).sum();
 
-               return sum(LT, rhs).test(assignment) == (sumL <  (long) rhs);
-           });
+                  assertEquals(
+                     (sumL < (long) rhs),
+                     sum(LT, rhs).test(assignment));
+              })
+        );
     }
     @Test
     public void testSumEqIsNotSubjectToOverflows() {
-        qt.forAll(
-               assignments().describedAs(a -> "ASSIGNMENT(" + a + ")"),
-               integers().all().describedAs(rhs -> "RHS(" + rhs + ")"))
-           .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
-           .check((assignment, rhs) -> {
-               long sumL =
-                  assignment.stream().mapToLong(Integer::longValue).sum();
+        assertThat(
+           forAll(assignments("ASN"), integers("RHS"))
+              .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
+              .assertThat((assignment, rhs) -> randomness -> {
+                  long sumL =
+                     assignment.stream().mapToLong(Integer::longValue).sum();
 
-               return sum(EQ, rhs).test(assignment) == (sumL == (long) rhs);
-           });
+                  assertEquals(
+                     (sumL == (long) rhs),
+                     sum(EQ, rhs).test(assignment));
+              })
+        );
     }
     @Test
     public void testSumNeIsNotSubjectToOverflows() {
-        qt.forAll(
-               assignments().describedAs(a -> "ASSIGNMENT(" + a + ")"),
-               integers().all().describedAs(rhs -> "RHS(" + rhs + ")"))
-           .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
-           .check((assignment, rhs) -> {
-               long sumL =
-                  assignment.stream().mapToLong(Integer::longValue).sum();
+        assertThat(
+           forAll(assignments("ASN"), integers("RHS"))
+              .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
+              .assertThat((assignment, rhs) -> randomness -> {
+                  long sumL =
+                     assignment.stream().mapToLong(Integer::longValue).sum();
 
-               return sum(NE, rhs).test(assignment) == (sumL != (long) rhs);
-           });
+                  assertEquals(
+                     (sumL != (long) rhs),
+                     sum(NE, rhs).test(assignment));
+              })
+        );
     }
     @Test
     public void testSumGeIsNotSubjectToOverflows() {
-        qt.forAll(
-               assignments().describedAs(a -> "ASSIGNMENT(" + a + ")"),
-               integers().all().describedAs(rhs -> "RHS(" + rhs + ")"))
-           .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
-           .check((assignment, rhs) -> {
-               long sumL =
-                  assignment.stream().mapToLong(Integer::longValue).sum();
+        assertThat(
+           forAll(assignments("ASN"), integers("RHS"))
+              .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
+              .assertThat((assignment, rhs) -> randomness -> {
+                  long sumL =
+                     assignment.stream().mapToLong(Integer::longValue).sum();
 
-               return sum(GE, rhs).test(assignment) == (sumL >= (long) rhs);
-           });
+                  assertEquals(
+                     (sumL >= (long) rhs),
+                     sum(GE, rhs).test(assignment));
+              })
+        );
     }
     @Test
     public void testSumGtIsNotSubjectToOverflows() {
-        qt.forAll(
-               assignments().describedAs(a -> "ASSIGNMENT(" + a + ")"),
-               integers().all().describedAs(rhs -> "RHS(" + rhs + ")"))
-           .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
-           .check((assignment, rhs) -> {
-               long sumL =
-                  assignment.stream().mapToLong(Integer::longValue).sum();
+        assertThat(
+           forAll(assignments("ASN"), integers("RHS"))
+              .assuming((assignment, rhs) -> underflowOrOverflow(assignment))
+              .assertThat((assignment, rhs) -> randomness -> {
+                  long sumL =
+                     assignment.stream().mapToLong(Integer::longValue).sum();
 
-               return sum(GT, rhs).test(assignment) == (sumL >  (long) rhs);
-           });
+                  assertEquals(
+                     (sumL > (long) rhs),
+                     sum(GT, rhs).test(assignment));
+              })
+        );
     }
 
     @Test
     public void testTable() {
-        qt.forAll(tables().build(), assignments())
-            .check((t, a) -> table(t).test(a) == t.contains(a));
-    }
-
-    private Gen<Assignment> assignments() {
-        return Generators.assignments().build();
-    }
-    private Gen<Assignment> assignmentWithAtLeast(int nVars) {
-        return Generators.assignments()
-                .withVariablesBetween(nVars, nVars+3)
-                .withValuesRanging(-10, 10)
-                .build();
+        assertThat(
+           forAll(tables(), assignments())
+           .assertThat((t, a) -> randomness ->
+              assertEquals(t.contains(a), table(t).test(a))
+           )
+        );
     }
 
     /**

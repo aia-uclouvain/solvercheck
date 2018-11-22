@@ -2,12 +2,9 @@ package be.uclouvain.solvercheck.assertions.util;
 
 import be.uclouvain.solvercheck.assertions.Assertion;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import org.quicktheories.core.Strategy;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * This class provides a simple way to define and check a property that
@@ -24,15 +21,6 @@ public final class ForAnyPartialAssignment
         super();
     }
 
-    /**
-     * Creates a new instance based on a given config.
-     *
-     * @param config the initial configuration to use.
-     */
-    public ForAnyPartialAssignment(final Supplier<Strategy> config) {
-        super(config);
-    }
-
     /** {@inheritDoc} */
     @Override
     protected ForAnyPartialAssignment getThis() {
@@ -40,34 +28,35 @@ public final class ForAnyPartialAssignment
     }
 
     /**
-     * Tests the validity of the given predicate by feeding it a large number
-     * of test cases.
-     * <div>
-     *     <h1>Note</h1>
-     *     This is the core of the utility of this class.
-     * </div>
+     * Lets you express the parametric assertion in terms of its actual
+     * parameters.
      *
-     * @param test a predicate whose validity is being tested.
+     * @param assertion the parametric assertion expressed in terms of
+     *                  its abstract parameter.
+     * @return the (parametric) assertion which can be checked.
      */
-    public void check(final Predicate<PartialAssignment> test) {
-        doCheck(test);
+    public Assertion itIsTrueThat(final Predicate<PartialAssignment> assertion) {
+        return assertThat(pa -> rnd -> {
+               if (!assertion.test(pa)) {
+                   throw new AssertionError(
+                      "\nCAUSE     : Property violated"
+                   );
+               }
+           }
+        );
     }
 
     /**
-     * Tests the validity of the given assertion by feeding it a large number
-     * of test cases.
-     * <div>
-     *     <h1>Note</h1>
-     *     This is the core of the utility of this class.
-     * </div>
+     * Lets you express the parametric assertion in terms of its actual
+     * parameters.
      *
-     * @param test an assertion snippet testing the validity of some property
-     *            depending on partial assignment.
+     * @param assertion the parametric assertion expressed in terms of
+     *                  its abstract parameter.
+     * @return the (parametric) assertion which can be checked.
      */
-    public void checkAssert(final Consumer<PartialAssignment> test) {
-        doCheckAssert(test);
+    public Assertion itIsFalseThat(final Predicate<PartialAssignment> assertion) {
+        return itIsTrueThat(assertion.negate());
     }
-
 
     /**
      * Tests the validity of the given assertion by feeding it a large number
@@ -82,8 +71,8 @@ public final class ForAnyPartialAssignment
      * @return an assertion which is to be tested against a wide range of
      * partial assignments.
      */
-    public Assertion itIsTrueThat(
+    public Assertion assertThat(
             final Function<PartialAssignment, Assertion> assertion) {
-        return () -> doCheckAssert(pa -> assertion.apply(pa).check());
+        return rnd -> doCheckAssert(rnd, pa -> assertion.apply(pa).check(rnd));
     }
 }

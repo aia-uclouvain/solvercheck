@@ -1,4 +1,4 @@
-package be.uclouvain.solvercheck.assertions;
+package be.uclouvain.solvercheck.assertions.stateless;
 
 import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.Domain;

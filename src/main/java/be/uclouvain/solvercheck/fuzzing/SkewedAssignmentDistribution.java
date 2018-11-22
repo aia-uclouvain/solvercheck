@@ -1,0 +1,53 @@
+package be.uclouvain.solvercheck.fuzzing;
+
+import be.uclouvain.solvercheck.core.data.Assignment;
+
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+public final class SkewedAssignmentDistribution {
+
+    /** Utility class has no public constructor. */
+    private SkewedAssignmentDistribution() { }
+
+    public static Stream<Assignment> stream(final Randomness randomness,
+                                            final int szMin,
+                                            final int szMax,
+                                            final int valMin,
+                                            final int valMax) {
+
+        final Assignment simplest = randomItem(
+           randomness.randomInt(szMin, szMax),
+           IntStream.generate(() -> 0)
+        );
+
+        final Assignment minimum = randomItem(
+           randomness.randomInt(szMin, szMax),
+           IntStream.generate(() -> valMin)
+        );
+
+        final Assignment maximum = randomItem(
+           randomness.randomInt(szMin, szMax),
+           IntStream.generate(() -> valMax)
+        );
+
+        if (0 > valMin && 0 < valMax) {
+          return Stream.concat(
+             Stream.of(simplest, minimum, maximum),
+             UniformAssignmentDistribution
+                .stream(randomness, szMin, szMax, valMin, valMax)
+          );
+        } else {
+          return Stream.concat(
+             Stream.of(minimum, maximum),
+             UniformAssignmentDistribution
+                .stream(randomness, szMin, szMax, valMin, valMax)
+          );
+        }
+    }
+
+    private static Assignment randomItem(final int ofSize,
+                                         final IntStream source) {
+        return source.limit(ofSize).boxed().collect(Assignment.collector());
+    }
+}

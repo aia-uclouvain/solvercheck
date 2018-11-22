@@ -1,19 +1,22 @@
 package be.uclouvain.solvercheck.assertions.util;
 
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.generators.Generators;
-import org.quicktheories.QuickTheory;
-import org.quicktheories.core.Configuration;
-import org.quicktheories.core.Gen;
-import org.quicktheories.core.Strategy;
+import be.uclouvain.solvercheck.generators.GeneratorsDSL;
+import be.uclouvain.solvercheck.fuzzing.Randomness;
 
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.MIN_VALUE;
-import static org.quicktheories.generators.SourceDSL.integers;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_ANCHOR_SAMPLES;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_EXAMPLES;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_MIN_VALUE;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_MAX_VALUE;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_SPREAD;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_NB_VARS_MIN;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_NB_VARS_MAX;
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_MAX_DOM_SIZE;
 
 /**
  * This class provides the basic services to create classes of assertions that
@@ -24,70 +27,16 @@ import static org.quicktheories.generators.SourceDSL.integers;
  */
 public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
         implements WithFluentConfig<T> {
-
-    /**
-     * The default number of attempts made to generate an input that matches
-     * the assumptions.
-     */
-    private static final int DEFAULT_GEN_ATTEMPTS = 10000;
-    /**
-     * The default the number of shrink cycles used by the underlying
-     * quicktheories layer in order to determine the smallest possible
-     * violation instances.
-     */
-    private static final int DEFAULT_SHRINK_CYCLES = 10;
-    /**
-     * The default number of `anchor values` which designate the 'center' of
-     * the values distributions in a partial assignment.
-     */
-    private static final int DEFAULT_ANCHOR_SAMPLES = 100;
-    /**
-     * The default number of partial assignment generated (and tested) for each
-     * anchor value.
-     */
-    private static final int DEFAULT_EXAMPLES = 100;
-    /**
-     * The default minimal value that may appear in a generated partial
-     * assignment.
-     */
-    private static final int DEFAULT_MIN_VALUE = MIN_VALUE;
-    /**
-     * The default maximal value that may appear in a generated partial
-     * assignment.
-     */
-    private static final int DEFAULT_MAX_VALUE = MAX_VALUE;
-    /**
-     * The default maximum difference between any two values occurring in a
-     * partial assignment.
-     */
-    private static final int DEFAULT_SPREAD = 10;
-    /**
-     * The default minimum number of variables constituting a partial
-     * assignment.
-     */
-    private static final int DEFAULT_NB_VARS_MIN = 0;
-    /**
-     * The default maximum number of variables constituting a partial
-     * assignment.
-     */
-    private static final int DEFAULT_NB_VARS_MAX = 5;
-    /**
-     * The default maximum number of values in a domain constitutive of a
-     * partial assignment.
-     */
-    private static final int DEFAULT_MAX_DOM_SIZE = 10;
-
-    /**
-     * A hook used to build on top of the underlying QuickTheories
-     * property-based testing library.
-     */
-    private Strategy strategy;
-
     /**
      * The number of `anchor values` which designate the 'center' of the
      * values distributions in a partial assignment.
      */
     private int anchorSamples;
+    /**
+     * The number of number of partial assignment generated (and tested) for
+     * each anchor value.
+     */
+    private int examples;
     /**
      * The minimal value that may appear in a generated partial assignment.
      */
@@ -120,17 +69,21 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      * assumptions.
      */
     private Predicate<PartialAssignment> assumptions;
+    /**
+     * A function parsing a partial assignment to make an intelligible
+     * explanation (description) out of it. This is particularly appropriate
+     * for the constraints having different groups of arguments like i.e. the
+     * element constraint.
+     */
+    private Function<PartialAssignment, String> description;
 
     /**
      * Creates a new instance with all fields initialized to their default
      * values.
-     *
-     * @param config an initial configuration to start from
      */
-    public AbstractFluentConfig(final Supplier<Strategy> config) {
-        this.strategy      = config.get();
-
+    public AbstractFluentConfig() {
         this.anchorSamples = DEFAULT_ANCHOR_SAMPLES;
+        this.examples      = DEFAULT_EXAMPLES;
         this.minValue      = DEFAULT_MIN_VALUE;
         this.maxValue      = DEFAULT_MAX_VALUE;
         this.spread        = DEFAULT_SPREAD;
@@ -139,14 +92,7 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
         this.maxDomSize    = DEFAULT_MAX_DOM_SIZE;
 
         this.assumptions   = pa -> true;
-    }
-
-    /**
-     * Creates a new instance with all fields initialized to their default
-     * values.
-     */
-    public AbstractFluentConfig() {
-        this(AbstractFluentConfig::defaultStrategy);
+        this.description   = PartialAssignment::toString;
     }
 
     /**
@@ -162,23 +108,16 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
     }
 
     /** {@inheritDoc} */
-    @Override
-    public final T withFixedSeed(final long seed) {
-        strategy = strategy.withFixedSeed(seed);
-        return getThis();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public final T withGenerateAttempts(final int attempts) {
-        strategy = strategy.withGenerateAttempts(attempts);
+    @Override @SuppressWarnings("checkstyle:hiddenfield")
+    public final T describedAs(final Function<PartialAssignment, String> description) {
+        this.description = description;
         return getThis();
     }
 
     /** {@inheritDoc} */
     @Override
     public final T withExamples(final int n) {
-        strategy = strategy.withExamples(n);
+        this.examples = n;
         return getThis();
     }
 
@@ -186,13 +125,6 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
     @Override
     public final T withAnchorSamples(final int n) {
         anchorSamples = n;
-        return getThis();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public final T withShrinkCycles(final int cycles) {
-        strategy = strategy.withShrinkCycles(cycles);
         return getThis();
     }
 
@@ -264,18 +196,25 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      *     This is the core of the utility of this class.
      * </div>
      *
+     * @param rnd the source of randomness used for the fuzzing.
      * @param test a predicate whose validity is being tested.
      */
-    protected final void doCheck(final Predicate<PartialAssignment> test) {
-        final QuickTheory qt = QuickTheory.qt(this);
+    protected final void doCheck(final Randomness rnd,
+                                 final Predicate<PartialAssignment> test) {
+        Optional<PartialAssignment> failure = anchors()
+           .build()
+           .generate(rnd)
+           .limit(anchorSamples)
+           .map(a  -> partialAssignments(a).build().generate(rnd).limit(examples))
+           .flatMap(pas -> pas.filter(assumptions).filter(pa -> !test.test(pa)))
+           //.parallel()
+           .findAny();
 
-        qt.withExamples(anchorSamples)
-          .forAll(anchors())
-          .checkAssert(anchor ->
-              qt.forAll(partialAssignments(anchor))
-                .assuming(assumptions)
-                .check(test)
-          );
+        if (failure.isPresent()) {
+            throw new AssertionError(
+               explanation(rnd, failure.get(), "Property violated")
+            );
+        }
     }
 
     /**
@@ -286,25 +225,57 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      *     This is the core of the utility of this class.
      * </div>
      *
+     * @param rnd the source of randomness used for the fuzzing.
      * @param test an assertion snippet testing the validity of some property
      *            depending on partial assignment.
      */
-    protected final void doCheckAssert(final Consumer<PartialAssignment> test) {
-        final QuickTheory qt = QuickTheory.qt(this);
-
-        qt.withExamples(anchorSamples)
-          .forAll(anchors())
-          .checkAssert(anchor ->
-             qt.forAll(partialAssignments(anchor))
-               .assuming(assumptions)
-               .checkAssert(test)
-          );
+    protected final void doCheckAssert(final Randomness rnd,
+                                       final Consumer<PartialAssignment> test) {
+        anchors()
+           .build()
+           .generate(rnd)
+           .limit(anchorSamples)
+           .map(a  -> partialAssignments(a).build().generate(rnd).limit(examples))
+           .flatMap(pas -> pas.filter(assumptions))
+           //.parallel()
+           .forEach(pa -> {
+               try {
+                 test.accept(pa);
+               } catch (AssertionError cause) {
+                 throw new AssertionError(
+                      explanation(rnd, pa, cause.getMessage()), cause);
+               } catch (Throwable cause) {
+                 throw new AssertionError(
+                      explanation(rnd, pa,
+                      "\nCAUSE     : An exception was caught"
+                         + "\n###########################"),
+                      cause);
+               }
+           });
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public final Strategy get() {
-        return strategy;
+    /**
+     * Creates an intelligible error report which can be used to reproduce an
+     * investigate an error witness.
+     *
+     * @param rnd the source of randomness used for the fuzzing.
+     * @param pa the partial assignment
+     * @param cause an explanatory message about why the violation occurred.
+     * @return An error message giving the details of the witnessed
+     * property violation.
+     */
+    protected final String explanation(final Randomness rnd,
+                                       final PartialAssignment pa,
+                                       final String cause) {
+
+        final StringBuilder builder = new StringBuilder("\n");
+        builder.append("########################### \n");
+        builder.append("SEED    : ").append(Long.toHexString(rnd.getSeed())).append("\n");
+        builder.append("CAUSE   : ").append(cause).append("\n");
+        builder.append("WITNESS : ").append(description.apply(pa)).append("\n");
+        builder.append("########################### \n");
+
+        return builder.toString();
     }
 
     /**
@@ -314,22 +285,19 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      * @param anchor the anchor value
      * @return a generator of partial assignment.
      */
-    private Gen<PartialAssignment> partialAssignments(final int anchor) {
-        return Generators.partialAssignments()
+    private GeneratorsDSL.GenPartialAssignmentBuilder partialAssignments(final int anchor) {
+        return GeneratorsDSL.partialAssignments()
                 .withVariablesBetween(nbVarMin, nbVarMax)
                 .withDomainsOfSizeUpTo(maxDomSize)
-                .withValuesRanging(lowerBound(anchor), upperBound(anchor))
-                .describedAs(pa -> String.format("PARTIAL_ASSIGNMENT(%s)", pa));
+                .withValuesRanging(lowerBound(anchor), upperBound(anchor));
     }
 
     /**
      * @return a generator producing the anchors used during a check or
      * checkAssert phase.
      */
-    private Gen<Integer> anchors() {
-        return integers()
-           .between(anchorMin(), anchorMax())
-           .describedAs(i -> String.format("ANCHOR(%d)", i));
+    private GeneratorsDSL.GenIntBuilder anchors() {
+        return GeneratorsDSL.ints().between(anchorMin(), anchorMax());
     }
 
     /**
@@ -400,19 +368,5 @@ public abstract class AbstractFluentConfig<T extends AbstractFluentConfig<T>>
      */
     private boolean rangeFitsInSpreadMax() {
         return (long) maxValue - (long) minValue <= (long) spread;
-    }
-
-
-    /**
-     * Returns the default strategy to run all tests.
-     *
-     * @return the default strategy
-     */
-    private static Strategy defaultStrategy() {
-        return Configuration
-                .systemStrategy()
-                .withGenerateAttempts(DEFAULT_GEN_ATTEMPTS)
-                .withShrinkCycles(DEFAULT_SHRINK_CYCLES)
-                .withExamples(DEFAULT_EXAMPLES);
     }
 }

@@ -1,20 +1,16 @@
 package be.uclouvain.solvercheck.consistencies.boundZ;
 
-import be.uclouvain.solvercheck.checkers.WithCheckers;
-import be.uclouvain.solvercheck.consistencies.WithConsistencies;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.task.DomainFilter;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import be.uclouvain.solvercheck.utils.collections.Range;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
-import org.quicktheories.WithQuickTheories;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,19 +18,13 @@ import java.util.stream.Collectors;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
 
-public class TestBoundZConsistencyDomainFilter
-        implements WithQuickTheories,
-                   WithCpGenerators,
-                   WithConsistencies,
-                   WithCheckers {
+public class TestBoundZConsistencyDomainFilter implements WithSolverCheck {
 
-    private QuickTheory qt;
     private Checker checker;
     private DomainFilter filter;
 
     @Before
     public void setUp() {
-        qt = qt().withGenerateAttempts(10000);
         checker= allDiff();
         filter = bcZDomain().apply(checker);
     }
@@ -55,23 +45,15 @@ public class TestBoundZConsistencyDomainFilter
      */
     @Test
     public void itMustBeWeaklyMonotonic() throws Exception {
-        qt.withExamples(10)
-          .forAll(integers().between(Integer.MIN_VALUE+5, Integer.MAX_VALUE-4))
-          .checkAssert(anchor ->
-            qt.withExamples(100)
-              .forAll(
-                    partialAssignments()
-                            .withUpToVariables(5)
-                            .withValuesRanging(anchor-5, anchor+4))
-              .assuming(pa -> !pa.isError())
-              .checkAssert(pa -> {
-                  for (int var = 0; var < pa.size(); var++) {
-                      Domain filtered = filter.filter(var, pa);
+        assertThat(
+           forAnyPartialAssignment().assertThat(pa -> randomness -> {
+              for (int var = 0; var < pa.size(); var++) {
+                  Domain filtered = filter.filter(var, pa);
 
-                      Assert.assertTrue(List.of(STRONGER, EQUIVALENT)
-                            .contains(filtered.compareWith(pa.get(var))));
-                  }
-              })
+                  Assert.assertTrue(List.of(STRONGER, EQUIVALENT)
+                        .contains(filtered.compareWith(pa.get(var))));
+              }
+          })
         );
     }
 
@@ -80,16 +62,8 @@ public class TestBoundZConsistencyDomainFilter
      */
     @Test
     public void itRemovesNoSolution() {
-        qt.withExamples(10)
-          .forAll(integers().between(Integer.MIN_VALUE+5, Integer.MAX_VALUE-4))
-          .checkAssert(anchor ->
-             qt.withExamples(100)
-               .forAll(
-                   partialAssignments()
-                           .withUpToVariables(5)
-                           .withValuesRanging(anchor-5, anchor+4))
-               .assuming(pa -> !pa.isError())
-               .checkAssert(pa -> {
+        assertThat(
+           forAnyPartialAssignment().assertThat(pa -> randomness -> {
                    PartialAssignment solutions =
                       PartialAssignment.unionOf(pa.size(),
                          CartesianProduct.of(pa)
@@ -110,16 +84,8 @@ public class TestBoundZConsistencyDomainFilter
      */
     @Test
     public void testConsistencyDefinition() {
-        qt.withExamples(10)
-          .forAll(integers().between(Integer.MIN_VALUE+5, Integer.MAX_VALUE-4))
-          .checkAssert(anchor ->
-             qt.withExamples(100)
-               .forAll(
-                  partialAssignments()
-                     .withUpToVariables(5)
-                     .withValuesRanging(anchor-5, anchor+4))
-               .assuming(pa -> !pa.isError())
-               .checkAssert(pa -> {
+        assertThat(
+           forAnyPartialAssignment().assertThat(pa -> randomness -> {
                    CartesianProduct<Integer> boundSupports =
                            CartesianProduct.of(
                                pa.stream().map(d ->

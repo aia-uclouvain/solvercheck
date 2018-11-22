@@ -1,10 +1,9 @@
 package be.uclouvain.solvercheck.assertions.util;
 
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import org.quicktheories.core.Strategy;
 
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * This class provides a mini framework to setup tests relative to the use of
@@ -22,8 +21,7 @@ import java.util.function.Supplier;
  * @param <T> the concrete type of the implementing subclass.
  */
 
-public interface WithFluentConfig<T extends WithFluentConfig<T>>
-       extends Supplier<Strategy> {
+public interface WithFluentConfig<T extends WithFluentConfig<T>> {
 
     /**
      * Makes the interface of the filter assertion more fluent.
@@ -33,23 +31,15 @@ public interface WithFluentConfig<T extends WithFluentConfig<T>>
     T forAnyPartialAssignment();
 
     /**
-     * Configures the seed of the PRNG used to pseudo-randomly generate partial
-     * assignments, anchors and values.
+     * A function parsing some given partial assignment to make an intelligible
+     * explanation (description) out of it. This is particularly appropriate
+     * for the constraints having different groups of arguments like i.e. the
+     * element constraint.
      *
-     * @param seed the seed to use to initialize the PRNG
+     * @param description the description function.
      * @return this
      */
-    T withFixedSeed(long seed);
-
-    /**
-     * Configures the underlying quicktheories layer to try to generate a
-     * partial assignment satisfying the assumptions at least `attempts` time
-     * before failing on value exhaustion.
-     *
-     * @param attempts the number of attempts to try before value exhaustion.
-     * @return this
-     */
-    T withGenerateAttempts(int attempts);
+    T describedAs(Function<PartialAssignment, String> description);
 
     /**
      * Configures the desired number of anchors which are picked to seed a
@@ -68,16 +58,6 @@ public interface WithFluentConfig<T extends WithFluentConfig<T>>
      * @return this
      */
     T withExamples(int n);
-
-    /**
-     * Configures the number of shrink cycles used by the underlying
-     * quicktheories layer in order to determine the smallest possible
-     * violation instances.
-     *
-     * @param cycles the number of shrink cycles to use.
-     * @return this
-     */
-    T withShrinkCycles(int cycles);
 
     /**
      * Configures the range of values which can appear in the partial

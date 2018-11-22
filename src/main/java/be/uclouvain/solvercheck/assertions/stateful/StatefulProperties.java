@@ -106,8 +106,27 @@ public final class StatefulProperties {
         /** {@inheritDoc} */
         @Override
         public final void setup(final PartialAssignment root) {
-            actual.setup(root);
-            other .setup(root);
+            RuntimeException happened = null;
+            // We want to make sure that *both* actual and are setup.
+            // Hence, we defer potential exception rethrow to a later time.
+
+            // 1. actual must be setup.
+            try {
+                actual.setup(root);
+            } catch (RuntimeException ex) {
+                happened = ex;
+            }
+            // 2. other must be setup too.
+            try {
+                other .setup(root);
+            } catch (RuntimeException ex) {
+                happened = ex;
+            }
+
+            // Rethrow deferred exception
+            if (happened != null) {
+                throw happened;
+            }
         }
 
         /** {@inheritDoc} */

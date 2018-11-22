@@ -8,7 +8,7 @@
     <!-- IDENTIFICATION **************************************************** -->
     <groupId>org.bitbucket.xaviergillard</groupId>
     <artifactId>SolverCheck</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
 
     <!-- DESCRIPTION ******************************************************* -->
     <name>org.bitbucket.xaviergillard:SolverCheck</name>
@@ -83,19 +83,6 @@
     </properties>
 
     <dependencies>
-        <!--
-            QuickTheories the PBT library for java.
-
-            Note:
-            It is not test scoped because it is at the heart from what
-            SolverCheck should do
-        -->
-        <dependency>
-            <groupId>org.quicktheories</groupId>
-            <artifactId>quicktheories</artifactId>
-            <version>0.25</version>
-        </dependency>
-
         <!--
             AssertJ provides an assertion DSL to evaluate your solver. Hence,
             it is not test

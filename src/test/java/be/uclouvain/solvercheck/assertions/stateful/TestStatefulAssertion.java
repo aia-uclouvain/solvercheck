@@ -5,7 +5,6 @@ import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
-import be.uclouvain.solvercheck.stateful.StatefulFilterAdapter;
 import org.junit.Test;
 
 import java.util.Stack;
@@ -17,7 +16,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(arcConsistent(allDiff()));
         StatefulFilter beta  = incorrectSetup(stateful(arcConsistent(allDiff())));
 
-        assertThat( given().examples(10).an(alpha).isEquivalentTo(beta) );
+        assertThat( an(alpha).isEquivalentTo(beta) );
     }
 
     // --- Equiv ---
@@ -26,7 +25,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(arcConsistent(allDiff()));
         StatefulFilter beta  = stateful(arcConsistent(allDiff()));
 
-        assertThat( given().examples(10).an(alpha).isEquivalentTo(beta) );
+        assertThat( an(alpha).isEquivalentTo(beta) );
     }
 
     @Test(expected = AssertionError.class)
@@ -36,8 +35,6 @@ public class TestStatefulAssertion implements WithSolverCheck {
 
         assertThat(
             an(alpha).isEquivalentTo(beta)
-               .withShrinkCycles(0)
-               .withExamples(10)
         );
     }
 
@@ -51,8 +48,6 @@ public class TestStatefulAssertion implements WithSolverCheck {
 
         assertThat(
             an(alpha).isEquivalentTo(beta)
-               .withShrinkCycles(0)
-               .withExamples(30)
         );
     }
 
@@ -62,7 +57,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(arcConsistent(allDiff()));
         StatefulFilter beta  = stateful(arcConsistent(allDiff()));
 
-        assertThat( given().examples(10).an(alpha).isWeakerThan(beta) );
+        assertThat( an(alpha).isWeakerThan(beta) );
     }
 
     @Test
@@ -70,7 +65,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(arcConsistent(alwaysTrue()));
         StatefulFilter beta  = stateful(arcConsistent(alwaysFalse()));
 
-        assertThat( given().examples(10).an(alpha).isWeakerThan(beta) );
+        assertThat( an(alpha).isWeakerThan(beta) );
     }
 
 
@@ -79,7 +74,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(arcConsistent(allDiff()));
         StatefulFilter beta  = stateful(boundDConsistent(allDiff()));
 
-        assertThat( given().examples(10).an(alpha).isWeakerThan(beta) );
+        assertThat( an(alpha).isWeakerThan(beta) );
     }
 
     @Test(expected = AssertionError.class)
@@ -90,11 +85,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
                 25);
         StatefulFilter beta  = stateful(boundDConsistent(allDiff()));
 
-        assertThat(
-                an(alpha).isWeakerThan(beta)
-                   .withShrinkCycles(0)
-                   .withExamples(30)
-        );
+        assertThat( an(alpha).isWeakerThan(beta) );
     }
 
     // --- Stronger ---
@@ -103,7 +94,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(arcConsistent(allDiff()));
         StatefulFilter beta  = stateful(arcConsistent(allDiff()));
 
-        assertThat( given().examples(10).an(alpha).isStrongerThan(beta) );
+        assertThat( an(alpha).isStrongerThan(beta) );
     }
 
     @Test
@@ -111,7 +102,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(arcConsistent(alwaysFalse()));
         StatefulFilter beta  = stateful(arcConsistent(alwaysTrue()));
 
-        assertThat( given().examples(10).an(alpha).isStrongerThan(beta) );
+        assertThat( an(alpha).isStrongerThan(beta) );
     }
 
 
@@ -120,7 +111,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(boundDConsistent(allDiff()));
         StatefulFilter beta  = stateful(arcConsistent(allDiff()));
 
-        assertThat( given().examples(10).an(alpha).isStrongerThan(beta) );
+        assertThat( an(alpha).isStrongerThan(beta) );
     }
 
     @Test(expected = AssertionError.class)
@@ -132,11 +123,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
 
         StatefulFilter beta  = stateful(arcConsistent(allDiff()));
 
-        assertThat(
-                an(alpha).isStrongerThan(beta)
-                   .withShrinkCycles(0)
-                   .withExamples(30)
-        );
+        assertThat( an(alpha).isStrongerThan(beta) );
     }
 
     // --- Strictly Weaker ---
@@ -145,11 +132,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(arcConsistent(allDiff()));
         StatefulFilter beta  = stateful(arcConsistent(allDiff()));
 
-        assertThat(
-           an(alpha).isStrictlyWeakerThan(beta)
-              .withExamples(30)
-              .withShrinkCycles(0)
-        );
+        assertThat( an(alpha).isStrictlyWeakerThan(beta) );
     }
 
     @Test
@@ -157,12 +140,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(arcConsistent(alwaysTrue()));
         StatefulFilter beta  = stateful(arcConsistent(alwaysFalse()));
 
-        assertThat(
-           given()
-              .examples(10)
-              .an(alpha).isStrictlyWeakerThan(beta)
-              .assuming(pa -> !pa.isError())
-        );
+        assertThat( an(alpha).isStrictlyWeakerThan(beta) );
     }
 
 
@@ -171,7 +149,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(arcConsistent(allDiff()));
         StatefulFilter beta  = stateful(boundDConsistent(allDiff()));
 
-        assertThat( given().examples(10).an(alpha).isStrictlyWeakerThan(beta) );
+        assertThat( an(alpha).isStrictlyWeakerThan(beta) );
     }
 
     @Test(expected = AssertionError.class)
@@ -182,11 +160,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
                 arcConsistent(alwaysFalse()),
                 25);
 
-        assertThat(
-                an(alpha).isStrictlyWeakerThan(beta)
-                   .withShrinkCycles(0)
-                   .withExamples(30)
-        );
+        assertThat( an(alpha).isStrictlyWeakerThan(beta) );
     }
 
     // --- Strictly Stronger ---
@@ -195,11 +169,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(arcConsistent(allDiff()));
         StatefulFilter beta  = stateful(arcConsistent(allDiff()));
 
-        assertThat(
-           an(alpha).isStrictlyStrongerThan(beta)
-            .withShrinkCycles(0)
-            .withExamples(30)
-        );
+        assertThat( an(alpha).isStrictlyStrongerThan(beta) );
     }
 
     @Test
@@ -207,12 +177,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(arcConsistent(alwaysFalse()));
         StatefulFilter beta  = stateful(arcConsistent(alwaysTrue()));
 
-        assertThat(
-           given()
-              .examples(10)
-              .an(alpha).isStrictlyStrongerThan(beta)
-              .assuming(pa -> !pa.isError())
-        );
+        assertThat( an(alpha).isStrictlyStrongerThan(beta) );
     }
 
 
@@ -221,7 +186,7 @@ public class TestStatefulAssertion implements WithSolverCheck {
         StatefulFilter alpha = stateful(boundDConsistent(allDiff()));
         StatefulFilter beta  = stateful(arcConsistent(allDiff()));
 
-        assertThat( given().examples(10).an(alpha).isStrictlyStrongerThan(beta) );
+        assertThat( an(alpha).isStrictlyStrongerThan(beta) );
     }
 
     // --- Utils ---

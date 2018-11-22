@@ -1,30 +1,21 @@
 package be.uclouvain.solvercheck.core.data;
 
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.impl.DomainFactory;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import org.junit.Test;
-import org.quicktheories.WithQuickTheories;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TestDomainFactory implements WithQuickTheories, WithCpGenerators {
+public class TestDomainFactory implements WithSolverCheck {
 
     @Test
     public void testFromExtension() {
-        qt().forAll(
-               lists()
-                .of(integers().all())
-                .ofSizeBetween(0, 1000))
-            .check(lst -> {
-                int[] array = lst
-                        .stream()
-                        .mapToInt(Integer::intValue)
-                        .toArray();
-
-                List<Integer> distinct = lst
-                        .stream()
+        assertThat(forAll(arrays()).itIsTrueThat(array -> {
+                List<Integer> distinct = Arrays.stream(array)
+                        .boxed()
                         .distinct()
                         .collect(Collectors.toList());
 
@@ -32,33 +23,30 @@ public class TestDomainFactory implements WithQuickTheories, WithCpGenerators {
 
                 return distinct.containsAll(domain)
                         && domain.containsAll(distinct);
-            });
+            })
+        );
     }
 
     @Test
     public void testFromCollectionExtension() {
-        qt().forAll(
-                lists()
-                  .of(integers().all())
-                  .ofSizeBetween(0, 1000))
-            .check(lst -> {
-                HashSet<Integer> set = new HashSet<>(lst);
-                return set.equals(Domain.from(lst));
-            });
+        assertThat(forAll(lists()).itIsTrueThat(lst -> {
+            HashSet<Integer> set = new HashSet<>(lst);
+            return set.equals(Domain.from(lst));
+        }));
     }
 
     @Test
     public void domainFromAnOtherDomainIsIdentity() {
-        qt().forAll(domains())
-            .check(dom ->
-                 dom.equals(DomainFactory.from(dom)) && dom == DomainFactory.from(dom)
-            );
+        assertThat(forAll(domains()).itIsTrueThat(dom ->
+           dom.equals(DomainFactory.from(dom)) && dom == DomainFactory.from(dom)
+        ));
     }
 
     @Test
     public void testRestrict() {
-        qt().forAll(operators(), integers().all()).checkAssert((op, value) ->
-            qt().forAll(domains()).check(dom -> {
+        assertThat(
+           forAll(operators(), integers()).assertThat((op, value) ->
+           forAll(domains()).itIsTrueThat(dom -> {
                 Domain restricted = DomainFactory.restrict(dom, op, value);
                 Domain computed   = dom
                         .stream()
@@ -66,7 +54,7 @@ public class TestDomainFactory implements WithQuickTheories, WithCpGenerators {
                         .collect(DomainFactory.collector());
 
                 return restricted.equals(computed);
-            })
+            }))
         );
     }
 
@@ -92,11 +80,10 @@ public class TestDomainFactory implements WithQuickTheories, WithCpGenerators {
 
     @Test
     public void testCollector() {
-        qt().forAll(lists().of(integers().all()).ofSizeBetween(0, 1000))
-           .check(lst -> {
-               Domain d = lst.stream().collect(DomainFactory.collector());
+        assertThat(forAll(lists()).itIsTrueThat(lst -> {
+           Domain d = lst.stream().collect(DomainFactory.collector());
 
-                return d.containsAll(lst) && lst.containsAll(d);
-           });
+           return d.containsAll(lst) && lst.containsAll(d);
+       }));
     }
 }

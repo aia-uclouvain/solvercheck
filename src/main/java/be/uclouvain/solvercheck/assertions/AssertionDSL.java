@@ -2,12 +2,14 @@ package be.uclouvain.solvercheck.assertions;
 
 import be.uclouvain.solvercheck.assertions.stateful.StatefulAssertion;
 import be.uclouvain.solvercheck.assertions.stateless.StatelessAssertion;
+import be.uclouvain.solvercheck.assertions.util.AssertionRunner;
 import be.uclouvain.solvercheck.assertions.util.ForAllAssertion;
 import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
-import be.uclouvain.solvercheck.assertions.util.TestConfiguration;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
-import org.quicktheories.core.Gen;
+import be.uclouvain.solvercheck.generators.GenBuilder;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class provides some utility methods to instanciate CP-level test cases.
@@ -18,14 +20,34 @@ public final class AssertionDSL {
     private AssertionDSL() { }
 
     /**
-     * This method returns an object holding the information to appropriately
-     * configure a running test.
+     * Builds a runner for some assertion that will timeout after the
+     * specified time period.
      *
-     * @return an object holding the information to appropriately configure a
-     * running test.
+     * @param timeout the duration (in `unit`) after which the assertion
+     *                should be killed.
+     * @param unit the time unit to use to interpret the value of `duration`.
+     * @return a runner able to evaluate some assertion.
      */
-    public static TestConfiguration given() {
-        return new TestConfiguration();
+    public static AssertionRunner given(final long timeout, final TimeUnit unit) {
+        return new AssertionRunner(timeout, unit);
+    }
+
+    /**
+     * Builds a runner for some assertion that will not timeout.
+     *
+     * @return a runner able to evaluate some assertion.
+     */
+    public static AssertionRunner given() {
+        return new AssertionRunner();
+    }
+
+    /**
+     * Checks the validity of the given assertion.
+     *
+     * @param assertion the assertion to verify.
+     */
+    public static void assertThat(final Assertion assertion) {
+        new AssertionRunner().assertThat(assertion);
     }
 
     /**
@@ -127,8 +149,8 @@ public final class AssertionDSL {
      *
      *    <pre>
      *    assertThat(
-     *       forAll(booleans())
-     *          .itIsTrueThat(b -&gt; ... ) )))
+     *       forAll(ints(0, 10))
+     *          .assertThat(b -&gt; ... ) )))
      *    </pre>
      *
      *
@@ -136,7 +158,7 @@ public final class AssertionDSL {
      * @param <A> the type of the parameter produced by the generator
      * @return a hook to conveniently express a 1-parametric assertion.
      */
-    public static <A> ForAllAssertion.Forall1<A> forAll(final Gen<A> a) {
+    public static <A> ForAllAssertion.Forall1<A> forAll(final GenBuilder<A> a) {
         return ForAllAssertion.forAll(a);
     }
 
@@ -155,8 +177,8 @@ public final class AssertionDSL {
      *
      *   <pre>
      *    assertThat(
-     *       forAll(booleans(), integers.between(0, 10))
-     *            .itIsTrueThat((b, i) -&gt; ... ) )))
+     *       forAll(ints(0, 10), ints(0, 20))
+     *            .assertThat((b, i) -&gt; ... ) )))
      *    </pre>
      *
      *
@@ -167,85 +189,10 @@ public final class AssertionDSL {
      * @return a hook to conveniently express a 2-parametric assertion.
      */
     public static <A, B> ForAllAssertion.Forall2<A, B> forAll(
-            final Gen<A> a,
-            final Gen<B> b) {
+            final GenBuilder<A> a,
+            final GenBuilder<B> b) {
 
         return ForAllAssertion.forAll(a, b);
     }
-
-    /**
-     * Creates a 3-parametric assertion using the current configuration.
-     *
-     * This is particularly useful to check that not only constraint behave
-     * correctly no matter what partial assignment they are facing, but also
-     * to show that they behave correctly no matter the way they are configured.
-     *
-     * .. Example::
-     *   The following example illustrates how one can use a parametric
-     *   assertion to validate the behavior of the table constraint on
-     *   **virtually all** partial assignments and **virtually all** possble
-     *   table extensions.
-     *
-     *   <pre>
-     *    assertThat(
-     *       forAll(xs(), ys(), zs())
-     *            .itIsTrueThat((x, y, z) -&gt; ... ) )))
-     *    </pre>
-     *
-     *
-     * @param a the generator creating the generated 1st argument.
-     * @param b the generator creating the generated 2nd argument.
-     * @param c the generator creating the generated 3rd argument.
-     * @param <A> the type of the parameter produced by the 1st generator
-     * @param <B> the type of the parameter produced by the 2nd generator
-     * @param <C> the type of the parameter produced by the 3rd generator
-     * @return a hook to conveniently express a 3-parametric assertion.
-     */
-    public static <A, B, C> ForAllAssertion.Forall3<A, B, C> forAll(
-            final Gen<A> a,
-            final Gen<B> b,
-            final Gen<C> c) {
-
-        return ForAllAssertion.forAll(a, b, c);
-    }
-    /**
-     * Creates a 4-parametric assertion using the current configuration.
-     *
-     * This is particularly useful to check that not only constraint behave
-     * correctly no matter what partial assignment they are facing, but also
-     * to show that they behave correctly no matter the way they are configured.
-     *
-     * .. Example::
-     *   The following example illustrates how one can use a parametric
-     *   assertion to validate the behavior of the table constraint on
-     *   **virtually all** partial assignments and **virtually all** possble
-     *   table extensions.
-     *
-     *   <pre>
-     *    assertThat(
-     *       forAll(ws(), xs(), ys(), zs())
-     *            .itIsTrueThat((w, x, y, z) -&gt; ... ) )))
-     *    </pre>
-     *
-     *
-     * @param a the generator creating the generated 1st argument.
-     * @param b the generator creating the generated 2nd argument.
-     * @param c the generator creating the generated 3rd argument.
-     * @param d the generator creating the generated 4th argument.
-     * @param <A> the type of the parameter produced by the 1st generator
-     * @param <B> the type of the parameter produced by the 2nd generator
-     * @param <C> the type of the parameter produced by the 3rd generator
-     * @param <D> the type of the parameter produced by the 4th generator
-     * @return a hook to conveniently express a 4-parametric assertion.
-     */
-    public static <A, B, C, D> ForAllAssertion.Forall4<A, B, C, D> forAll(
-            final Gen<A> a,
-            final Gen<B> b,
-            final Gen<C> c,
-            final Gen<D> d) {
-
-        return ForAllAssertion.forAll(a, b, c, d);
-    }
-
 
 }

@@ -1,66 +1,90 @@
 package be.uclouvain.solvercheck.core;
 
-import org.junit.Assert;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import org.junit.Test;
-import org.quicktheories.WithQuickTheories;
 
-import static be.uclouvain.solvercheck.core.data.Operator.GT;
-import static be.uclouvain.solvercheck.core.data.Operator.GE;
 import static be.uclouvain.solvercheck.core.data.Operator.EQ;
-import static be.uclouvain.solvercheck.core.data.Operator.NE;
+import static be.uclouvain.solvercheck.core.data.Operator.GE;
+import static be.uclouvain.solvercheck.core.data.Operator.GT;
 import static be.uclouvain.solvercheck.core.data.Operator.LE;
 import static be.uclouvain.solvercheck.core.data.Operator.LT;
+import static be.uclouvain.solvercheck.core.data.Operator.NE;
+import static org.junit.Assert.assertEquals;
 
-public class TestOperator implements WithQuickTheories {
+public class TestOperator implements WithSolverCheck {
 
     @Test
     public void testToString() {
-        Assert.assertEquals("==", EQ.toString());
-        Assert.assertEquals("!=", NE.toString());
-        Assert.assertEquals("<",  LT.toString());
-        Assert.assertEquals("<=", LE.toString());
-        Assert.assertEquals(">",  GT.toString());
-        Assert.assertEquals(">=", GE.toString());
+        assertEquals("==", EQ.toString());
+        assertEquals("!=", NE.toString());
+        assertEquals("<",  LT.toString());
+        assertEquals("<=", LE.toString());
+        assertEquals(">",  GT.toString());
+        assertEquals(">=", GE.toString());
     }
 
     @Test
     public void testNot() {
-        Assert.assertEquals(NE.not(), EQ);
-        Assert.assertEquals(EQ.not(), NE);
-        Assert.assertEquals(GE.not(), LT);
-        Assert.assertEquals(GT.not(), LE);
-        Assert.assertEquals(LE.not(), GT);
-        Assert.assertEquals(LT.not(), GE);
+        assertEquals(NE.not(), EQ);
+        assertEquals(EQ.not(), NE);
+        assertEquals(GE.not(), LT);
+        assertEquals(GT.not(), LE);
+        assertEquals(LE.not(), GT);
+        assertEquals(LT.not(), GE);
     }
 
     @Test
     public void testCheckEQ() {
-        qt().forAll(integers().all(), integers().all())
-                .check((x, y) -> EQ.check(x,y) == (x.equals(y)));
+        assertThat(
+           forAll(integers("X"), integers("Y"))
+           .assertThat((x, y) -> rnd ->
+              assertEquals((x.equals(y)), EQ.check(x, y))
+           )
+        );
     }
     @Test
     public void testCheckNE() {
-        qt().forAll(integers().all(), integers().all())
-                .check((x, y) -> NE.check(x,y) == (!x.equals(y)));
+        assertThat(
+           forAll(integers("X"), integers("Y"))
+              .assertThat((x, y) -> rnd ->
+                 assertEquals((!x.equals(y)), NE.check(x,y))
+              )
+        );
     }
     @Test
     public void testCheckLT() {
-        qt().forAll(integers().all(), integers().all())
-                .check((x, y) -> LT.check(x,y) == (x.compareTo(y) < 0));
+        assertThat(
+           forAll(integers("X"), integers("Y"))
+              .assertThat((x, y) -> rnd ->
+                 assertEquals((x.compareTo(y) < 0), LT.check(x,y))
+              )
+        );
     }
     @Test
     public void testCheckLE() {
-        qt().forAll(integers().all(), integers().all())
-                .check((x, y) -> LE.check(x,y) == (x.compareTo(y) <= 0));
+        assertThat(
+           forAll(integers("X"), integers("Y"))
+              .assertThat((x, y) -> rnd ->
+                 assertEquals((x.compareTo(y) <= 0), LE.check(x,y))
+              )
+        );
     }
     @Test
     public void testCheckGT() {
-        qt().forAll(integers().all(), integers().all())
-                .check((x, y) -> GT.check(x,y) == (x.compareTo(y) > 0));
+        assertThat(
+           forAll(integers("X"), integers("Y"))
+              .assertThat((x, y) -> rnd ->
+                 assertEquals((x.compareTo(y) > 0), GT.check(x,y))
+              )
+        );
     }
     @Test
     public void testCheckGE() {
-        qt().forAll(integers().all(), integers().all())
-                .check((x, y) -> GE.check(x,y) == (x.compareTo(y) >= 0));
+        assertThat(
+           forAll(integers("X"), integers("Y"))
+              .assertThat((x, y) -> rnd ->
+                 assertEquals((x.compareTo(y) >= 0), GE.check(x,y))
+              )
+        );
     }
 }

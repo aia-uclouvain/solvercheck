@@ -1,19 +1,16 @@
 package be.uclouvain.solvercheck.assertions.util;
 
 import be.uclouvain.solvercheck.assertions.Assertion;
-import org.quicktheories.QuickTheory;
-import org.quicktheories.api.Function3;
-import org.quicktheories.api.Function4;
-import org.quicktheories.api.Predicate3;
-import org.quicktheories.api.Predicate4;
-import org.quicktheories.core.Gen;
-import org.quicktheories.core.Strategy;
+import be.uclouvain.solvercheck.generators.GenBuilder;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
+
+import static be.uclouvain.solvercheck.assertions.util.Defaults.DEFAULT_EXAMPLES;
 
 /**
  * This class implements an "higher order" assertion which checks that the
@@ -24,7 +21,7 @@ public final class ForAllAssertion {
     private ForAllAssertion() { }
 
     /**
-     * Creates a 1-parametric assertion using the default configuration.
+     * Creates a 1-parametric assertion.
      *
      * This is particularly useful to check that not only constraint behave
      * correctly no matter what partial assignment they are facing, but also
@@ -34,31 +31,12 @@ public final class ForAllAssertion {
      * @param <A> the type of the parameter produced by the generator
      * @return a hook to conveniently express a 1-parametric assertion.
      */
-    public static <A> Forall1<A> forAll(final Gen<A> genA) {
-        return forAll(new TestConfiguration(), genA);
+    public static <A> Forall1<A> forAll(final GenBuilder<A> genA) {
+        return new Forall1<>(genA);
     }
 
     /**
-     * Creates a 1-parametric assertion using the given configuration.
-     *
-     * This is particularly useful to check that not only constraint behave
-     * correctly no matter what partial assignment they are facing, but also
-     * to show that they behave correctly no matter the way they are configured.
-     *
-     * @param config the configuration of the random args generation.
-     * @param genA the generator creating the generated 1-parameter
-     * @param <A> the type of the parameter produced by the generator
-     * @return a hook to conveniently express a 1-parametric assertion.
-     */
-    public static <A> Forall1<A> forAll(
-            final Supplier<Strategy> config,
-            final Gen<A> genA) {
-
-        return new Forall1<>(config, genA);
-    }
-
-    /**
-     * Creates a 2-parametric assertion using the current configuration.
+     * Creates a 2-parametric assertion.
      *
      * This is particularly useful to check that not only constraint behave
      * correctly no matter what partial assignment they are facing, but also
@@ -71,132 +49,10 @@ public final class ForAllAssertion {
      * @return a hook to conveniently express a 2-parametric assertion.
      */
     public static <A, B> Forall2<A, B> forAll(
-            final Gen<A> genA,
-            final Gen<B> genB) {
+            final GenBuilder<A> genA,
+            final GenBuilder<B> genB) {
 
-        return forAll(new TestConfiguration(), genA, genB);
-    }
-    /**
-     * Creates a 2-parametric assertion using the given configuration.
-     *
-     * This is particularly useful to check that not only constraint behave
-     * correctly no matter what partial assignment they are facing, but also
-     * to show that they behave correctly no matter the way they are configured.
-     *
-     * @param config the configuration of the random args generation.
-     * @param genA the generator creating the generated 1st argument.
-     * @param genB the generator creating the generated 2nd argument.
-     * @param <A> the type of the parameter produced by the 1st generator
-     * @param <B> the type of the parameter produced by the 2nd generator
-     * @return a hook to conveniently express a 2-parametric assertion.
-     */
-    public static <A, B> Forall2<A, B> forAll(
-            final Supplier<Strategy> config,
-            final Gen<A> genA,
-            final Gen<B> genB) {
-
-        return new Forall2<>(config, genA, genB);
-    }
-    /**
-     * Creates a 3-parametric assertion using the current configuration.
-     *
-     * This is particularly useful to check that not only constraint behave
-     * correctly no matter what partial assignment they are facing, but also
-     * to show that they behave correctly no matter the way they are configured.
-     *
-     * @param genA the generator creating the generated 1st argument.
-     * @param genB the generator creating the generated 2nd argument.
-     * @param genC the generator creating the generated 3rd argument.
-     * @param <A> the type of the parameter produced by the 1st generator
-     * @param <B> the type of the parameter produced by the 2nd generator
-     * @param <C> the type of the parameter produced by the 3rd generator
-     * @return a hook to conveniently express a 3-parametric assertion.
-     */
-    public static <A, B, C> Forall3<A, B, C> forAll(
-            final Gen<A> genA,
-            final Gen<B> genB,
-            final Gen<C> genC) {
-
-        return forAll(new TestConfiguration(), genA, genB, genC);
-    }
-    /**
-     * Creates a 3-parametric assertion using the given configuration.
-     *
-     * This is particularly useful to check that not only constraint behave
-     * correctly no matter what partial assignment they are facing, but also
-     * to show that they behave correctly no matter the way they are configured.
-     *
-     * @param config the configuration of the random args generation.
-     * @param genA the generator creating the generated 1st argument.
-     * @param genB the generator creating the generated 2nd argument.
-     * @param genC the generator creating the generated 3rd argument.
-     * @param <A> the type of the parameter produced by the 1st generator
-     * @param <B> the type of the parameter produced by the 2nd generator
-     * @param <C> the type of the parameter produced by the 3rd generator
-     * @return a hook to conveniently express a 3-parametric assertion.
-     */
-    public static <A, B, C> Forall3<A, B, C> forAll(
-            final Supplier<Strategy> config,
-            final Gen<A> genA,
-            final Gen<B> genB,
-            final Gen<C> genC) {
-
-        return new Forall3<>(config, genA, genB, genC);
-    }
-
-    /**
-     * Creates a 4-parametric assertion using the current configuration.
-     *
-     * This is particularly useful to check that not only constraint behave
-     * correctly no matter what partial assignment they are facing, but also
-     * to show that they behave correctly no matter the way they are configured.
-     *
-     * @param genA the generator creating the generated 1st argument.
-     * @param genB the generator creating the generated 2nd argument.
-     * @param genC the generator creating the generated 3rd argument.
-     * @param genD the generator creating the generated 4th argument.
-     *
-     * @param <A> the type of the parameter produced by the 1st generator
-     * @param <B> the type of the parameter produced by the 2nd generator
-     * @param <C> the type of the parameter produced by the 3rd generator
-     * @param <D> the type of the parameter produced by the 4th generator
-     * @return a hook to conveniently express a 4-parametric assertion.
-     */
-    public static <A, B, C, D> Forall4<A, B, C, D> forAll(
-            final Gen<A> genA,
-            final Gen<B> genB,
-            final Gen<C> genC,
-            final Gen<D> genD) {
-
-        return forAll(new TestConfiguration(), genA, genB, genC, genD);
-    }
-    /**
-     * Creates a 4-parametric assertion using the current configuration.
-     *
-     * This is particularly useful to check that not only constraint behave
-     * correctly no matter what partial assignment they are facing, but also
-     * to show that they behave correctly no matter the way they are configured.
-     *
-     * @param config the configuration of the random args generation.
-     * @param genA the generator creating the generated 1st argument.
-     * @param genB the generator creating the generated 2nd argument.
-     * @param genC the generator creating the generated 3rd argument.
-     * @param genD the generator creating the generated 4th argument.
-     *
-     * @param <A> the type of the parameter produced by the 1st generator
-     * @param <B> the type of the parameter produced by the 2nd generator
-     * @param <C> the type of the parameter produced by the 3rd generator
-     * @param <D> the type of the parameter produced by the 4th generator
-     * @return a hook to conveniently express a 4-parametric assertion.
-     */
-    public static <A, B, C, D> Forall4<A, B, C, D> forAll(
-            final Supplier<Strategy> config,
-            final Gen<A> genA,
-            final Gen<B> genB,
-            final Gen<C> genC,
-            final Gen<D> genD) {
-
-        return new Forall4<>(config, genA, genB, genC, genD);
+        return new Forall2<>(genA, genB);
     }
 
     /**
@@ -207,10 +63,8 @@ public final class ForAllAssertion {
      * @param <A> the type of the generated parameter
      */
     public static final class Forall1<A> {
-        /** The configuration used when generating the random args. */
-        private final Supplier<Strategy> config;
         /** The generator creating the generated 1st argument. */
-        private final Gen<A> genA;
+        private final GenBuilder<A> genA;
         /**
          * A predicate encapsulating the assumptions used to filter out
          * parameter values which are not relevant for the test at hand.
@@ -218,15 +72,19 @@ public final class ForAllAssertion {
         private Predicate<A> assumptions;
 
         /**
+         * The number of inputs that will be auto generated.
+         */
+        private int examples;
+
+        /**
          * Creates a new hook to facilitate the writing of 1-parametric
          * assertions.
          *
-         * @param config the configuration of the random args generation.
          * @param genA the generator creating the generated 1st argument.
          */
-        public Forall1(final Supplier<Strategy> config, final Gen<A> genA) {
-            this.config = config;
+        public Forall1(final GenBuilder<A> genA) {
             this.genA = genA;
+            this.examples = DEFAULT_EXAMPLES;
             this.assumptions = a -> true;
         }
 
@@ -242,6 +100,18 @@ public final class ForAllAssertion {
         }
 
         /**
+         * Constrains the number of generated tests (could also be set via a
+         * call to limit on the stream).
+         *
+         * @param n the number of examples to generate
+         * @return this
+         */
+        public Forall1<A> withExamples(final int n) {
+            this.examples = n;
+            return this;
+        }
+
+        /**
          * Lets you express the parametric assertion in terms of its actual
          * parameters.
          *
@@ -249,13 +119,78 @@ public final class ForAllAssertion {
          *                  its abstract parameter.
          * @return the (parametric) assertion which can be checked.
          */
-        public Assertion itIsTrueThat(final Function<A, Assertion> assertion) {
-            return () -> {
-                QuickTheory.qt(config)
-                        .forAll(genA)
-                        .assuming(assumptions)
-                        .checkAssert(a -> assertion.apply(a).check());
+        public Assertion itIsTrueThat(final Predicate<A> assertion) {
+            return assertThat(a -> rnd -> {
+                    if (!assertion.test(a)) {
+                        throw new AssertionError(
+                           "\nCAUSE     : Property violated"
+                        );
+                    }
+                }
+            );
+        }
+
+        /**
+         * Lets you express the parametric assertion in terms of its actual
+         * parameters.
+         *
+         * @param assertion the parametric assertion expressed in terms of
+         *                  its abstract parameter.
+         * @return the (parametric) assertion which can be checked.
+         */
+        public Assertion itIsFalseThat(final Predicate<A> assertion) {
+            return itIsTrueThat(assertion.negate());
+        }
+
+        /**
+         * Lets you express the parametric assertion in terms of its actual
+         * parameters.
+         *
+         * @param assertion the parametric assertion expressed in terms of
+         *                  its abstract parameter.
+         * @return the (parametric) assertion which can be checked.
+         */
+        public Assertion assertThat(final Function<A, Assertion> assertion) {
+            return randomness -> {
+                genA.build()
+                   .generate(randomness)
+                   .limit(examples)
+                   .filter(assumptions)
+                   //.parallel()
+                   .forEach(a -> {
+                       try {
+                           assertion.apply(a).check(randomness);
+                       } catch (AssertionError cause) {
+                            throw new AssertionError(
+                               explanation(a, cause.getMessage()),
+                               cause);
+                       } catch (Throwable cause) {
+                           throw new AssertionError(
+                              explanation(a,
+                              "\nCAUSE     : An exception was caught"
+                                 + "\n###########################"),
+                              cause);
+                       }
+                   });
             };
+        }
+
+        /**
+         * Creates an intelligible error report which can be used to reproduce
+         * and investigate an error witness.
+         *
+         * @param a the generated object for which a counterexample of th
+         *          property has been found.
+         * @param cause an explanatory message about why the violation occurred.
+         * @return An error message giving the details of the witnessed
+         * property violation.
+         */
+        private String explanation(final A a, final String cause) {
+            final StringBuilder builder = new StringBuilder("\n");
+            builder.append("########################### \n");
+            builder.append(genA.name()).append(" : ").append(describe(a));
+            builder.append(cause);
+            return builder.toString();
         }
     }
 
@@ -268,12 +203,12 @@ public final class ForAllAssertion {
      * @param <B> the type of the 2nd generated parameter
      */
     public static final class Forall2<A, B> {
-        /** the configuration used when generating the random args. */
-        private final Supplier<Strategy> config;
         /** The generator creating the generated 1st argument. */
-        private final Gen<A> genA;
+        private final GenBuilder<A> genA;
         /** The generator creating the generated 2nd argument. */
-        private final Gen<B> genB;
+        private final GenBuilder<B> genB;
+        /** The number of inputs that will be auto generated.  */
+        private int examples;
         /**
          * A predicate encapsulating the assumptions used to filter out
          * parameter values which are not relevant for the test at hand.
@@ -284,19 +219,16 @@ public final class ForAllAssertion {
          * Creates a new hook to facilitate the writing of 2-parametric
          * assertions.
          *
-         * @param config the configuration of the random args generation.
          * @param genA the generator creating the generated 1st argument.
          * @param genB the generator creating the generated 2nd argument.
          */
         public Forall2(
-                final Supplier<Strategy> config,
-                final Gen<A> genA,
-                final Gen<B> genB) {
+                final GenBuilder<A> genA,
+                final GenBuilder<B> genB) {
 
-            this.config = config;
             this.genA = genA;
             this.genB = genB;
-
+            this.examples = DEFAULT_EXAMPLES;
             this.assumptions = (a, b) -> true;
         }
 
@@ -310,6 +242,50 @@ public final class ForAllAssertion {
             this.assumptions = this.assumptions.and(assumption);
             return this;
         }
+
+        /**
+         * Constrains the number of generated tests (could also be set via a
+         * call to limit on the stream).
+         *
+         * @param n the number of examples to generate
+         * @return this
+         */
+        public Forall2<A, B> withExamples(final int n) {
+            this.examples = n;
+            return this;
+        }
+
+        /**
+         * Lets you express the parametric assertion in terms of its actual
+         * parameters.
+         *
+         * @param assertion the parametric assertion expressed in terms of
+         *                  its abstract parameter.
+         * @return the (parametric) assertion which can be checked.
+         */
+        public Assertion itIsTrueThat(final BiPredicate<A, B> assertion) {
+            return assertThat((a, b) -> rnd -> {
+                   if (!assertion.test(a, b)) {
+                       throw new AssertionError(
+                          "\nCAUSE     : Property violated"
+                       );
+                   }
+               }
+            );
+        }
+
+        /**
+         * Lets you express the parametric assertion in terms of its actual
+         * parameters.
+         *
+         * @param assertion the parametric assertion expressed in terms of
+         *                  its abstract parameter.
+         * @return the (parametric) assertion which can be checked.
+         */
+        public Assertion itIsFalseThat(final BiPredicate<A, B> assertion) {
+            return itIsTrueThat(assertion.negate());
+        }
+
         /**
          * Lets you express the parametric assertion in terms of its actual
          * parameters.
@@ -318,176 +294,97 @@ public final class ForAllAssertion {
          *                  its abstract parameters.
          * @return the (parametric) assertion which can be checked.
          */
-        public Assertion itIsTrueThat(final BiFunction<A, B, Assertion> assertion) {
-            return () -> {
-                QuickTheory.qt(config)
-                        .forAll(genA, genB)
-                        .assuming(assumptions)
-                        .checkAssert(
-                                (a, b) -> assertion.apply(a, b).check()
-                        );
+        public Assertion assertThat(final BiFunction<A, B, Assertion> assertion) {
+            return randomness -> {
+                Iterator<A> iterA = genA.build().generate(randomness).iterator();
+                Iterator<B> iterB = genB.build().generate(randomness).iterator();
+
+                int counter = 0;
+                while (counter < examples) {
+                    A itemA = iterA.next();
+                    B itemB = iterB.next();
+
+                    try {
+                        if (!assumptions.test(itemA, itemB)) {
+                            continue;
+                        } else {
+                            counter++;
+                        }
+
+                        assertion.apply(itemA, itemB).check(randomness);
+                    } catch (AssertionError cause) {
+                      throw new AssertionError(
+                         explanation(itemA, itemB, cause.getMessage()),
+                         cause);
+                    } catch (Throwable cause) {
+                      throw new AssertionError(
+                         explanation(itemA, itemB,
+                    "\nCAUSE     : An exception was caught"
+                       + "\n###########################"),
+                         cause);
+                    }
+                }
             };
+        }
+
+        /**
+         * Creates an intelligible error report which can be used to reproduce
+         * and investigate an error witness.
+         *
+         * @param a the 1st generated object for which a counterexample of the
+         *          property has been found.
+         * @param b the 2nd generated object for which a counterexample of the
+         *          property has been found.
+         * @param cause an explanatory message about why the violation occurred.
+         * @return An error message giving the details of the witnessed
+         * property violation.
+         */
+        private String explanation(final A a, final B b, final String cause) {
+            final StringBuilder builder = new StringBuilder("\n");
+            builder.append("########################### \n");
+            builder.append(genA.name()).append(" : ").append(describe(a)).append("\n");
+            builder.append(genB.name()).append(" : ").append(describe(b));
+            builder.append(cause);
+            return builder.toString();
         }
     }
 
     /**
-     * This class provides a hook to create and customize 3-parametric
-     * assertions. The set of classes Forall{1..4} pretty much reflects
-     * `QuickTheories` set of `TheoryBuilder{1..4}` classes.
+     * Returns a string representation of the given object `t`. Usually, a
+     * call to this method boils down to a call to `t.toString()`, but this
+     * method gracefully handles (unidimentional) arrays too.
      *
-     * @param <A> the type of the 1st generated parameter
-     * @param <B> the type of the 2nd generated parameter
-     * @param <C> the type of the 3rd generated parameter
+     * @param t the object to describe
+     * @param <T> the type of the object to describe
+     * @return an intelligible string representation of `t`.
      */
-    public static final class Forall3<A, B, C> {
-        /** the configuration used when generating the random args. */
-        private final Supplier<Strategy> config;
-        /** The generator creating the generated 1st argument. */
-        private final Gen<A> genA;
-        /** The generator creating the generated 2nd argument. */
-        private final Gen<B> genB;
-        /** The generator creating the generated 3rd argument. */
-        private final Gen<C> genC;
-        /**
-         * A predicate encapsulating the assumptions used to filter out
-         * parameter values which are not relevant for the test at hand.
-         */
-        private Predicate3<A, B, C> assumptions;
-
-        /**
-         * Creates a new hook to facilitate the writing of 3-parametric
-         * assertions.
-         *
-         * @param config the configuration of the random args generation.
-         * @param genA the generator creating the generated 1st argument.
-         * @param genB the generator creating the generated 2nd argument.
-         * @param genC the generator creating the generated 3rd argument.
-         */
-        public Forall3(
-                final Supplier<Strategy> config,
-                final Gen<A> genA,
-                final Gen<B> genB,
-                final Gen<C> genC) {
-
-            this.config = config;
-            this.genA = genA;
-            this.genB = genB;
-            this.genC = genC;
-
-            this.assumptions = (a, b, c) -> true;
-        }
-
-        /**
-         * Constrains the values allowed for the generated parameters.
-         *
-         * @param assumption a predicate that must be true of all values
-         * @return this
-         */
-        public Forall3<A, B, C> assuming(final Predicate3<A, B, C> assumption) {
-            this.assumptions = this.assumptions.and(assumption);
-            return this;
-        }
-        /**
-         * Lets you express the parametric assertion in terms of its actual
-         * parameters.
-         *
-         * @param assertion the parametric assertion expressed in terms of
-         *                  its abstract parameters.
-         * @return the (parametric) assertion which can be checked.
-         */
-        public Assertion itIsTrueThat(final Function3<A, B, C, Assertion> assertion) {
-            return () -> {
-                QuickTheory.qt(config)
-                        .forAll(genA, genB, genC)
-                        .assuming(assumptions)
-                        .checkAssert(
-                                (a, b, c) -> assertion.apply(a, b, c).check()
-                        );
-            };
-        }
-    }
-
-    /**
-     * This class provides a hook to create and customize 3-parametric
-     * assertions. The set of classes Forall{1..4} pretty much reflects
-     * `QuickTheories` set of `TheoryBuilder{1..4}` classes.
-     *
-     * @param <A> the type of the 1st generated parameter
-     * @param <B> the type of the 2nd generated parameter
-     * @param <C> the type of the 3rd generated parameter
-     * @param <D> the type of the 4th generated parameter
-     */
-    public static final class Forall4<A, B, C, D> {
-        /** the configuration used when generating the random args. */
-        private final Supplier<Strategy> config;
-
-        /** The generator creating the generated 1st argument. */
-        private final Gen<A> genA;
-        /** The generator creating the generated 2nd argument. */
-        private final Gen<B> genB;
-        /** The generator creating the generated 3rd argument. */
-        private final Gen<C> genC;
-        /** The generator creating the generated 4th argument. */
-        private final Gen<D> genD;
-        /**
-         * A predicate encapsulating the assumptions used to filter out
-         * parameter values which are not relevant for the test at hand.
-         */
-        private Predicate4<A, B, C, D> assumptions;
-
-        /**
-         * Creates a new hook to facilitate the writing of 4-parametric
-         * assertions.
-         *
-         * @param config the configuration of the random args generation.
-         * @param genA the generator creating the generated 1st argument.
-         * @param genB the generator creating the generated 2nd argument.
-         * @param genC the generator creating the generated 3rd argument.
-         * @param genD the generator creating the generated 4th argument.
-         */
-        public Forall4(
-                final Supplier<Strategy> config,
-                final Gen<A> genA,
-                final Gen<B> genB,
-                final Gen<C> genC,
-                final Gen<D> genD) {
-
-            this.config = config;
-            this.genA = genA;
-            this.genB = genB;
-            this.genC = genC;
-            this.genD = genD;
-
-            this.assumptions = (a, b, c, d) -> true;
-        }
-
-        /**
-         * Constrains the values allowed for the generated parameters.
-         *
-         * @param assumption a predicate that must be true of all values
-         * @return this
-         */
-        public Forall4<A, B, C, D> assuming(final Predicate4<A, B, C, D> assumption) {
-            this.assumptions = this.assumptions.and(assumption);
-            return this;
-        }
-        /**
-         * Lets you express the parametric assertion in terms of its actual
-         * parameters.
-         *
-         * @param assertion the parametric assertion expressed in terms of
-         *                  its abstract parameters.
-         * @return the (parametric) assertion which can be checked.
-         */
-        public Assertion itIsTrueThat(final Function4<A, B, C, D, Assertion> assertion) {
-            return () -> {
-                QuickTheory.qt(config)
-                        .forAll(genA, genB, genC, genD)
-                        .assuming(assumptions)
-                        .checkAssert(
-                                (a, b, c, d) -> assertion.apply(a, b, c, d).check()
-                        );
-            };
+    private static <T> String describe(final T t) {
+        Class<T> clazz = (Class<T>) t.getClass();
+        if (clazz.isArray()) {
+            if (clazz.getComponentType().isPrimitive()) {
+                if (int[].class.equals(clazz)) {
+                    return Arrays.toString((int[]) t);
+                } else if (long[].class.equals(clazz)) {
+                    return Arrays.toString((long[]) t);
+                } else if (short[].class.equals(clazz)) {
+                    return Arrays.toString((short[]) t);
+                } else if (byte[].class.equals(clazz)) {
+                    return Arrays.toString((byte[]) t);
+                } else if (char[].class.equals(clazz)) {
+                    return Arrays.toString((char[]) t);
+                } else if (double[].class.equals(clazz)) {
+                    return Arrays.toString((double[]) t);
+                } else if (float[].class.equals(clazz)) {
+                    return Arrays.toString((float[]) t);
+                } else if (boolean[].class.equals(clazz)) {
+                    return Arrays.toString((boolean[]) t);
+                }
+                return "Unknown type ! (This should never happen)";
+            } else {
+                return Arrays.toString((Object[]) t);
+            }
+        } else {
+            return t.toString();
         }
     }
 }
