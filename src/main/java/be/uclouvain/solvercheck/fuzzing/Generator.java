@@ -19,12 +19,21 @@ public interface Generator<T> {
     String name();
 
     /**
+     * Produces (generates) one T using the given randomness source.
+     *
+     * @param randomness the source of randomness used to perform the fuzzing.
+     * @return one single made up object of type T.
+     */
+    T item(Randomness randomness);
+
+    /**
      * Produces (generates) a stream of the T using the given randomness
      * source to invent pseudo-random T objects.
      *
      * @param randomness the source of randomness used to perform the fuzzing.
      * @return a stream of data, all of type T.
      */
-    Stream<T> generate(Randomness randomness);
-
+    default Stream<T> generate(Randomness randomness) {
+        return Stream.generate(() -> item(randomness));
+    }
 }

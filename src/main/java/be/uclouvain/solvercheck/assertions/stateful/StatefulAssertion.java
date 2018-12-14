@@ -1,10 +1,11 @@
 package be.uclouvain.solvercheck.assertions.stateful;
 
 import be.uclouvain.solvercheck.assertions.Assertion;
-import be.uclouvain.solvercheck.assertions.util.AbstractFluentConfig;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
 import be.uclouvain.solvercheck.fuzzing.Randomness;
+
+import java.util.function.Function;
 
 import static be.uclouvain.solvercheck.assertions.stateful.StatefulProperties.equivalentTo;
 import static be.uclouvain.solvercheck.assertions.stateful.StatefulProperties.strictlyStrongerThan;
@@ -21,9 +22,7 @@ import static be.uclouvain.solvercheck.assertions.stateful.StatefulProperties.we
  * @see Dive
  */
 @SuppressWarnings("checkstyle:hiddenfield")
-public final class StatefulAssertion
-        extends AbstractFluentConfig<StatefulAssertion>
-        implements Assertion {
+public final class StatefulAssertion implements Function<PartialAssignment, Assertion> {
     /**
      * The number of 'dives' (branches that are explored until a leaf is
      * reached) explored by default when testing a stateful property.
@@ -53,15 +52,6 @@ public final class StatefulAssertion
         super();
         this.actual  = actual;
         this.nbDives = DEFAULT_NB_DIVES;
-
-        // performing dives for an empty root makes no sense.
-        assuming(root -> !root.isEmpty());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected StatefulAssertion getThis() {
-        return this;
     }
 
     /**
@@ -142,24 +132,10 @@ public final class StatefulAssertion
 
     /** {@inheritDoc} */
     @Override
-    public void check(final Randomness rnd) {
-        doCheckAssert(rnd, pa -> dive(rnd, pa).run());
-    }
-
-    /**
-     * Verifies the property for one single partial assignment.
-     *
-     * @param rnd the source of randomness (for the search)
-     * @param pa the partial assignment for which to verify the property
-     * @return true iff the property is satisfied for the given `pa`
-     */
-    public boolean test(final Randomness rnd, final PartialAssignment pa) {
-        try {
+    public Assertion apply(final PartialAssignment pa) {
+        return rnd -> {
             dive(rnd, pa).run();
-            return true;
-        } catch (AssertionError error) {
-            return false;
-        }
+        };
     }
 
     /**

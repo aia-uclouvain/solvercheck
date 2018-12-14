@@ -1,11 +1,11 @@
 package be.uclouvain.solvercheck.assertions.stateless;
 
 import be.uclouvain.solvercheck.assertions.Assertion;
-import be.uclouvain.solvercheck.assertions.util.AbstractFluentConfig;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.fuzzing.Randomness;
 
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static be.uclouvain.solvercheck.assertions.stateless.StatelessProperties.contracting;
@@ -24,9 +24,7 @@ import static be.uclouvain.solvercheck.assertions.stateless.StatelessProperties.
 // Given that this class behaves as a builder, it is ok to shadow fields in
 // certain (setter) methods.
 @SuppressWarnings("checkstyle:hiddenfield")
-public final class StatelessAssertion
-        extends AbstractFluentConfig<StatelessAssertion>
-        implements Predicate<PartialAssignment>, Assertion {
+public final class StatelessAssertion implements Function<PartialAssignment, Assertion> {
 
     /** The actual filter being tested. */
     private final Filter actual;
@@ -149,18 +147,33 @@ public final class StatelessAssertion
     }
 
     /** {@inheritDoc} */
-    public boolean test(final PartialAssignment domains) {
-        return this.check.test(domains);
-    }
-
-    /** {@inheritDoc} */
-    public void check(final Randomness rnd) {
-        doCheck(rnd, this);
-    }
-
-    /** {@inheritDoc} */
     @Override
-    protected StatelessAssertion getThis() {
-        return this;
+    public Assertion apply(final PartialAssignment pa) {
+        return rnd -> {
+            if (!this.check.test(pa)) {
+                throw new AssertionError(explanation(rnd, pa));
+            }
+        };
+    }
+
+    /**
+     * Creates an intelligible error report which can be used to reproduce an
+     * investigate an error witness.
+     *
+     * @param rnd the source of randomness used for the fuzzing.
+     * @param pa  the partial assignment
+     * @return An error message giving the details of the witnessed
+     * property violation.
+     */
+    private String explanation(final Randomness rnd,
+                               final PartialAssignment pa) {
+
+        final StringBuilder builder = new StringBuilder("\n");
+        builder.append("########################### \n");
+        builder.append("SEED    : ").append(Long.toHexString(rnd.getSeed())).append("\n");
+        builder.append("WITNESS : ").append(pa).append("\n");
+        builder.append("########################### \n");
+
+        return builder.toString();
     }
 }

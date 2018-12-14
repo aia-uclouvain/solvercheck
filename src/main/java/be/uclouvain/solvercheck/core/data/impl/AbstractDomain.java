@@ -15,7 +15,7 @@ import java.util.stream.StreamSupport;
  * The base class of all Domains. It provides some facility wrt iterators and
  * spliterators.
  */
-/* package */ abstract class AbstractDomain
+public abstract class AbstractDomain
         extends AbstractSet<Integer>
         implements Domain {
 

@@ -12,7 +12,7 @@ public interface WithGenerators {
     /**
      * @return a generator (builder) to create int values.
      */
-    default GeneratorsDSL.GenIntBuilder integers() {
+    default GeneratorsDSL.GenIntBuilder integer() {
         return GeneratorsDSL.ints();
     }
     /**
@@ -20,14 +20,14 @@ public interface WithGenerators {
      *             information in case of error reporting).
      * @return a generator (builder) to create int values.
      */
-    default GeneratorsDSL.GenIntBuilder integers(final String name) {
+    default GeneratorsDSL.GenIntBuilder integer(final String name) {
         return GeneratorsDSL.ints(name);
     }
 
     /**
      * @return a generator (builder) to create boolean values.
      */
-    default GeneratorsDSL.GenBoolBuilder booleans() {
+    default GeneratorsDSL.GenBoolBuilder bool() {
         return GeneratorsDSL.booleans();
     }
     /**
@@ -35,14 +35,14 @@ public interface WithGenerators {
      *             information in case of error reporting).
      * @return a generator (builder) to create boolean values.
      */
-    default GeneratorsDSL.GenBoolBuilder booleans(final String name) {
+    default GeneratorsDSL.GenBoolBuilder bool(final String name) {
         return GeneratorsDSL.booleans(name);
     }
 
     /**
      * @return a generator (builder) to create lists of int values.
      */
-    default GeneratorsDSL.GenListBuilder lists() {
+    default GeneratorsDSL.GenListBuilder list() {
         return GeneratorsDSL.lists();
     }
     /**
@@ -50,14 +50,14 @@ public interface WithGenerators {
      *             information in case of error reporting).
      * @return a generator (builder) to create lists of int values.
      */
-    default GeneratorsDSL.GenListBuilder lists(final String name) {
+    default GeneratorsDSL.GenListBuilder list(final String name) {
         return GeneratorsDSL.lists(name);
     }
 
     /**
      * @return a generator (builder) to create int[] values.
      */
-    default GeneratorsDSL.GenArrayBuilder arrays() {
+    default GeneratorsDSL.GenArrayBuilder array() {
         return GeneratorsDSL.arrays();
     }
     /**
@@ -65,14 +65,14 @@ public interface WithGenerators {
      *             information in case of error reporting).
      * @return a generator (builder) to create int[] values.
      */
-    default GeneratorsDSL.GenArrayBuilder arrays(final String name) {
+    default GeneratorsDSL.GenArrayBuilder array(final String name) {
         return GeneratorsDSL.arrays(name);
     }
 
     /**
      * @return a generator (builder) to create sets of int values.
      */
-    default GeneratorsDSL.GenSetBuilder sets() {
+    default GeneratorsDSL.GenSetBuilder set() {
         return GeneratorsDSL.sets();
     }
     /**
@@ -80,14 +80,14 @@ public interface WithGenerators {
      *             information in case of error reporting).
      * @return a generator (builder) to create sets of int values.
      */
-    default GeneratorsDSL.GenSetBuilder sets(final String name) {
+    default GeneratorsDSL.GenSetBuilder set(final String name) {
         return GeneratorsDSL.sets(name);
     }
 
     /**
      * @return a generator meant to produce random `Operator` instances
      */
-    default GeneratorsDSL.GenOperatorBuilder operators() {
+    default GeneratorsDSL.GenOperatorBuilder operator() {
         return GeneratorsDSL.operators();
     }
     /**
@@ -95,7 +95,7 @@ public interface WithGenerators {
      *             information in case of error reporting).
      * @return a generator meant to produce random `Operator` instances
      */
-    default GeneratorsDSL.GenOperatorBuilder operators(final String name) {
+    default GeneratorsDSL.GenOperatorBuilder operator(final String name) {
         return GeneratorsDSL.operators(name);
     }
 
@@ -103,7 +103,7 @@ public interface WithGenerators {
      * @return a configurable generator meant to produce random
      * `Domain` instances
      */
-    default GeneratorsDSL.GenDomainBuilder domains() {
+    default GeneratorsDSL.GenDomainBuilder domain() {
         return GeneratorsDSL.domains();
     }
     /**
@@ -112,7 +112,7 @@ public interface WithGenerators {
      * @return a configurable generator meant to produce random
      * `Domain` instances
      */
-    default GeneratorsDSL.GenDomainBuilder domains(final String name) {
+    default GeneratorsDSL.GenDomainBuilder domain(final String name) {
         return GeneratorsDSL.domains(name);
     }
 
@@ -120,7 +120,7 @@ public interface WithGenerators {
      * @return a configurable generator meant to produce random
      * `Assignment` instances
      */
-    default GeneratorsDSL.GenAssignmentBuilder assignments() {
+    default GeneratorsDSL.GenAssignmentBuilder assignment() {
         return GeneratorsDSL.assignments();
     }
     /**
@@ -129,7 +129,7 @@ public interface WithGenerators {
      * @return a configurable generator meant to produce random
      * `Assignment` instances
      */
-    default GeneratorsDSL.GenAssignmentBuilder assignments(final String name) {
+    default GeneratorsDSL.GenAssignmentBuilder assignment(final String name) {
         return GeneratorsDSL.assignments(name);
     }
 
@@ -137,7 +137,7 @@ public interface WithGenerators {
      * @return a configurable generator meant to produce random
      * `PartialAssignment` instances
      */
-    default GeneratorsDSL.GenPartialAssignmentBuilder partialAssignments() {
+    default GeneratorsDSL.GenPartialAssignmentBuilder partialAssignment() {
         return GeneratorsDSL.partialAssignments();
     }
     /**
@@ -146,25 +146,7 @@ public interface WithGenerators {
      * @return a configurable generator meant to produce random
      * `PartialAssignment` instances
      */
-    default GeneratorsDSL.GenPartialAssignmentBuilder partialAssignments(final String n) {
+    default GeneratorsDSL.GenPartialAssignmentBuilder partialAssignment(final String n) {
         return GeneratorsDSL.partialAssignments(n);
     }
-
-    /**
-     * @return a configurable generator meant to produce random tables. That
-     * is to say, to produce random lists of `Assignment`.
-     */
-    default GeneratorsDSL.GenTableBuilder tables() {
-        return GeneratorsDSL.tables();
-    }
-    /**
-     * @param name the name of the generator. (used to provide meaningful
-     *             information in case of error reporting).
-     * @return a configurable generator meant to produce random tables. That
-     * is to say, to produce random lists of `Assignment`.
-     */
-    default GeneratorsDSL.GenTableBuilder tables(final String name) {
-        return GeneratorsDSL.tables(name);
-    }
-
 }

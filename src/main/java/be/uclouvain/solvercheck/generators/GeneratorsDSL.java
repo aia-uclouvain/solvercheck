@@ -4,14 +4,19 @@ import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.fuzzing.BaseGenerator;
+import be.uclouvain.solvercheck.fuzzing.ArrayGenerator;
+import be.uclouvain.solvercheck.fuzzing.AssignmentGenerator;
+import be.uclouvain.solvercheck.fuzzing.BooleanGenerator;
+import be.uclouvain.solvercheck.fuzzing.DomainGenerator;
 import be.uclouvain.solvercheck.fuzzing.Generator;
-import be.uclouvain.solvercheck.fuzzing.Generators;
-import be.uclouvain.solvercheck.fuzzing.Randomness;
+import be.uclouvain.solvercheck.fuzzing.IntGenerator;
+import be.uclouvain.solvercheck.fuzzing.ListGenerator;
+import be.uclouvain.solvercheck.fuzzing.OperatorGenerator;
+import be.uclouvain.solvercheck.fuzzing.PartialAssignmentGenerator;
+import be.uclouvain.solvercheck.fuzzing.SetGenerator;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * This class provides utility method to create generators that will be used
@@ -25,7 +30,10 @@ public final class GeneratorsDSL {
     private static final int DEFAULT_NB_VARS_MAX = 5;
 
     /** The default maximum number of values in the domains. */
-    private static final int DEFAULT_NB_VAL_MAX = 10;
+    private static final int DEFAULT_NB_VAL_MAX  = 10;
+
+    /** The default maximum number of variables in (partial) assignment. */
+    private static final int DEFAULT_SPREAD      = 10;
 
     /** the default minimum number of lines in the generated tables. */
     private static final int DEFAULT_NB_LINES_MIN = 0;
@@ -114,7 +122,7 @@ public final class GeneratorsDSL {
     public static GenPartialAssignmentBuilder partialAssignments(final String name) {
         return new GenPartialAssignmentBuilder(name);
     }
-
+    
     // --------- ASSIGNMENT ---------------------------------------------------
     /**
      * @return a builder meant to act as a micro DSL to instantiate
@@ -125,18 +133,6 @@ public final class GeneratorsDSL {
     }
     public static GenAssignmentBuilder assignments(final String name) {
         return new GenAssignmentBuilder(name);
-    }
-
-    // --------- TABLES -------------------------------------------------------
-    /**
-     * @return a builder meant to act as a micro DSL to instantiate
-     * generators that produce random table constraints.
-     */
-    public static GenTableBuilder tables() {
-        return tables("Table");
-    }
-    public static GenTableBuilder tables(final String name) {
-        return new GenTableBuilder(name);
     }
 
     // --------- BUILDERS -----------------------------------------------------
@@ -165,13 +161,7 @@ public final class GeneratorsDSL {
 
         @Override
         public Generator<Integer> build() {
-            return new BaseGenerator<>(name()) {
-                /** @inheritDoc} */
-                @Override
-                public Stream<Integer> generate(final Randomness rnd) {
-                    return Generators.ints(rnd, low, high);
-                }
-            };
+            return new IntGenerator(name(), low, high);
         }
     }
 
@@ -183,22 +173,17 @@ public final class GeneratorsDSL {
 
         @Override
         public Generator<Boolean> build() {
-            return new BaseGenerator<>(name()) {
-                /** @inheritDoc} */
-                @Override
-                public Stream<Boolean> generate(final Randomness rnd) {
-                    return Generators.booleans(rnd);
-                }
-            };
+            return new BooleanGenerator(name());
         }
     }
 
     /**
      * A builder which acts as a micro DSL to produce generators of lists of
      * integers.
+     *
+     * @param <T> the kind if items in the generated lists.
      */
-    public static final class GenListBuilder extends GenBuilder<List<Integer>> {
-
+    public static final class GenListBuilder<T> extends GenBuilder<List<T>> {
         /**
          * The minimum number of items in the list. (default: 0)
          */
@@ -208,16 +193,36 @@ public final class GeneratorsDSL {
          */
         private int nbItemsMax = DEFAULT_NB_VARS_MAX;
         /**
-         * The minimum value that may occur in the list.
+         * The generator that actually produces the items
          */
-        private int valueMin  = DEFAULT_VALUE_MIN;
-        /**
-         * The maximum value that may occur in the list.
-         */
-        private int valueMax  = DEFAULT_VALUE_MAX;
+        private Generator<T> generator;
 
+        /**
+         * Contructor with a name
+         * @param name the name of the generator
+         */
         public GenListBuilder(final String name) {
             super(name);
+        }
+
+        /**
+         * Tells what is going to be generated as items in the list.
+         * @param what a generator for the kind of items in the list.
+         * @return this.
+         */
+        public GenListBuilder of(final Generator<T> what) {
+            generator = what;
+            return this;
+        }
+
+        /**
+         * Tells what is going to be generated as items in the list.
+         * @param what a generator builder for the kind of items in the list.
+         * @return this.
+         */
+        public GenListBuilder of(final GenBuilder<T> what) {
+            generator = what.build();
+            return this;
         }
 
         /**
@@ -258,44 +263,24 @@ public final class GeneratorsDSL {
         }
 
         /**
-         * Specifies the allowed range of value to be comprised between `from`
-         * and `to` (inclusive).
-         *
-         * @param from a lower bound on the possible values.
-         * @param to an upper bound on the possible values.
-         * @return this
-         */
-        public GenListBuilder withValuesRanging(final int from, final int to) {
-            this.valueMin = from;
-            this.valueMax = to;
-            return this;
-        }
-
-        /**
          * {@inheritDoc}
          *
          * @return an assignment generator that corresponds to the
          * configuration specified with the other methods
          */
         @Override
-        public Generator<List<Integer>> build() {
-            return new BaseGenerator<>(name()) {
-                /** {@inheritDoc} */
-                @Override
-                public Stream<List<Integer>> generate(final Randomness rnd) {
-                    return Generators
-                       .lists(rnd, nbItemsMin, nbItemsMax, valueMin, valueMax);
-                }
-            };
+        public Generator<List<T>> build() {
+            return new ListGenerator<T>(name(), generator, nbItemsMin, nbItemsMax);
         }
     }
 
     /**
      * A builder which acts as a micro DSL to produce generators of lists of
      * integers.
+     *
+     * @param <T> the kind if items in the generated lists.
      */
-    public static final class GenArrayBuilder extends GenBuilder<int[]> {
-
+    public static final class GenArrayBuilder<T> extends GenBuilder<T[]> {
         /**
          * The minimum number of items in the list. (default: 0)
          */
@@ -305,16 +290,46 @@ public final class GeneratorsDSL {
          */
         private int nbItemsMax = DEFAULT_NB_VARS_MAX;
         /**
-         * The minimum value that may occur in the list.
+         * The class of the items being generated.
          */
-        private int valueMin  = DEFAULT_VALUE_MIN;
+        private Class<T> clazz;
         /**
-         * The maximum value that may occur in the list.
+         * The generator that actually produces the items.
          */
-        private int valueMax  = DEFAULT_VALUE_MAX;
+        private Generator<T> generator;
 
+        /**
+         * Contructor with a name
+         * @param name the name of the generator
+         */
         public GenArrayBuilder(final String name) {
             super(name);
+        }
+
+        /**
+         * Tells what is going to be generated as items in the array.
+         *
+         * @param clazz the class of the generated elements.
+         * @param what a generator for the kind of items in the array.
+         * @return this.
+         */
+        public GenArrayBuilder of(final Class<T> clazz, final Generator<T> what) {
+            this.clazz = clazz;
+            this.generator = what;
+            return this;
+        }
+
+        /**
+         * Tells what is going to be generated as items in the list.
+         *
+         * @param clazz the class of the generated elements.
+         * @param what a generator builder for the kind of items in the array.
+         * @return this.
+         */
+        public GenArrayBuilder of(final Class<T> clazz, final GenBuilder<T> what) {
+            this.clazz = clazz;
+            this.generator = what.build();
+            return this;
         }
 
         /**
@@ -340,7 +355,7 @@ public final class GeneratorsDSL {
             return this;
         }
         /**
-         * Tells that generator will produce arrays having between from
+         * Tells that generator will produce lists having between from
          * and to items.
          *
          * @param from a lower bound on the number of items in the list.
@@ -355,18 +370,83 @@ public final class GeneratorsDSL {
         }
 
         /**
-         * Specifies the allowed range of value to be comprised between `from`
-         * and `to` (inclusive).
+         * {@inheritDoc}
          *
-         * @param from a lower bound on the possible values.
-         * @param to an upper bound on the possible values.
-         * @return this
+         * @return an assignment generator that corresponds to the
+         * configuration specified with the other methods
          */
-        public GenArrayBuilder withValuesRanging(final int from, final int to) {
-            this.valueMin = from;
-            this.valueMax = to;
+        @Override
+        public Generator<T[]> build() {
+            return new ArrayGenerator<>(name(), generator, clazz, nbItemsMin, nbItemsMax);
+        }
+    }
+
+    /**
+     * A builder which acts as a micro DSL to produce generators of domains.
+     */
+    public static final class GenSetBuilder<T> extends GenBuilder<Set<T>> {
+        /**
+         * The minimum number of items in the list. (default: 0)
+         */
+        private boolean canBeEmpty = false;
+        /**
+         * The maximum number of items in the list. (default: 5)
+         */
+        private int nbItemsMax = DEFAULT_NB_VARS_MAX;
+        /**
+         * The generator that actually produces the items
+         */
+        private Generator<T> generator;
+
+        /**
+         * Contructor with a name
+         * @param name the name of the generator
+         */
+        public GenSetBuilder(final String name) {
+            super(name);
+        }
+
+        /**
+         * Tells what is going to be generated as items in the set.
+         * @param what a generator for the kind of items in the set.
+         * @return this.
+         */
+        public GenSetBuilder of(final Generator<T> what) {
+            generator = what;
             return this;
         }
+
+        /**
+         * Tells what is going to be generated as items in the set.
+         * @param what a generator builder for the kind of items in the set.
+         * @return this.
+         */
+        public GenSetBuilder of(final GenBuilder<T> what) {
+            generator = what.build();
+            return this;
+        }
+
+        /**
+         * Tells that generator will produce lists having &lt;= n items.
+         *
+         * @param n the maximum number of items in the generated list
+         * @return this
+         */
+        public GenSetBuilder ofSizeUpTo(final int n) {
+            this.nbItemsMax = n;
+            return this;
+        }
+
+        /**
+         * Tells that the generated set can possibly be empty.
+         *
+         * @return this
+         */
+        public GenSetBuilder possiblyEmpty() {
+            this.canBeEmpty = true;
+            return this;
+        }
+
 
         /**
          * {@inheritDoc}
@@ -375,86 +455,8 @@ public final class GeneratorsDSL {
          * configuration specified with the other methods
          */
         @Override
-        public Generator<int[]> build() {
-            return new BaseGenerator<>(name()) {
-                /** {@inheritDoc} */
-                @Override
-                public Stream<int[]> generate(final Randomness rnd) {
-                    return Generators
-                       .lists(rnd, nbItemsMin, nbItemsMax, valueMin, valueMax)
-                       .map(lst -> lst.stream().mapToInt(Integer::intValue).toArray());
-                }
-            };
-        }
-    }
-
-    /**
-     * A builder which acts as a micro DSL to produce generators of domains.
-     */
-    public static final class GenSetBuilder extends GenBuilder<Set<Integer>> {
-        /**
-         * a flag telling whether or not we allow the generator to produce
-         * empty sets.
-         */
-        private boolean allowEmpty = false;
-        /** the maximum number of different values a domain should contain. */
-        private int nbValMax = DEFAULT_NB_VAL_MAX;
-        /** the lowest value that can be contained in the domain. */
-        private int minValue = DEFAULT_VALUE_MIN;
-        /** the highest value that can be contained in the domain. */
-        private int maxValue = DEFAULT_VALUE_MAX;
-
-        public GenSetBuilder(final String name) {
-            super(name);
-        }
-
-        /**
-         * Configures the builder to create stream of sets which may be empty.
-         *
-         * @return this
-         */
-        public GenSetBuilder possiblyEmpty() {
-            allowEmpty = true;
-            return this;
-        }
-
-        /**
-         * Sets the size range of the generated sets (from 0, to n).
-         *
-         * @param n the maximum number of different values a generated
-         *           set should hold
-         * @return this
-         */
-        public GenSetBuilder ofSizeUpTo(final int n) {
-            nbValMax = n;
-
-            return this;
-        }
-
-        /**
-         * Sets the values range of the generated sets.
-         *
-         * @param from the minimum value that a generated set can hold
-         * @param to the maximum value that a generated set can hold
-         * @return this
-         */
-        public GenSetBuilder withValuesBetween(final int from, final int to) {
-            minValue = from;
-            maxValue = to;
-
-            return this;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Generator<Set<Integer>> build() {
-            return new BaseGenerator<>(name()) {
-                /** @inheritDoc} */
-                @Override
-                public Stream<Set<Integer>> generate(final Randomness rnd) {
-                    return Generators.sets(rnd, allowEmpty, nbValMax, minValue, maxValue);
-                }
-            };
+        public Generator<Set<T>> build() {
+            return new SetGenerator<>(name(), generator, canBeEmpty, nbItemsMax);
         }
     }
 
@@ -468,13 +470,7 @@ public final class GeneratorsDSL {
 
         @Override
         public Generator<Operator> build() {
-            return new BaseGenerator<>(name()) {
-                /** @inheritDoc} */
-                @Override
-                public Stream<Operator> generate(final Randomness rnd) {
-                    return Generators.operators(rnd);
-                }
-            };
+            return new OperatorGenerator(name());
         }
     }
 
@@ -482,43 +478,55 @@ public final class GeneratorsDSL {
      * A builder which acts as a micro DSL to produce generators of domains.
      */
     public static final class GenDomainBuilder extends GenBuilder<Domain> {
-        /**
-         * a flag telling whether or not we allow the generator to produce
-         * error domains.
-         */
-        private boolean allowErrors = false;
+        /** the minimum number of different values a domain should contain. */
+        private int nbValMin = 1;
         /** the maximum number of different values a domain should contain. */
         private int nbValMax = DEFAULT_NB_VAL_MAX;
         /** the lowest value that can be contained in the domain. */
         private int minValue = DEFAULT_VALUE_MIN;
         /** the highest value that can be contained in the domain. */
         private int maxValue = DEFAULT_VALUE_MAX;
+        /** the highest value that can be contained in the domain. */
+        private int spread   = DEFAULT_SPREAD;
 
         public GenDomainBuilder(final String name) {
             super(name);
         }
 
         /**
-         * Configures the builder to create stream of domains which may be
-         * empty (erroneous).
+         * Tells that generator will produce lists having exactly n items.
          *
+         * @param n the number of items in the generated list.
          * @return this
          */
-        public GenDomainBuilder allowingErrors() {
-            allowErrors = true;
+        public GenDomainBuilder ofSize(final int n) {
+            this.nbValMin = n;
+            this.nbValMax = n;
             return this;
         }
-
         /**
-         * Sets the size range of the generated domains (from 0, to n).
+         * Tells that generator will produce lists having &lt;= n items.
          *
-         * @param n the maximum number of different values a generated
-         *           domain should hold
+         * @param n the maximum number of items in the generated list
          * @return this
          */
         public GenDomainBuilder ofSizeUpTo(final int n) {
-            nbValMax = n;
-
+            this.nbValMin = 1;
+            this.nbValMax = n;
+            return this;
+        }
+        /**
+         * Tells that generator will produce lists having between from
+         * and to items.
+         *
+         * @param from a lower bound on the number of items in the list.
+         * @param to an upper bound on the number of items in the list.
+         *
+         * @return this
+         */
+        public GenDomainBuilder ofSizeBetween(final int from, final int to) {
+            this.nbValMin = from;
+            this.nbValMax = to;
             return this;
         }
 
@@ -539,13 +547,106 @@ public final class GeneratorsDSL {
         /** {@inheritDoc} */
         @Override
         public Generator<Domain> build() {
-          return new BaseGenerator<>(name()) {
-             /** @inheritDoc} */
-             @Override
-             public Stream<Domain> generate(final Randomness rnd) {
-                 return Generators.domains(rnd, allowErrors, nbValMax, minValue, maxValue);
-             }
-          };
+          return new DomainGenerator(name(), nbValMin, nbValMax, minValue, maxValue, spread);
+        }
+    }
+
+    /**
+     * A builder which acts as a micro DSL to produce generators of partial
+     * assignments.
+     */
+    public static final class GenAssignmentBuilder
+       extends GenBuilder<Assignment> {
+
+        /**
+         * The minimum number of variables in the assignment. (default: 0)
+         */
+        private int nbVarsMin = DEFAULT_NB_VARS_MIN;
+        /**
+         * The maximum number of variables in the assignment. (default: 5)
+         */
+        private int nbVarsMax = DEFAULT_NB_VARS_MAX;
+        /**
+         * The minimum value of a variable in the assignment. (default: -10)
+         */
+        private int valueMin  = DEFAULT_VALUE_MIN;
+        /**
+         * The maximum value of a variable in the assignment. (default: 10)
+         */
+        private int valueMax  = DEFAULT_VALUE_MAX;
+
+        public GenAssignmentBuilder(final String name) {
+            super(name);
+        }
+
+        /**
+         * Tells that generator will produce assignments having exactly n
+         * variables.
+         *
+         * @param n the number of variables in the generated assignments
+         * @return this
+         */
+        public GenAssignmentBuilder withVariables(final int n) {
+            this.nbVarsMin = n;
+            this.nbVarsMax = n;
+            return this;
+        }
+        /**
+         * Tells that generator will produce assignments having &lt;= n
+         * variables.
+         *
+         * @param n the maximum number of variables in the generated assignments
+         * @return this
+         */
+        public GenAssignmentBuilder withUpToVariables(final int n) {
+            this.nbVarsMin = 0;
+            this.nbVarsMax = n;
+            return this;
+        }
+        /**
+         * Tells that generator will produce assignments having between from
+         * and to variables.
+         *
+         * @param from a lower bound on the number of variables in the
+         *             generated assignments
+         * @param to an upper bound on the number of variables in the generated
+         *          assignments
+         * @return this
+         */
+        public GenAssignmentBuilder withVariablesBetween(
+           final int from,
+           final int to) {
+            this.nbVarsMin = from;
+            this.nbVarsMax = to;
+            return this;
+        }
+        /**
+         * Tells that in the generated assignments, the values assigned to
+         * variables, will range between `from` and `to`.
+         *
+         * @param from a lower bound on the value of variables in the
+         *             generated assignments
+         * @param to an upper bound on the value of variables in the generated
+         *          assignments
+         * @return this
+         */
+        public GenAssignmentBuilder withValuesRanging(
+           final int from,
+           final int to) {
+            this.valueMin = from;
+            this.valueMax = to;
+            return this;
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @return an assignment generator that corresponds to the
+         * configuration specified with the other methods
+         */
+        @Override
+        public Generator<Assignment> build() {
+            return new AssignmentGenerator(name(), nbVarsMin, nbVarsMax, valueMin, valueMax);
         }
     }
 
@@ -565,17 +666,14 @@ public final class GeneratorsDSL {
          * (default: 5)
          */
         private int nbVarsMax = DEFAULT_NB_VARS_MAX;
-        /**
-         * a flag telling whether or not we allow the generator to produce
-         * error domains.
-         */
-        private boolean allowErrors = false;
         /** the maximum number of different values a domain should contain. */
         private int domSzMax = DEFAULT_NB_VAL_MAX;
         /** the lowest value that can be contained in the domain. */
         private int minValue = DEFAULT_VALUE_MIN;
         /** the highest value that can be contained in the domain. */
         private int maxValue = DEFAULT_VALUE_MAX;
+        /** the max distance between any two values */
+        private int spread   = DEFAULT_SPREAD;
 
         public GenPartialAssignmentBuilder(final String name) {
             super(name);
@@ -646,256 +744,29 @@ public final class GeneratorsDSL {
          * @return this
          */
         public GenPartialAssignmentBuilder withValuesRanging(
-                final int from,
-                final int to) {
+           final int from,
+           final int to) {
             this.minValue = from;
             this.maxValue = to;
+            return this;
+        }
+
+        /**
+         * Sets the maximum spread for any generated domain.
+         * @param s the new spread
+         * @return this
+         */
+        public GenPartialAssignmentBuilder spreading(final int s) {
+            this.spread = s;
             return this;
         }
 
         /** {@inheritDoc} */
         @Override
         public Generator<PartialAssignment> build() {
-            return new BaseGenerator<>(name()) {
-                /**
-                 * {@inheritDoc}
-                 */
-                @Override
-                public Stream<PartialAssignment> generate(final Randomness rnd) {
-                    return Generators.partialAssignments(
-                       rnd, nbVarsMin, nbVarsMax, allowErrors, domSzMax, minValue, maxValue);
-                }
-            };
-        }
-    }
-
-    /**
-     * A builder which acts as a micro DSL to produce generators of partial
-     * assignments.
-     */
-    public static final class GenAssignmentBuilder
-            extends GenBuilder<Assignment> {
-
-        /**
-         * The minimum number of variables in the assignment. (default: 0)
-         */
-        private int nbVarsMin = DEFAULT_NB_VARS_MIN;
-        /**
-         * The maximum number of variables in the assignment. (default: 5)
-         */
-        private int nbVarsMax = DEFAULT_NB_VARS_MAX;
-        /**
-         * The minimum value of a variable in the assignment. (default: -10)
-         */
-        private int valueMin  = DEFAULT_VALUE_MIN;
-        /**
-         * The maximum value of a variable in the assignment. (default: 10)
-         */
-        private int valueMax  = DEFAULT_VALUE_MAX;
-
-        public GenAssignmentBuilder(final String name) {
-            super(name);
-        }
-
-        /**
-         * Tells that generator will produce assignments having exactly n
-         * variables.
-         *
-         * @param n the number of variables in the generated assignments
-         * @return this
-         */
-        public GenAssignmentBuilder withVariables(final int n) {
-            this.nbVarsMin = n;
-            this.nbVarsMax = n;
-            return this;
-        }
-        /**
-         * Tells that generator will produce assignments having &lt;= n
-         * variables.
-         *
-         * @param n the maximum number of variables in the generated assignments
-         * @return this
-         */
-        public GenAssignmentBuilder withUpToVariables(final int n) {
-            this.nbVarsMin = 0;
-            this.nbVarsMax = n;
-            return this;
-        }
-        /**
-         * Tells that generator will produce assignments having between from
-         * and to variables.
-         *
-         * @param from a lower bound on the number of variables in the
-         *             generated assignments
-         * @param to an upper bound on the number of variables in the generated
-         *          assignments
-         * @return this
-         */
-        public GenAssignmentBuilder withVariablesBetween(
-                final int from,
-                final int to) {
-            this.nbVarsMin = from;
-            this.nbVarsMax = to;
-            return this;
-        }
-        /**
-         * Tells that in the generated assignments, the values assigned to
-         * variables, will range between `from` and `to`.
-         *
-         * @param from a lower bound on the value of variables in the
-         *             generated assignments
-         * @param to an upper bound on the value of variables in the generated
-         *          assignments
-         * @return this
-         */
-        public GenAssignmentBuilder withValuesRanging(
-                final int from,
-                final int to) {
-            this.valueMin = from;
-            this.valueMax = to;
-            return this;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @return an assignment generator that corresponds to the
-         * configuration specified with the other methods
-         */
-        @Override
-        public Generator<Assignment> build() {
-            return new BaseGenerator<>(name()) {
-                /** {@inheritDoc} */
-                @Override
-                public Stream<Assignment> generate(final Randomness rnd) {
-                  return Generators
-                    .assignments(rnd, nbVarsMin, nbVarsMax, valueMin, valueMax);
-                }
-            };
-        }
-    }
-
-    /**
-     * A builder which acts as a micro DSL to produce generators of table
-     * constraints.
-     */
-    public static final class GenTableBuilder
-            extends GenBuilder<List<Assignment>> {
-
-        /** the minimum number of lines in the generated tables. */
-        private int nbLinesMin = DEFAULT_NB_LINES_MIN;
-        /** the maximum number of lines in the generated tables. */
-        private int nbLinesMax = DEFAULT_NB_LINES_MAX;
-        /**
-         * The minimum number of variables in the assignment. (default: 0)
-         */
-        private int nbVarsMin = DEFAULT_NB_VARS_MIN;
-        /**
-         * The maximum number of variables in the assignment. (default: 5)
-         */
-        private int nbVarsMax = DEFAULT_NB_VARS_MAX;
-        /**
-         * The minimum value of a variable in the assignment. (default: -10)
-         */
-        private int valueMin  = DEFAULT_VALUE_MIN;
-        /**
-         * The maximum value of a variable in the assignment. (default: 10)
-         */
-        private int valueMax  = DEFAULT_VALUE_MAX;
-
-        public GenTableBuilder(final String name) {
-            super(name);
-        }
-
-        /**
-         * Tells that generator will produce tables made of assignments having
-         * exactly n variables.
-         *
-         * @param n the number of variables in the generated tables
-         * @return this
-         */
-        public GenTableBuilder withVariables(final int n) {
-            this.nbVarsMin = n;
-            this.nbVarsMax = n;
-            return this;
-        }
-
-        /**
-         * Tells that in the generated table, the values assigned to
-         * variables, will range between `from` and `to`.
-         *
-         * @param from a lower bound on the value of variables in any of the
-         *             generated assignments
-         * @param to an upper bound on the value of variables in any of the
-         *           generated assignments
-         * @return this
-         */
-        public GenTableBuilder withValuesRanging(
-                final int from,
-                final int to) {
-            this.valueMin = from;
-            this.valueMax = to;
-            return this;
-        }
-
-        /**
-         * Tells that the generated tables will have exactly `n` lines.
-         *
-         * @param n the number of lines in the generated tables
-         * @return this
-         */
-        public GenTableBuilder withLines(final int n) {
-            nbLinesMin = n;
-            nbLinesMax = n;
-            return this;
-        }
-        /**
-         * Tells that the generated tables will have up to `n` lines.
-         *
-         * @param n the maximum number of lines in the generated tables
-         * @return this
-         */
-        public GenTableBuilder withUpToLines(final int n) {
-            nbLinesMin = 0;
-            nbLinesMax = n;
-            return this;
-        }
-        /**
-         * Tells that the number of lines in the generated tables range
-         * between `from` and `to`.
-         *
-         * @param from the minimum number of lines in the generated tables
-         * @param to the maximum number of lines in the generated tables
-         *
-         * @return this
-         */
-        public GenTableBuilder withLinesRanging(
-                final int from,
-                final int to) {
-            nbLinesMin = from;
-            nbLinesMax = to;
-            return this;
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @return an table constraints generator that corresponds to the
-         * configuration specified with the other methods.
-         */
-        @Override
-        public Generator<List<Assignment>> build() {
-            return new BaseGenerator<>(name()) {
-                /** {@inheritDoc} */
-                @Override
-                public Stream<List<Assignment>> generate(final Randomness rnd) {
-                    return Generators
-                       .tables(rnd,
-                               nbLinesMin, nbLinesMax,
-                               nbVarsMin, nbVarsMax,
-                               valueMin, valueMax);
-                }
-            };
+            Generator<Domain> domains = new DomainGenerator("", 1, domSzMax, minValue, maxValue, spread);
+            return new PartialAssignmentGenerator(name())
+               .addListComponent(new ListGenerator<>(domains, nbVarsMin, nbVarsMax));
         }
     }
 }

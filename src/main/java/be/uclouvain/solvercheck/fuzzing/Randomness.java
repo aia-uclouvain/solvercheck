@@ -30,7 +30,7 @@ public final class Randomness extends Random {
      * @return any int value in the range [from, to].
      */
     public int randomInt(final int from, final int to) {
-        return nextInt((to - from) + 1) + from;
+        return (int) (nextDouble() * ((long) to - (long) from) + from);
     }
 
     /**

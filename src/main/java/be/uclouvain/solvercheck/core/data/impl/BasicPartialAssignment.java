@@ -7,6 +7,7 @@ import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 import be.uclouvain.solvercheck.utils.Utils;
 
 import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.RandomAccess;
 
@@ -20,9 +21,12 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARA
  * This class merely decorates an existing list type to interpret it as a
  * partial assignment {@see PartialAssignment}.
  */
-/* package */ final class BasicPartialAssignment
+public final class BasicPartialAssignment
         extends AbstractList<Domain>
         implements PartialAssignment, RandomAccess {
+
+    /** The size of the various groups of arguments making up this pa */
+    private final List<Integer> componentSizesCumSum;
 
     /** The wrapped collection. */
     private final List<Domain> domains;
@@ -34,8 +38,60 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARA
      *                partial assignment. (ith item in the list corresponds to
      *                the domain of variable x_i)
      */
-    /* package */ BasicPartialAssignment(final List<Domain> domains) {
+    public BasicPartialAssignment(final List<Domain> domains) {
         this.domains = List.copyOf(domains);
+        this.componentSizesCumSum = List.of(0, domains.size());
+    }
+
+    public BasicPartialAssignment() {
+        this.domains        = new ArrayList<>();
+        this.componentSizesCumSum = new ArrayList<>(0);
+    }
+
+    public int addComponent(final List<Domain> component) {
+        int cid = componentSizesCumSum.size();
+        domains.addAll(component);
+        componentSizesCumSum.add(componentSizesCumSum.get(cid - 1) + component.size());
+        return cid;
+    }
+
+    public int addComponent(final Domain[] component) {
+        int cid = componentSizesCumSum.size();
+        domains.addAll(List.of(component));
+        componentSizesCumSum.add(componentSizesCumSum.get(cid - 1) + component.length);
+        return cid;
+    }
+
+    public int addComponent(final Domain component) {
+        int cid = componentSizesCumSum.size();
+        domains.add(component);
+        componentSizesCumSum.add(componentSizesCumSum.get(cid - 1) + 1);
+        return cid;
+    }
+
+    public int addComponent(final int component) {
+        int cid = componentSizesCumSum.size();
+        domains.add(Domain.from(component));
+        componentSizesCumSum.add(componentSizesCumSum.get(cid - 1) + 1);
+        return cid;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<Domain> getComponent(final int i) {
+        return domains.subList(componentSizesCumSum.get(i - 1), componentSizesCumSum.get(i));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<List<Domain>> getAllComponents() {
+        List<List<Domain>> lst = new ArrayList<>();
+
+        for (int i = 1; i < componentSizesCumSum.size(); i++) {
+            lst.add(getComponent(i));
+        }
+
+        return lst;
     }
 
     /** {@inheritDoc} */

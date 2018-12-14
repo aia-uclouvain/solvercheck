@@ -1,15 +1,16 @@
 package be.uclouvain.solvercheck.assertions;
 
+import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.fuzzing.Randomness;
 
 /** Interface of an assertion. */
 @FunctionalInterface
 public interface Assertion {
     /**
-     * Tests whether the assertion is satisfied, throws an AssertionError
-     * otherwise.
+     * Verifies the property for one single partial assignment.
      *
-     * @param randomness the source of randomness used for the fuzzing.
+     * @param rnd the source of randomness (for the search)
+     * @throws AssertionError whenever the property is violated
      */
-    void check(Randomness randomness);
+    void check(Randomness rnd);
 }

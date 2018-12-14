@@ -80,6 +80,20 @@ public interface PartialAssignment
      */
     Assignment asAssignment();
 
+    /*
+    int addComponent(List<Domain> component);
+
+    int addComponent(Domain[] component);
+
+    int addComponent(Domain component);
+
+    int addComponent(int component);
+    */
+
+    List<Domain> getComponent(int i);
+
+    List<List<Domain>> getAllComponents();
+
     /**
      * Creates a new PartialAssignement from the given list of domains.
      *

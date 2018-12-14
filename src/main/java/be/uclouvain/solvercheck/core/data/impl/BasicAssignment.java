@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * This class merely wraps an existing list type to interpret it as a (complete)
  * assignment {@see Assignment}.
  */
-/* package */ final class BasicAssignment extends AbstractList<Integer>
+public final class BasicAssignment extends AbstractList<Integer>
         implements Assignment, RandomAccess {
 
     /** The wrapped collection. */
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
      *               (ith item in the list corresponds to the value assigned
      *               to variable x_i)
      */
-    /* package */ BasicAssignment(final int... values) {
+    public BasicAssignment(final int... values) {
         this.values = Arrays.stream(values).boxed().collect(Collectors.toList());
     }
 

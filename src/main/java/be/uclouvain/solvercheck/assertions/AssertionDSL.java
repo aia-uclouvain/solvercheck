@@ -4,7 +4,6 @@ import be.uclouvain.solvercheck.assertions.stateful.StatefulAssertion;
 import be.uclouvain.solvercheck.assertions.stateless.StatelessAssertion;
 import be.uclouvain.solvercheck.assertions.util.AssertionRunner;
 import be.uclouvain.solvercheck.assertions.util.ForAllAssertion;
-import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
 import be.uclouvain.solvercheck.generators.GenBuilder;
@@ -48,19 +47,6 @@ public final class AssertionDSL {
      */
     public static void assertThat(final Assertion assertion) {
         new AssertionRunner().assertThat(assertion);
-    }
-
-    /**
-     * This class provides a simple way to define and check a property that
-     * should hold for any partial assignment. However, it should not be used
-     * in place of the more specific methods (an, a) which are much more
-     * powerful.
-     *
-     * @return a simple way to define and check a property that should hold
-     * for any partial assignment.
-     */
-    public static ForAnyPartialAssignment forAnyPartialAssignment() {
-        return new ForAnyPartialAssignment();
     }
 
     /**

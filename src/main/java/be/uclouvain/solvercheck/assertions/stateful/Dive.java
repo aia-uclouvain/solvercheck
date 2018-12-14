@@ -3,7 +3,8 @@ package be.uclouvain.solvercheck.assertions.stateful;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.fuzzing.Generators;
+import be.uclouvain.solvercheck.fuzzing.BooleanGenerator;
+import be.uclouvain.solvercheck.fuzzing.OperatorGenerator;
 import be.uclouvain.solvercheck.fuzzing.Randomness;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.function.Function;
  * branches of a partial assignment until a leaf of the search tree is reached
  * or an error is encountered.
  */
-/* package */ final class Dive implements Runnable {
+public final class Dive implements Runnable {
     /** The source of randomness used to pick random values during search. */
     private final Randomness randomness;
 
@@ -80,7 +81,7 @@ import java.util.function.Function;
      * @param root     the initial value of all the variables domains used as a
      *                 basis for the search tree explored by this dive check.
      */
-    /* package */ Dive(
+    public Dive(
        final Randomness randomness,
        final StatefulProperties.Property property,
        final int nbDives,
@@ -92,8 +93,8 @@ import java.util.function.Function;
 
         this.variables  = variables(root);
         this.values     = values(root);
-        this.operators  = Generators.operators(randomness).iterator();
-        this.backtracks = Generators.booleans(randomness).iterator();
+        this.operators  = new OperatorGenerator("operators").generate(randomness).iterator();
+        this.backtracks = new BooleanGenerator("booleans").generate(randomness).iterator();
 
         this.history    = new ArrayList<>();
         this.decisions  = new Stack<>();
