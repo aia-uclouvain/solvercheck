@@ -42,22 +42,22 @@ public interface WithGenerators {
     /**
      * @return a generator (builder) to create lists of int values.
      */
-    default GeneratorsDSL.GenListBuilder list() {
-        return GeneratorsDSL.lists();
+    default <T> GeneratorsDSL.GenListBuilder<T> listOf(final GenBuilder<T> bldr) {
+        return GeneratorsDSL.listOf(bldr);
     }
     /**
      * @param name the name of the generator. (used to provide meaningful
      *             information in case of error reporting).
      * @return a generator (builder) to create lists of int values.
      */
-    default GeneratorsDSL.GenListBuilder list(final String name) {
-        return GeneratorsDSL.lists(name);
+    default <T> GeneratorsDSL.GenListBuilder<T> listOf(final String name, final GenBuilder<T> bldr) {
+        return GeneratorsDSL.listOf(name, bldr);
     }
 
     /**
      * @return a generator (builder) to create int[] values.
      */
-    default GeneratorsDSL.GenArrayBuilder array() {
+    default <T> GeneratorsDSL.GenArrayBuilder<T> array() {
         return GeneratorsDSL.arrays();
     }
     /**
@@ -65,7 +65,7 @@ public interface WithGenerators {
      *             information in case of error reporting).
      * @return a generator (builder) to create int[] values.
      */
-    default GeneratorsDSL.GenArrayBuilder array(final String name) {
+    default <T> GeneratorsDSL.GenArrayBuilder<T> array(final String name) {
         return GeneratorsDSL.arrays(name);
     }
 

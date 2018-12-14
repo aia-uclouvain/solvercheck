@@ -10,15 +10,10 @@ import static java.lang.Integer.MIN_VALUE;
  */
 public final class Defaults {
     /**
-     * The default number of `anchor values` which designate the 'center' of
-     * the values distributions in a partial assignment.
-     */
-    public static final int DEFAULT_ANCHOR_SAMPLES = 100;
-    /**
      * The default number of partial assignment generated (and tested) for each
      * anchor value.
      */
-    public static final int DEFAULT_EXAMPLES = 10;
+    public static final int DEFAULT_EXAMPLES = 20;
     /**
      * The default minimal value that may appear in a generated partial
      * assignment.

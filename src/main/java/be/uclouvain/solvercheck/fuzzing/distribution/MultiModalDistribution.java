@@ -43,8 +43,14 @@ public final class MultiModalDistribution implements Distribution {
     public int next(final Random prng, final int l, final int h) {
         if (prng.nextDouble() < likelihood) { // extreme ?
             int[] feasible = Arrays.stream(modes).filter(x -> x >= l && x <= h).toArray();
-            int extreme = prng.nextInt(feasible.length);
-            return feasible[extreme];
+
+            if (feasible.length > 0) {
+                int extreme = prng.nextInt(feasible.length);
+                return feasible[extreme];
+            } else {
+                double d = prng.nextDouble();
+                return (int) (d * ((long) h - (long) l) + l);
+            }
         } else {
             double d = prng.nextDouble();
             return (int) (d * ((long) h - (long) l) + l);

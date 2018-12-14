@@ -40,12 +40,12 @@ public final class BasicPartialAssignment
      */
     public BasicPartialAssignment(final List<Domain> domains) {
         this.domains = List.copyOf(domains);
-        this.componentSizesCumSum = List.of(0, domains.size());
+        this.componentSizesCumSum = new ArrayList<>(List.of(0, domains.size()));
     }
 
     public BasicPartialAssignment() {
         this.domains        = new ArrayList<>();
-        this.componentSizesCumSum = new ArrayList<>(0);
+        this.componentSizesCumSum = new ArrayList<>(List.of(0));
     }
 
     public int addComponent(final List<Domain> component) {

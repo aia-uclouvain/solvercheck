@@ -71,17 +71,17 @@ public final class GeneratorsDSL {
     }
 
     // --------- LISTS --------------------------------------------------------
-    public static GenListBuilder lists() {
-        return lists("List");
+    public static <T> GenListBuilder<T> listOf(final GenBuilder<T> bldr) {
+        return listOf("List", bldr);
     }
-    public static GenListBuilder lists(final String name) {
-        return new GenListBuilder(name);
+    public static <T> GenListBuilder<T> listOf(final String name, final GenBuilder<T> bldr) {
+        return new GenListBuilder<>(name, bldr);
     }
-    public static GenArrayBuilder arrays() {
+    public static <T> GenArrayBuilder<T> arrays() {
         return arrays("Array");
     }
-    public static GenArrayBuilder arrays(final String name) {
-        return new GenArrayBuilder(name);
+    public static <T> GenArrayBuilder<T> arrays(final String name) {
+        return new GenArrayBuilder<>(name);
     }
     // --------- SETS --------------------------------------------------------
     public static GenSetBuilder sets() {
@@ -210,32 +210,27 @@ public final class GeneratorsDSL {
         private Generator<T> generator;
 
         /**
-         * Contructor with a name
+         * Contructor with a name.
+         *
          * @param name the name of the generator
+         * @param bldr a builder to create the delegate generator
          */
-        public GenListBuilder(final String name) {
+        public GenListBuilder(final String name, final GenBuilder<T> bldr) {
             super(name);
+            generator = bldr.build();
         }
 
         /**
-         * Tells what is going to be generated as items in the list.
-         * @param what a generator for the kind of items in the list.
-         * @return this.
+         * Contructor with a name.
+         *
+         * @param name the name of the generator
+         * @param gen the delegate generator
          */
-        public GenListBuilder of(final Generator<T> what) {
-            generator = what;
-            return this;
+        public GenListBuilder(final String name, final Generator<T> gen) {
+            super(name);
+            generator = gen;
         }
 
-        /**
-         * Tells what is going to be generated as items in the list.
-         * @param what a generator builder for the kind of items in the list.
-         * @return this.
-         */
-        public GenListBuilder of(final GenBuilder<T> what) {
-            generator = what.build();
-            return this;
-        }
 
         /**
          * Tells that generator will produce lists having exactly n items.
@@ -243,7 +238,7 @@ public final class GeneratorsDSL {
          * @param n the number of items in the generated list.
          * @return this
          */
-        public GenListBuilder ofSize(final int n) {
+        public GenListBuilder<T> ofSize(final int n) {
             this.nbItemsMin = n;
             this.nbItemsMax = n;
             return this;
@@ -254,7 +249,7 @@ public final class GeneratorsDSL {
          * @param n the maximum number of items in the generated list
          * @return this
          */
-        public GenListBuilder ofSizeUpTo(final int n) {
+        public GenListBuilder<T> ofSizeUpTo(final int n) {
             this.nbItemsMin = 0;
             this.nbItemsMax = n;
             return this;
@@ -268,7 +263,7 @@ public final class GeneratorsDSL {
          *
          * @return this
          */
-        public GenListBuilder ofSizeBetween(final int from, final int to) {
+        public GenListBuilder<T> ofSizeBetween(final int from, final int to) {
             this.nbItemsMin = from;
             this.nbItemsMax = to;
             return this;
@@ -325,7 +320,7 @@ public final class GeneratorsDSL {
          * @param what a generator for the kind of items in the array.
          * @return this.
          */
-        public GenArrayBuilder of(final Class<T> clazz, final Generator<T> what) {
+        public GenArrayBuilder<T> of(final Class<T> clazz, final Generator<T> what) {
             this.clazz = clazz;
             this.generator = what;
             return this;
@@ -338,7 +333,7 @@ public final class GeneratorsDSL {
          * @param what a generator builder for the kind of items in the array.
          * @return this.
          */
-        public GenArrayBuilder of(final Class<T> clazz, final GenBuilder<T> what) {
+        public GenArrayBuilder<T> of(final Class<T> clazz, final GenBuilder<T> what) {
             this.clazz = clazz;
             this.generator = what.build();
             return this;
@@ -350,7 +345,7 @@ public final class GeneratorsDSL {
          * @param n the number of items in the generated list.
          * @return this
          */
-        public GenArrayBuilder ofSize(final int n) {
+        public GenArrayBuilder<T> ofSize(final int n) {
             this.nbItemsMin = n;
             this.nbItemsMax = n;
             return this;
@@ -361,7 +356,7 @@ public final class GeneratorsDSL {
          * @param n the maximum number of items in the generated list
          * @return this
          */
-        public GenArrayBuilder ofSizeUpTo(final int n) {
+        public GenArrayBuilder<T> ofSizeUpTo(final int n) {
             this.nbItemsMin = 0;
             this.nbItemsMax = n;
             return this;
@@ -375,7 +370,7 @@ public final class GeneratorsDSL {
          *
          * @return this
          */
-        public GenArrayBuilder ofSizeBetween(final int from, final int to) {
+        public GenArrayBuilder<T> ofSizeBetween(final int from, final int to) {
             this.nbItemsMin = from;
             this.nbItemsMax = to;
             return this;
