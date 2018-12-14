@@ -4,8 +4,10 @@ import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
+import be.uclouvain.solvercheck.core.data.impl.BasicPartialAssignment;
 import be.uclouvain.solvercheck.fuzzing.ArrayGenerator;
 import be.uclouvain.solvercheck.fuzzing.AssignmentGenerator;
+import be.uclouvain.solvercheck.fuzzing.BaseGenerator;
 import be.uclouvain.solvercheck.fuzzing.BooleanGenerator;
 import be.uclouvain.solvercheck.fuzzing.DomainGenerator;
 import be.uclouvain.solvercheck.fuzzing.Generator;
@@ -13,10 +15,12 @@ import be.uclouvain.solvercheck.fuzzing.IntGenerator;
 import be.uclouvain.solvercheck.fuzzing.ListGenerator;
 import be.uclouvain.solvercheck.fuzzing.OperatorGenerator;
 import be.uclouvain.solvercheck.fuzzing.PartialAssignmentGenerator;
+import be.uclouvain.solvercheck.fuzzing.Randomness;
 import be.uclouvain.solvercheck.fuzzing.SetGenerator;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * This class provides utility method to create generators that will be used
@@ -116,13 +120,21 @@ public final class GeneratorsDSL {
      * @return a builder meant to act as a micro DSL to instantiate
      * generators that produce random partial assignments.
      */
-    public static GenPartialAssignmentBuilder partialAssignments() {
-        return partialAssignments("Partial Assignment");
+    public static GenSimplePartialAssignmentBuilder simplePartialAssignments() {
+        return simplePartialAssignments("Partial Assignment");
     }
-    public static GenPartialAssignmentBuilder partialAssignments(final String name) {
-        return new GenPartialAssignmentBuilder(name);
+    public static GenSimplePartialAssignmentBuilder simplePartialAssignments(final String name) {
+        return new GenSimplePartialAssignmentBuilder(name);
     }
-    
+
+    public static GenCompoundPartialAssignment partialAssignment() {
+        return partialAssignment("Partial Assignment");
+    }
+    public static GenCompoundPartialAssignment partialAssignment(final String name) {
+        return new GenCompoundPartialAssignment(name);
+    }
+
+
     // --------- ASSIGNMENT ---------------------------------------------------
     /**
      * @return a builder meant to act as a micro DSL to instantiate
@@ -654,7 +666,7 @@ public final class GeneratorsDSL {
      * A builder which acts as a micro DSL to produce generators of partial
      * assignments.
      */
-    public static final class GenPartialAssignmentBuilder
+    public static final class GenSimplePartialAssignmentBuilder
             extends GenBuilder<PartialAssignment> {
         /**
          * The minimum number of variables in the partial assignment.
@@ -675,7 +687,7 @@ public final class GeneratorsDSL {
         /** the max distance between any two values */
         private int spread   = DEFAULT_SPREAD;
 
-        public GenPartialAssignmentBuilder(final String name) {
+        public GenSimplePartialAssignmentBuilder(final String name) {
             super(name);
         }
 
@@ -686,7 +698,7 @@ public final class GeneratorsDSL {
          * @param n the number of variables in the generated partial assignments
          * @return this
          */
-        public GenPartialAssignmentBuilder withVariables(final int n) {
+        public GenSimplePartialAssignmentBuilder withVariables(final int n) {
             this.nbVarsMin = n;
             this.nbVarsMax = n;
             return this;
@@ -700,7 +712,7 @@ public final class GeneratorsDSL {
          *          partial assignments
          * @return this
          */
-        public GenPartialAssignmentBuilder withUpToVariables(final int n) {
+        public GenSimplePartialAssignmentBuilder withUpToVariables(final int n) {
             this.nbVarsMin = 0;
             this.nbVarsMax = n;
             return this;
@@ -715,7 +727,7 @@ public final class GeneratorsDSL {
          *          partial assignments
          * @return this
          */
-        public GenPartialAssignmentBuilder withVariablesBetween(
+        public GenSimplePartialAssignmentBuilder withVariablesBetween(
                 final int from,
                 final int to) {
             this.nbVarsMin = from;
@@ -730,7 +742,7 @@ public final class GeneratorsDSL {
          *           partial assignments
          * @return this
          */
-        public GenPartialAssignmentBuilder withDomainsOfSizeUpTo(final int n) {
+        public GenSimplePartialAssignmentBuilder withDomainsOfSizeUpTo(final int n) {
             this.domSzMax = n;
             return this;
         }
@@ -743,7 +755,7 @@ public final class GeneratorsDSL {
          *          the partial assignments
          * @return this
          */
-        public GenPartialAssignmentBuilder withValuesRanging(
+        public GenSimplePartialAssignmentBuilder withValuesRanging(
            final int from,
            final int to) {
             this.minValue = from;
@@ -756,7 +768,7 @@ public final class GeneratorsDSL {
          * @param s the new spread
          * @return this
          */
-        public GenPartialAssignmentBuilder spreading(final int s) {
+        public GenSimplePartialAssignmentBuilder spreading(final int s) {
             this.spread = s;
             return this;
         }
@@ -767,6 +779,78 @@ public final class GeneratorsDSL {
             Generator<Domain> domains = new DomainGenerator("", 1, domSzMax, minValue, maxValue, spread);
             return new PartialAssignmentGenerator(name())
                .addListComponent(new ListGenerator<>(domains, nbVarsMin, nbVarsMax));
+        }
+    }
+
+    public static class GenCompoundPartialAssignment extends GenBuilder<PartialAssignment> {
+        private final BasicPartialAssignment instance;
+
+        /**
+         * Creates a new Generator builder with the given name.
+         *
+         * @param name the name (description) of the items to be generated. This
+         *             is useful to be able to provide a meaningful information
+         *             in the error reports.
+         */
+        public GenCompoundPartialAssignment(String name) {
+            super(name);
+            instance = new BasicPartialAssignment();
+        }
+
+
+        public GenCompoundPartialAssignment with(final List<Domain> component) {
+            instance.addComponent(component);
+            return this;
+        }
+
+        public GenCompoundPartialAssignment with(final Domain[] component) {
+            instance.addComponent(component);
+            return this;
+        }
+
+        public GenCompoundPartialAssignment with(final Domain component) {
+            instance.addComponent(component);
+            return this;
+        }
+
+        public GenCompoundPartialAssignment with(final int component) {
+            instance.addComponent(component);
+            return this;
+        }
+
+        public GenCompoundPartialAssignment then(final List<Domain> component) {
+            instance.addComponent(component);
+            return this;
+        }
+
+        public GenCompoundPartialAssignment then(final Domain[] component) {
+            instance.addComponent(component);
+            return this;
+        }
+
+        public GenCompoundPartialAssignment then(final Domain component) {
+            instance.addComponent(component);
+            return this;
+        }
+
+        public GenCompoundPartialAssignment then(final int component) {
+            instance.addComponent(component);
+            return this;
+        }
+
+        @Override
+        public Generator<PartialAssignment> build() {
+            return new BaseGenerator<PartialAssignment>(name()) {
+                @Override
+                public Stream<PartialAssignment> generate(final Randomness randomness) {
+                    return Stream.of(item(randomness));
+                }
+
+                @Override
+                public PartialAssignment item(final Randomness randomness) {
+                    return instance;
+                }
+            };
         }
     }
 }

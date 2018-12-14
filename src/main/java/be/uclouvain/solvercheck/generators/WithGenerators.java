@@ -137,8 +137,8 @@ public interface WithGenerators {
      * @return a configurable generator meant to produce random
      * `PartialAssignment` instances
      */
-    default GeneratorsDSL.GenPartialAssignmentBuilder partialAssignment() {
-        return GeneratorsDSL.partialAssignments();
+    default GeneratorsDSL.GenSimplePartialAssignmentBuilder simplePartialAssignment() {
+        return GeneratorsDSL.simplePartialAssignments();
     }
     /**
      * @param n the name of the generator. (used to provide meaningful
@@ -146,7 +146,15 @@ public interface WithGenerators {
      * @return a configurable generator meant to produce random
      * `PartialAssignment` instances
      */
-    default GeneratorsDSL.GenPartialAssignmentBuilder partialAssignment(final String n) {
-        return GeneratorsDSL.partialAssignments(n);
+    default GeneratorsDSL.GenSimplePartialAssignmentBuilder simplePartialAssignment(final String n) {
+        return GeneratorsDSL.simplePartialAssignments(n);
+    }
+
+    default GeneratorsDSL.GenCompoundPartialAssignment partialAssignment() {
+        return GeneratorsDSL.partialAssignment();
+    }
+
+    default GeneratorsDSL.GenCompoundPartialAssignment partialAssignment(final String n) {
+        return GeneratorsDSL.partialAssignment(n);
     }
 }

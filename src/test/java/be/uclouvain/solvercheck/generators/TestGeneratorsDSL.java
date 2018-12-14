@@ -107,20 +107,20 @@ public class TestGeneratorsDSL implements WithSolverCheck {
     // ----- PARTIAL ASSIGNMENTS ----------------------------------------------
     @Test
     public void defaultPartialAssingment() {
-        assertThat(forAll(GeneratorsDSL.partialAssignments()).itIsTrueThat(Objects::nonNull));
+        assertThat(forAll(GeneratorsDSL.simplePartialAssignments()).itIsTrueThat(Objects::nonNull));
     }
 
     @Test
     public void partialAssignmentWithNVariables() {
         assertThat  (      forAll(integers().between(0, 10))
-       .assertThat  (i  -> forAll(GeneratorsDSL.partialAssignments().withVariables(i))
+       .assertThat  (i  -> forAll(GeneratorsDSL.simplePartialAssignments().withVariables(i))
        .itIsTrueThat(pa -> pa.size() == i)));
     }
 
     @Test
     public void partialAssignmentWithUpToNVariables() {
         assertThat  (     forAll(integers().between(0, 10))
-       .assertThat  (i -> forAll(GeneratorsDSL.partialAssignments().withUpToVariables(i))
+       .assertThat  (i -> forAll(GeneratorsDSL.simplePartialAssignments().withUpToVariables(i))
        .itIsTrueThat(pa -> pa.size() <= i)));
     }
 
@@ -131,7 +131,7 @@ public class TestGeneratorsDSL implements WithSolverCheck {
            integers("to"  ).between(0, 10))
       .assuming  ((from, to) -> from <= to)
       .assertThat((from, to) ->
-         forAll(GeneratorsDSL.partialAssignments().withVariablesBetween(from, to))
+         forAll(GeneratorsDSL.simplePartialAssignments().withVariablesBetween(from, to))
       .itIsTrueThat(pa -> from <= pa.size() && pa.size() <= to)));
     }
 
@@ -139,7 +139,7 @@ public class TestGeneratorsDSL implements WithSolverCheck {
     public void partialAssignmentWithDomainsOfSizeUpTo() {
         assertThat(forAll(integers().between(0, 10))
        .assertThat(i ->
-          forAll(GeneratorsDSL.partialAssignments().withDomainsOfSizeUpTo(i))
+          forAll(GeneratorsDSL.simplePartialAssignments().withDomainsOfSizeUpTo(i))
        .itIsTrueThat(pa -> pa.stream().allMatch(d-> d.size() <= i))));
     }
 
@@ -150,7 +150,7 @@ public class TestGeneratorsDSL implements WithSolverCheck {
            integers("to"  ).positive())
        .assuming  ((from, to) -> from <= to)
        .assertThat((from, to) ->
-          forAll(GeneratorsDSL.partialAssignments().withValuesRanging(from, to))
+          forAll(GeneratorsDSL.simplePartialAssignments().withValuesRanging(from, to))
        .assuming    (pa -> !pa.isEmpty() && !pa.isError())
        .itIsTrueThat(pa ->
              pa.stream().allMatch(d -> d.minimum() >= from)
