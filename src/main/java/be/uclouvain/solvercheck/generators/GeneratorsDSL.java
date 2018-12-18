@@ -28,11 +28,6 @@ public final class GeneratorsDSL {
     /** The default maximum number of variables in (partial) assignment. */
     private static final int DEFAULT_SPREAD      = 10;
 
-    /** the default minimum number of lines in the generated tables. */
-    private static final int DEFAULT_NB_LINES_MIN = 0;
-    /** the default maximum number of lines in the generated tables. */
-    private static final int DEFAULT_NB_LINES_MAX = 5;
-
     /** the default minimum value assignable to some variable. */
     private static final int DEFAULT_VALUE_MIN = Integer.MIN_VALUE;
     /** the default maximum value assignable to some variable. */
