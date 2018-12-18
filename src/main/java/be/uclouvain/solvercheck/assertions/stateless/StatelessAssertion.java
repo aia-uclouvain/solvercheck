@@ -1,9 +1,10 @@
 package be.uclouvain.solvercheck.assertions.stateless;
 
 import be.uclouvain.solvercheck.assertions.Assertion;
+import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
-import be.uclouvain.solvercheck.fuzzing.Randomness;
+import be.uclouvain.solvercheck.randomness.Randomness;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -144,6 +145,16 @@ public final class StatelessAssertion implements Function<PartialAssignment, Ass
      */
     public StatelessAssertion isWeaklyMonotonic() {
         return is(weaklyMonotonic(actual));
+    }
+
+    /**
+     * Wraps the current stateful assertion into a configurable assertion that
+     * bears on any partial assignment.
+     *
+     * @return a configurable assertion that bears on partial assignments.
+     */
+    public ForAnyPartialAssignment forAnyPartialAssignment() {
+        return new ForAnyPartialAssignment(this);
     }
 
     /** {@inheritDoc} */

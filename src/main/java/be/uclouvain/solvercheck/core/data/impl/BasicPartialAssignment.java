@@ -3,8 +3,8 @@ package be.uclouvain.solvercheck.core.data.impl;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 import be.uclouvain.solvercheck.utils.Utils;
+import be.uclouvain.solvercheck.utils.relations.PartialOrdering;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.RandomAccess;
 
 import static be.uclouvain.solvercheck.utils.Utils.zip;
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
-import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.INCOMPARABLE;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
+import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
 
 /**
  * This class merely decorates an existing list type to interpret it as a
@@ -25,13 +25,14 @@ public final class BasicPartialAssignment
         extends AbstractList<Domain>
         implements PartialAssignment, RandomAccess {
 
-    /** The size of the various groups of arguments making up this pa */
+    /** The size of the various groups of arguments making up this pa. */
     private final List<Integer> componentSizesCumSum;
 
     /** The wrapped collection. */
     private final List<Domain> domains;
 
-    /** Creates a new (immutable !) partial assignment from the given list of
+    /**
+     * Creates a new (immutable !) partial assignment from the given list of
      * domains.
      *
      * @param domains the domains of all the variables represented in this
@@ -43,11 +44,35 @@ public final class BasicPartialAssignment
         this.componentSizesCumSum = new ArrayList<>(List.of(0, domains.size()));
     }
 
+    /** Default constructor. Meant to be used with the 'add component' style. */
     public BasicPartialAssignment() {
         this.domains        = new ArrayList<>();
         this.componentSizesCumSum = new ArrayList<>(List.of(0));
     }
 
+    /**
+     * Adds a component, a list of arguments to the partial assignment.
+     * One such component is really meant to represent a set of arguments passed
+     * to the constructor of an actual constraint. The element constraint is
+     * a typical example that illustrates this. The element constraint
+     * `X[Y] = Z` has three components:
+     * <ul>
+     *     <li>X, an array of variables</li>
+     *     <li>Y, an index variable</li>
+     *     <li>Z, a value variable</li>
+     * </ul>
+     *
+     * A partial assignment for the element constraint can thus be created with
+     * <code>
+     *  BasicPartialAssignment pa = new BasicPartialAssignment();
+     *  pa.addComponent(x);
+     *  pa.addComponent(y);
+     *  pa.addComponent(z);
+     * </code>
+     *
+     * @param component the component to add to the current partial assignment.
+     * @return the identifier (starts at 1) of the added component.
+     */
     public int addComponent(final List<Domain> component) {
         int cid = componentSizesCumSum.size();
         domains.addAll(component);
@@ -55,6 +80,29 @@ public final class BasicPartialAssignment
         return cid;
     }
 
+    /**
+     * Adds a component, a list of arguments to the partial assignment.
+     * One such component is really meant to represent a set of arguments passed
+     * to the constructor of an actual constraint. The element constraint is
+     * a typical example that illustrates this. The element constraint
+     * `X[Y] = Z` has three components:
+     * <ul>
+     *     <li>X, an array of variables</li>
+     *     <li>Y, an index variable</li>
+     *     <li>Z, a value variable</li>
+     * </ul>
+     *
+     * A partial assignment for the element constraint can thus be created with
+     * <code>
+     *  BasicPartialAssignment pa = new BasicPartialAssignment();
+     *  pa.addComponent(x);
+     *  pa.addComponent(y);
+     *  pa.addComponent(z);
+     * </code>
+     *
+     * @param component the component to add to the current partial assignment.
+     * @return the identifier (starts at 1) of the added component.
+     */
     public int addComponent(final Domain[] component) {
         int cid = componentSizesCumSum.size();
         domains.addAll(List.of(component));
@@ -62,6 +110,29 @@ public final class BasicPartialAssignment
         return cid;
     }
 
+    /**
+     * Adds a component, a list of arguments to the partial assignment.
+     * One such component is really meant to represent a set of arguments passed
+     * to the constructor of an actual constraint. The element constraint is
+     * a typical example that illustrates this. The element constraint
+     * `X[Y] = Z` has three components:
+     * <ul>
+     *     <li>X, an array of variables</li>
+     *     <li>Y, an index variable</li>
+     *     <li>Z, a value variable</li>
+     * </ul>
+     *
+     * A partial assignment for the element constraint can thus be created with
+     * <code>
+     *  BasicPartialAssignment pa = new BasicPartialAssignment();
+     *  pa.addComponent(x);
+     *  pa.addComponent(y);
+     *  pa.addComponent(z);
+     * </code>
+     *
+     * @param component the component to add to the current partial assignment.
+     * @return the identifier (starts at 1) of the added component.
+     */
     public int addComponent(final Domain component) {
         int cid = componentSizesCumSum.size();
         domains.add(component);
@@ -69,6 +140,29 @@ public final class BasicPartialAssignment
         return cid;
     }
 
+    /**
+     * Adds a component, a list of arguments to the partial assignment.
+     * One such component is really meant to represent a set of arguments passed
+     * to the constructor of an actual constraint. The element constraint is
+     * a typical example that illustrates this. The element constraint
+     * `X[Y] = Z` has three components:
+     * <ul>
+     *     <li>X, an array of variables</li>
+     *     <li>Y, an index variable</li>
+     *     <li>Z, a value variable</li>
+     * </ul>
+     *
+     * A partial assignment for the element constraint can thus be created with
+     * <code>
+     *  BasicPartialAssignment pa = new BasicPartialAssignment();
+     *  pa.addComponent(x);
+     *  pa.addComponent(y);
+     *  pa.addComponent(z);
+     * </code>
+     *
+     * @param component the component to add to the current partial assignment.
+     * @return the identifier (starts at 1) of the added component.
+     */
     public int addComponent(final int component) {
         int cid = componentSizesCumSum.size();
         domains.add(Domain.from(component));

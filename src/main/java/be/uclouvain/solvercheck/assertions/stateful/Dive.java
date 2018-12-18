@@ -3,9 +3,9 @@ package be.uclouvain.solvercheck.assertions.stateful;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.fuzzing.BooleanGenerator;
-import be.uclouvain.solvercheck.fuzzing.OperatorGenerator;
-import be.uclouvain.solvercheck.fuzzing.Randomness;
+import be.uclouvain.solvercheck.generators.BooleanGenerator;
+import be.uclouvain.solvercheck.generators.OperatorGenerator;
+import be.uclouvain.solvercheck.randomness.Randomness;
 
 import java.util.ArrayList;
 import java.util.Iterator;

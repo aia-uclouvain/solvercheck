@@ -90,8 +90,39 @@ public interface PartialAssignment
     int addComponent(int component);
     */
 
+    /**
+     * Returns the ith (starting at one) component of the partial assignment.
+     * Whenever the notion of component makes sense, ne such component is
+     * really meant to represent a set of arguments passed to the constructor
+     * of an actual constraint. The element constraint is a typical example
+     * that illustrates this. The element constraint `X[Y] = Z` has three
+     * components:
+     * <ul>
+     *     <li>X, an array of variables</li>
+     *     <li>Y, an index variable</li>
+     *     <li>Z, a value variable</li>
+     * </ul>
+
+     * @param i the identifier (starts at 1) of the component.
+     * @return the list of domains in this component.
+     */
     List<Domain> getComponent(int i);
 
+    /**
+     * Returns the list of all components of this partial assignment.
+     * Whenever the notion of component makes sense, ne such component is
+     * really meant to represent a set of arguments passed to the constructor
+     * of an actual constraint. The element constraint is a typical example
+     * that illustrates this. The element constraint `X[Y] = Z` has three
+     * components:
+     * <ul>
+     *     <li>X, an array of variables</li>
+     *     <li>Y, an index variable</li>
+     *     <li>Z, a value variable</li>
+     * </ul>
+
+     * @return the list of all component in this partial assignment.
+     */
     List<List<Domain>> getAllComponents();
 
     /**

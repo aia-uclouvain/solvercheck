@@ -1,9 +1,10 @@
 package be.uclouvain.solvercheck.assertions.stateful;
 
 import be.uclouvain.solvercheck.assertions.Assertion;
+import be.uclouvain.solvercheck.assertions.util.ForAnyPartialAssignment;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
-import be.uclouvain.solvercheck.fuzzing.Randomness;
+import be.uclouvain.solvercheck.randomness.Randomness;
 
 import java.util.function.Function;
 
@@ -128,6 +129,16 @@ public final class StatefulAssertion implements Function<PartialAssignment, Asse
      */
     public StatefulAssertion isStrictlyStrongerThan(final StatefulFilter other) {
         return is(strictlyStrongerThan(actual, other));
+    }
+
+    /**
+     * Wraps the current stateful assertion into a configurable assertion that
+     * bears on any partial assignment.
+     *
+     * @return a configurable assertion that bears on partial assignments.
+     */
+    public ForAnyPartialAssignment forAnyPartialAssignment() {
+        return new ForAnyPartialAssignment(this);
     }
 
     /** {@inheritDoc} */

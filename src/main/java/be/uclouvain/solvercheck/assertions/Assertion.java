@@ -1,7 +1,6 @@
 package be.uclouvain.solvercheck.assertions;
 
-import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.fuzzing.Randomness;
+import be.uclouvain.solvercheck.randomness.Randomness;
 
 /** Interface of an assertion. */
 @FunctionalInterface

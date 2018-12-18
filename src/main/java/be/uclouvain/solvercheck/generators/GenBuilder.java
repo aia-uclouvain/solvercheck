@@ -1,7 +1,5 @@
 package be.uclouvain.solvercheck.generators;
 
-import be.uclouvain.solvercheck.fuzzing.Generator;
-
 /**
  * This abstract class serves as a basis for the implementation of
  * fluent generator builders.
