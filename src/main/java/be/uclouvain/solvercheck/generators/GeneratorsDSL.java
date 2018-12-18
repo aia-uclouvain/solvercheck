@@ -107,7 +107,8 @@ public final class GeneratorsDSL {
     public static GenSimplePartialAssignmentBuilder simplePartialAssignments() {
         return simplePartialAssignments("Partial Assignment");
     }
-    public static GenSimplePartialAssignmentBuilder simplePartialAssignments(final String name) {
+    public static GenSimplePartialAssignmentBuilder simplePartialAssignments(
+                                                            final String name) {
         return new GenSimplePartialAssignmentBuilder(name);
     }
 
@@ -189,7 +190,7 @@ public final class GeneratorsDSL {
          */
         private int nbItemsMax = DEFAULT_NB_VARS_MAX;
         /**
-         * The generator that actually produces the items
+         * The generator that actually produces the items.
          */
         private Generator<T> generator;
 
@@ -290,7 +291,8 @@ public final class GeneratorsDSL {
         private Generator<T> generator;
 
         /**
-         * Contructor with a name
+         * Contructor with a name.
+         *
          * @param name the name of the generator
          */
         public GenArrayBuilder(final String name) {
@@ -385,12 +387,13 @@ public final class GeneratorsDSL {
          */
         private int nbItemsMax = DEFAULT_NB_VARS_MAX;
         /**
-         * The generator that actually produces the items
+         * The generator that actually produces the items.
          */
         private Generator<T> generator;
 
         /**
-         * Contructor with a name
+         * Contructor with a name.
+         *
          * @param name the name of the generator
          */
         public GenSetBuilder(final String name) {
@@ -663,7 +666,7 @@ public final class GeneratorsDSL {
         private int minValue = DEFAULT_VALUE_MIN;
         /** the highest value that can be contained in the domain. */
         private int maxValue = DEFAULT_VALUE_MAX;
-        /** the max distance between any two values */
+        /** the max distance between any two values. */
         private int spread   = DEFAULT_SPREAD;
 
         public GenSimplePartialAssignmentBuilder(final String name) {
@@ -755,13 +758,16 @@ public final class GeneratorsDSL {
         /** {@inheritDoc} */
         @Override
         public Generator<PartialAssignment> build() {
-            Generator<Domain> domains = new DomainGenerator("", 1, domSzMax, minValue, maxValue, spread);
+            Generator<Domain> domains =
+               new DomainGenerator("", 1, domSzMax, minValue, maxValue, spread);
             return new PartialAssignmentGenerator(name())
                .addListComponent(new ListGenerator<>(domains, nbVarsMin, nbVarsMax));
         }
     }
 
-    public static class GenCompoundPartialAssignment extends GenBuilder<PartialAssignment> {
+    public static final class GenCompoundPartialAssignment
+       extends GenBuilder<PartialAssignment> {
+
         private final BasicPartialAssignment instance;
 
         /**
@@ -771,7 +777,7 @@ public final class GeneratorsDSL {
          *             is useful to be able to provide a meaningful information
          *             in the error reports.
          */
-        public GenCompoundPartialAssignment(String name) {
+        public GenCompoundPartialAssignment(final String name) {
             super(name);
             instance = new BasicPartialAssignment();
         }

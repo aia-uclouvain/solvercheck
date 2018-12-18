@@ -50,7 +50,8 @@ public interface WithGenerators {
      *             information in case of error reporting).
      * @return a generator (builder) to create lists of int values.
      */
-    default <T> GeneratorsDSL.GenListBuilder<T> listOf(final String name, final GenBuilder<T> bldr) {
+    default <T> GeneratorsDSL.GenListBuilder<T> listOf(final String name,
+                                                       final GenBuilder<T> bldr) {
         return GeneratorsDSL.listOf(name, bldr);
     }
 
@@ -146,7 +147,8 @@ public interface WithGenerators {
      * @return a configurable generator meant to produce random
      * `PartialAssignment` instances
      */
-    default GeneratorsDSL.GenSimplePartialAssignmentBuilder simplePartialAssignment(final String n) {
+    default GeneratorsDSL.GenSimplePartialAssignmentBuilder simplePartialAssignment(
+                                                               final String n) {
         return GeneratorsDSL.simplePartialAssignments(n);
     }
 
