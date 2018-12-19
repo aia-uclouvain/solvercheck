@@ -24,7 +24,7 @@ public class TestElement implements WithSolverCheck {
     public void testAllDiff() {
         assertThat(
            forAll(listOf("Xs", domain())).assertThat(xs ->
-               an(arcConsistent(allDiff())).isEquivalentTo(boundDConsistent(allDiff()))
+               an(arcConsistent(allDiff())).isEquivalentTo(arcConsistent(allDiff()))
                .forAnyPartialAssignment().with(xs)
            )
         );
