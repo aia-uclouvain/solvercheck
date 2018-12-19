@@ -30,7 +30,7 @@ public class TestDefaultGeneratorsDSL implements WithSolverCheck {
     @Test
     public void domainsOfSizeUpTo() {
         assertThat  (     forAll(integer().between(0, 10))
-       .assertThat  (i -> forAll(domain().ofSizeBetween(0, i))
+       .assertThat  (i -> forAll(domain().ofSizeUpTo(i).allowingErrors())
        .itIsTrueThat(d -> d.size() <= i)));
     }
     @Test

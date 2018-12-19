@@ -77,7 +77,7 @@ public class TestGeneratorsDSL implements WithSolverCheck {
     @Test
     public void domainsOfSizeUpTo() {
         assertThat  (     forAll(integer().between(0, 10))
-       .assertThat  (i -> forAll(GeneratorsDSL.domain().ofSizeBetween(0, i))
+       .assertThat  (i -> forAll(GeneratorsDSL.domain().ofSizeUpTo(i).allowingErrors())
        .itIsTrueThat(x -> x.size() <= i)));
     }
     @Test

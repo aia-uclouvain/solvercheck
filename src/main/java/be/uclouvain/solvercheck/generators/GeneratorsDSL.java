@@ -673,8 +673,8 @@ public final class GeneratorsDSL {
      * A builder which acts as a micro DSL to produce generators of domains.
      */
     public static final class GenDomainBuilder extends GenBuilder<Domain> {
-        /** the minimum number of different values a domain should contain. */
-        private int nbValMin = 1;
+        /** is it allowed to generate an error domain ? (default false) */
+        private boolean allowError = false;
         /** the maximum number of different values a domain should contain. */
         private int nbValMax = DEFAULT_NB_VAL_MAX;
         /** the lowest value that can be contained in the domain. */
@@ -694,16 +694,16 @@ public final class GeneratorsDSL {
         }
 
         /**
-         * Tells that generator will produce lists having exactly n items.
+         * Configures the builder to create stream of domains which may be
+         * empty (erroneous).
          *
-         * @param n the number of items in the generated list.
          * @return this
          */
-        public GenDomainBuilder ofSize(final int n) {
-            this.nbValMin = n;
-            this.nbValMax = n;
+        public GenDomainBuilder allowingErrors() {
+            allowError = true;
             return this;
         }
+
         /**
          * Tells that generator will produce lists having &lt;= n items.
          *
@@ -711,22 +711,7 @@ public final class GeneratorsDSL {
          * @return this
          */
         public GenDomainBuilder ofSizeUpTo(final int n) {
-            this.nbValMin = 1;
             this.nbValMax = n;
-            return this;
-        }
-        /**
-         * Tells that generator will produce lists having between from
-         * and to items.
-         *
-         * @param from a lower bound on the number of items in the list.
-         * @param to an upper bound on the number of items in the list.
-         *
-         * @return this
-         */
-        public GenDomainBuilder ofSizeBetween(final int from, final int to) {
-            this.nbValMin = from;
-            this.nbValMax = to;
             return this;
         }
 
@@ -747,7 +732,7 @@ public final class GeneratorsDSL {
         /** {@inheritDoc} */
         @Override
         public Generator<Domain> build() {
-          return new DomainGenerator(name(), nbValMin, nbValMax, minValue, maxValue, spread);
+          return new DomainGenerator(name(), allowError, nbValMax, minValue, maxValue, spread);
         }
     }
 
@@ -975,7 +960,7 @@ public final class GeneratorsDSL {
         @Override
         public Generator<PartialAssignment> build() {
             Generator<Domain> domains =
-               new DomainGenerator("", 1, domSzMax, minValue, maxValue, spread);
+               new DomainGenerator("", false, domSzMax, minValue, maxValue, spread);
             return new PartialAssignmentGenerator(name())
                .addListComponent(new ListGenerator<>(domains, nbVarsMin, nbVarsMax));
         }

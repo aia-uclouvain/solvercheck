@@ -31,6 +31,6 @@ public class TestElement implements WithSolverCheck {
     }
 
     private GeneratorsDSL.GenDomainBuilder smallDomain() {
-        return domain().ofSizeBetween(1, 3);
+        return domain().ofSizeUpTo(3);
     }
 }
