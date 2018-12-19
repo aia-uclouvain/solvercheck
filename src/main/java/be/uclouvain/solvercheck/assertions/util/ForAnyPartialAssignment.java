@@ -16,7 +16,7 @@ import java.util.function.Predicate;
  */
 public final class ForAnyPartialAssignment implements Assertion {
     /** The builder for the generator used to produce the partial assignments. */
-    private final GeneratorsDSL.GenCompoundPartialAssignment builder;
+    private final GeneratorsDSL.GenSinglePartialAssignment builder;
     /** The actual assertion, which must be fed with a partial assignment. */
     private final Function<PartialAssignment, Assertion> assertFn;
     /** A predicate used to filter out irrelevant partial assignments. */
@@ -28,7 +28,7 @@ public final class ForAnyPartialAssignment implements Assertion {
      * @param fn the PartialAssignment -> Assertion function.
      */
     public ForAnyPartialAssignment(final Function<PartialAssignment, Assertion> fn) {
-        builder  = GeneratorsDSL.partialAssignment();
+        builder  = GeneratorsDSL.singlePartialAssignment();
         assertFn = fn;
         check    = pa -> true;
     }

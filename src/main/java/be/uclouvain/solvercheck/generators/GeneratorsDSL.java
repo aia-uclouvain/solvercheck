@@ -39,116 +39,310 @@ public final class GeneratorsDSL {
     private GeneratorsDSL() { }
 
     // --------- INTEGERS -----------------------------------------------------
-    public static GenIntBuilder ints() {
-        return ints("Integer");
+    /**
+     * Creates an int generator builder. That is, an object that facilitates
+     * the creation of generator of streams of integers.
+     *
+     * @return an int generator builder.
+     */
+    public static GenIntBuilder integer() {
+        return integer("Integer");
     }
-    public static GenIntBuilder ints(final String name) {
+    /**
+     * Creates a named int generator builder. That is, an object that
+     * facilitates the creation of generator of streams of integers.
+     *
+     * @param name the name of the generator. (used when reporting a
+     *             counter example).
+     * @return an int generator builder.
+     */
+    public static GenIntBuilder integer(final String name) {
         return new GenIntBuilder(name);
     }
 
     // --------- BOOLEANS -----------------------------------------------------
-    public static GenBoolBuilder booleans() {
-        return booleans("Bool");
+    /**
+     * Creates an boolean generator builder. That is, an object that facilitates
+     * the creation of generator of streams of boolean values.
+     *
+     * @return a boolean generator builder.
+     */
+    public static GenBoolBuilder bool() {
+        return bool("Bool");
     }
-    public static GenBoolBuilder booleans(final String name) {
+    /**
+     * Creates a named boolean generator builder. That is, an object that
+     * facilitates the creation of generator of streams of boolean values.
+     *
+     * @param name the name of the generator. (used when reporting a
+     *             counter example).
+     * @return a boolean generator builder.
+     */
+    public static GenBoolBuilder bool(final String name) {
         return new GenBoolBuilder(name);
     }
 
     // --------- LISTS --------------------------------------------------------
+    /**
+     * Creates a list of Ts generator builder. That is, an object that
+     * facilitates the creation of streams of lists of T.
+     *
+     * @param bldr the generator builder used to instantiate the generator of T.
+     * @param <T>  the type of the objects constituting the payload of the
+     *             generated lists.
+     * @return a builder for a generator of lists of T.
+     */
     public static <T> GenListBuilder<T> listOf(final GenBuilder<T> bldr) {
         return listOf("List", bldr);
     }
-    public static <T> GenListBuilder<T> listOf(final String name, final GenBuilder<T> bldr) {
+    /**
+     * Creates a named list of Ts generator builder. That is, an object that
+     * facilitates the creation of streams of lists of T.
+     *
+     * @param name the name of the generator. (used when reporting a
+     *             counter example).
+     * @param bldr the generator builder used to instanciate the generator of T.
+     * @param <T>  the type of the objects constituting the payload of the
+     *             generated lists.
+     * @return a builder for a generator of lists of T.
+     */
+    public static <T> GenListBuilder<T> listOf(final String name,
+                                               final GenBuilder<T> bldr) {
         return new GenListBuilder<>(name, bldr);
     }
-    public static <T> GenArrayBuilder<T> arrays() {
-        return arrays("Array");
+
+    // --------- ARRAYS -------------------------------------------------------
+    /**
+     * Creates an array of Ts generator builder. That is, an object that
+     * facilitates the creation of streams of arrays of T.
+     *
+     * @param clazz the class of the items constituting the payload of the
+     *              generated arrays.
+     * @param bldr the generator builder used to instantiate the generator of T.
+     * @param <T>  the type of the objects constituting the payload of the
+     *             generated lists.
+     * @return a builder for a generator of arrays of T.
+     */
+    public static <T> GenArrayBuilder<T> arrayOf(final Class<T> clazz,
+                                                 final GenBuilder<T> bldr) {
+        return arrayOf("Array", clazz, bldr);
     }
-    public static <T> GenArrayBuilder<T> arrays(final String name) {
-        return new GenArrayBuilder<>(name);
+    /**
+     * Creates a named array of Ts generator builder. That is, an object that
+     * facilitates the creation of streams of arrays of T.
+     *
+     * @param name the name of the generator. (used when reporting a
+     *             counter example).
+     * @param clazz the class of the items constituting the payload of the
+     *              generated arrays.
+     * @param bldr the generator builder used to instantiate the generator of T.
+     * @param <T>  the type of the objects constituting the payload of the
+     *             generated arrays.
+     * @return a builder for a generator of arrays of T.
+     */
+    public static <T> GenArrayBuilder<T> arrayOf(final String name,
+                                                 final Class<T> clazz,
+                                                 final GenBuilder<T> bldr) {
+        return new GenArrayBuilder<>(name, clazz, bldr);
     }
-    // --------- SETS --------------------------------------------------------
-    public static GenSetBuilder sets() {
-        return sets("Set");
+
+    // --------- SETS ---------------------------------------------------------
+    /**
+     * Creates a setf of Ts generator builder. That is, an object that
+     * facilitates the creation of streams of sets of T.
+     *
+     * @param bldr the generator builder used to instantiate the generator of T.
+     * @param <T>  the type of the objects constituting the payload of the
+     *             generated sets.
+     * @return a builder for a generator of sets of T.
+     */
+    public static <T> GenSetBuilder<T> setOf(final GenBuilder<T> bldr) {
+        return setOf("Set", bldr);
     }
-    public static GenSetBuilder sets(final String name) {
-        return new GenSetBuilder(name);
+    /**
+     * Creates a setf of Ts generator builder. That is, an object that
+     * facilitates the creation of streams of sets of T.
+     *
+     * @param name the name of the generator. (used when reporting a
+     *             counter example).
+     * @param bldr the generator builder used to instantiate the generator of T.
+     * @param <T>  the type of the objects constituting the payload of the
+     *             generated sets.
+     * @return a builder for a generator of sets of T.
+     */
+    public static <T> GenSetBuilder<T> setOf(final String name,
+                                             final GenBuilder<T> bldr) {
+        return new GenSetBuilder<>(name, bldr);
     }
 
     // --------- OPERATORS ----------------------------------------------------
     /**
+     * Creates an operator generator builder. That is, an object that
+     * facilitates the creation of generator of streams of operators.
+     *
      * @return  generator pseudo-randomly returns one of the existing operators
      */
-    public static GenOperatorBuilder operators() {
-        return operators("Operator");
+    public static GenOperatorBuilder operator() {
+        return operator("Operator");
     }
-    public static GenOperatorBuilder operators(final String name) {
+    /**
+     * Creates a named operator generator builder. That is, an object that
+     * facilitates the creation of generator of streams of operators.
+     *
+     * @param name the name of the generator. (used when reporting a
+     *             counter example).
+     * @return  generator pseudo-randomly returns one of the existing operators
+     */
+    public static GenOperatorBuilder operator(final String name) {
         return new GenOperatorBuilder(name);
     }
 
     // --------- DOMAINS ------------------------------------------------------
 
     /**
+     * Creates a domain generator builder. That is, an object that
+     * facilitates the creation of generator of streams of domains.
+     *
      * @return a builder meant to act as a micro DSL to instantiate
      * generators that produce random domains.
      */
-    public static GenDomainBuilder domains() {
-        return domains("Domain");
+    public static GenDomainBuilder domain() {
+        return domain("Domain");
     }
-    public static GenDomainBuilder domains(final String name) {
+    /**
+     * Creates a named domain generator builder. That is, an object that
+     * facilitates the creation of generator of streams of domains.
+     *
+     * @param name the name of the generator. (used when reporting a
+     *             counter example).
+     * @return a named builder meant to act as a micro DSL to instantiate
+     * generators that produce random domains.
+     */
+    public static GenDomainBuilder domain(final String name) {
         return new GenDomainBuilder(name);
+    }
+
+    // --------- ASSIGNMENT ---------------------------------------------------
+    /**
+     * Creates a assignment generator builder. That is, an object that
+     * facilitates the creation of generator of streams of assignments
+     * (strongly typed lists of integer).
+     *
+     * @return a builder meant to act as a micro DSL to instantiate
+     * generators that produce random assignments.
+     */
+    public static GenAssignmentBuilder assignment() {
+        return assignment("Assignment");
+    }
+    /**
+     * Creates a named assignment generator builder. That is, an object that
+     * facilitates the creation of generator of streams of assignments
+     * (strongly typed lists of integer).
+     *
+     * @param name the name of the generator. (used when reporting a
+     *             counter example).
+     * @return a builder meant to act as a micro DSL to instantiate
+     * generators that produce random assignments.
+     */
+    public static GenAssignmentBuilder assignment(final String name) {
+        return new GenAssignmentBuilder(name);
     }
 
     // --------- PARTIAL-ASSIGNMENT -------------------------------------------
     /**
+     * Creates a monolithic partial assignment generator builder. That is, an
+     * object that facilitates the creation of generator of streams of partial
+     * assignments having one single component.
+     *
      * @return a builder meant to act as a micro DSL to instantiate
      * generators that produce random partial assignments.
      */
-    public static GenSimplePartialAssignmentBuilder simplePartialAssignments() {
-        return simplePartialAssignments("Partial Assignment");
+    public static GenMonolithicPartialAssignmentBuilder monolithicPartialAssignment() {
+        return monolithicPartialAssignment("Partial Assignment");
     }
-    public static GenSimplePartialAssignmentBuilder simplePartialAssignments(
-                                                            final String name) {
-        return new GenSimplePartialAssignmentBuilder(name);
-    }
-
-    public static GenCompoundPartialAssignment partialAssignment() {
-        return partialAssignment("Partial Assignment");
-    }
-    public static GenCompoundPartialAssignment partialAssignment(final String name) {
-        return new GenCompoundPartialAssignment(name);
-    }
-
-
-    // --------- ASSIGNMENT ---------------------------------------------------
     /**
+     * Creates a named monolithic partial assignment generator builder.
+     * That is, an object that facilitates the creation of generator of streams
+     * of partial assignments having one single component.
+     *
+     * @param name the name of the generator. (used when reporting a
+     *             counter example).
      * @return a builder meant to act as a micro DSL to instantiate
-     * generators that produce random assignments.
+     * generators that produce random partial assignments.
      */
-    public static GenAssignmentBuilder assignments() {
-        return assignments("Assignment");
+    public static GenMonolithicPartialAssignmentBuilder
+                                monolithicPartialAssignment(final String name) {
+        return new GenMonolithicPartialAssignmentBuilder(name);
     }
-    public static GenAssignmentBuilder assignments(final String name) {
-        return new GenAssignmentBuilder(name);
+    /**
+     * Creates a builder for a generator that produces one unique partial
+     * assignment. That is, an object that facilitates the creation of
+     * generator of streams of partial assignments possibly having more than one
+     * component. The resulting streams all have size one and all yield the one
+     * same unique PartialAssignment instance.
+     *
+     * The point of this generator is simply to concatenate different components
+     * (actual values) into a partial assignment.
+     *
+     * This factory method is mostly useful to implement the
+     * `forAnyPartialAssignment` idiom of the Stateless and Stateful assertions.
+     *
+     * @return a builder meant to act as a micro DSL to instantiate
+     * generators that produce random partial assignments.
+     */
+    public static GenSinglePartialAssignment singlePartialAssignment() {
+        return singlePartialAssignment("Partial Assignment");
+    }
+    /**
+     * Creates a builder for a generator that produces one unique partial
+     * assignment. That is, an object that facilitates the creation of
+     * generator of streams of partial assignments possibly having more than one
+     * component. The resulting streams all have size one and all yield the one
+     * same unique PartialAssignment instance.
+     *
+     * The point of this generator is simply to concatenate different components
+     * (actual values) into a partial assignment.
+     *
+     * This factory method is mostly useful to implement the
+     * `forAnyPartialAssignment` idiom of the Stateless and Stateful assertions.
+     *
+     * @param name the name of the generator. (used when reporting a
+     *             counter example).
+     * @return a builder meant to act as a micro DSL to instantiate
+     * generators that produce random partial assignments.
+     */
+    public static GenSinglePartialAssignment singlePartialAssignment(final String name) {
+        return new GenSinglePartialAssignment(name);
     }
 
     // --------- BUILDERS -----------------------------------------------------
 
+    /**
+     * A builder which acts as a micro DSL to produce generators of integers.
+     */
     public static final class GenIntBuilder extends GenBuilder<Integer> {
+        /** The minimum value that can be generated. */
         private int low  = Integer.MIN_VALUE;
+        /** The maximum value that can be generated. */
         private int high = Integer.MAX_VALUE;
 
-
+        /**
+         * Constructor with a name.
+         *
+         * @param name the name of the generator. (used when reporting a
+         *             counter example).
+         */
         public GenIntBuilder(final String name) {
             super(name);
         }
 
-        public GenIntBuilder positive() {
-            this.low = 0;
-            this.high = Integer.MAX_VALUE;
-            return this;
-        }
-
+        /**
+         * Specifies the range of values which may be generated.
+         *
+         * @param low the minimum value that can be generated (inclusive).
+         * @param high the maximum value that can be generated (inclusive).
+         * @return this.
+         */
         @SuppressWarnings("checkstyle:hiddenfield")
         public GenIntBuilder between(final int low, final int high) {
             this.low  = low;
@@ -156,18 +350,28 @@ public final class GeneratorsDSL {
             return this;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Generator<Integer> build() {
             return new IntGenerator(name(), low, high);
         }
     }
 
+    /**
+     * A builder which acts as a micro DSL to produce generators of booleans.
+     */
     public static final class GenBoolBuilder extends GenBuilder<Boolean> {
-
+        /**
+         * Constructor with a name.
+         *
+         * @param name the name of the generator. (used when reporting a
+         *             counter example).
+         */
         public GenBoolBuilder(final String name) {
             super(name);
         }
 
+        /** {@inheritDoc} */
         @Override
         public Generator<Boolean> build() {
             return new BooleanGenerator(name());
@@ -175,8 +379,29 @@ public final class GeneratorsDSL {
     }
 
     /**
+     * A builder which acts as a micro DSL to produce generators of operators.
+     */
+    public static final class GenOperatorBuilder extends GenBuilder<Operator> {
+        /**
+         * Constructor with a name.
+         *
+         * @param name the name of the generator. (used when reporting a
+         *             counter example).
+         */
+        public GenOperatorBuilder(final String name) {
+            super(name);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Generator<Operator> build() {
+            return new OperatorGenerator(name());
+        }
+    }
+
+    /**
      * A builder which acts as a micro DSL to produce generators of lists of
-     * integers.
+     * objects.
      *
      * @param <T> the kind if items in the generated lists.
      */
@@ -215,7 +440,6 @@ public final class GeneratorsDSL {
             super(name);
             generator = gen;
         }
-
 
         /**
          * Tells that generator will produce lists having exactly n items.
@@ -267,10 +491,10 @@ public final class GeneratorsDSL {
     }
 
     /**
-     * A builder which acts as a micro DSL to produce generators of lists of
-     * integers.
+     * A builder which acts as a micro DSL to produce generators of arrays of
+     * objects.
      *
-     * @param <T> the kind if items in the generated lists.
+     * @param <T> the kind if items in the generated arrays.
      */
     public static final class GenArrayBuilder<T> extends GenBuilder<T[]> {
         /**
@@ -293,36 +517,31 @@ public final class GeneratorsDSL {
         /**
          * Contructor with a name.
          *
-         * @param name the name of the generator
+         * @param name the name of the generator.
+         * @param clazz the class of the items being generated.
+         * @param bldr a builder to create the delegate generator.
          */
-        public GenArrayBuilder(final String name) {
+        public GenArrayBuilder(final String name,
+                               final Class<T> clazz,
+                               final GenBuilder<T> bldr) {
             super(name);
+            this.clazz = clazz;
+            this.generator = bldr.build();
         }
 
         /**
-         * Tells what is going to be generated as items in the array.
+         * Contructor with a name.
          *
-         * @param clazz the class of the generated elements.
-         * @param what a generator for the kind of items in the array.
-         * @return this.
+         * @param name the name of the generator.
+         * @param clazz the class of the items being generated.
+         * @param gen the delegate generator.
          */
-        public GenArrayBuilder<T> of(final Class<T> clazz, final Generator<T> what) {
+        public GenArrayBuilder(final String name,
+                               final Class<T> clazz,
+                               final Generator<T> gen) {
+            super(name);
             this.clazz = clazz;
-            this.generator = what;
-            return this;
-        }
-
-        /**
-         * Tells what is going to be generated as items in the list.
-         *
-         * @param clazz the class of the generated elements.
-         * @param what a generator builder for the kind of items in the array.
-         * @return this.
-         */
-        public GenArrayBuilder<T> of(final Class<T> clazz, final GenBuilder<T> what) {
-            this.clazz = clazz;
-            this.generator = what.build();
-            return this;
+            this.generator = gen;
         }
 
         /**
@@ -375,11 +594,14 @@ public final class GeneratorsDSL {
     }
 
     /**
-     * A builder which acts as a micro DSL to produce generators of domains.
+     * A builder which acts as a micro DSL to produce generators of sets of
+     * objects.
+     *
+     * @param <T> the kind if items in the generated sets.
      */
     public static final class GenSetBuilder<T> extends GenBuilder<Set<T>> {
         /**
-         * The minimum number of items in the list. (default: 0)
+         * Is it allowed to generated an empty set ? (default: false)
          */
         private boolean canBeEmpty = false;
         /**
@@ -395,29 +617,22 @@ public final class GeneratorsDSL {
          * Contructor with a name.
          *
          * @param name the name of the generator
+         * @param bldr a builder to create the delegate generator
          */
-        public GenSetBuilder(final String name) {
+        public GenSetBuilder(final String name, final GenBuilder<T> bldr) {
             super(name);
+            generator = bldr.build();
         }
 
         /**
-         * Tells what is going to be generated as items in the set.
-         * @param what a generator for the kind of items in the set.
-         * @return this.
+         * Contructor with a name.
+         *
+         * @param name the name of the generator
+         * @param gen the delegate generator
          */
-        public GenSetBuilder of(final Generator<T> what) {
-            generator = what;
-            return this;
-        }
-
-        /**
-         * Tells what is going to be generated as items in the set.
-         * @param what a generator builder for the kind of items in the set.
-         * @return this.
-         */
-        public GenSetBuilder of(final GenBuilder<T> what) {
-            generator = what.build();
-            return this;
+        public GenSetBuilder(final String name, final Generator<T> gen) {
+            super(name);
+            generator = gen;
         }
 
         /**
@@ -454,20 +669,6 @@ public final class GeneratorsDSL {
         }
     }
 
-
-
-    public static final class GenOperatorBuilder extends GenBuilder<Operator> {
-
-        public GenOperatorBuilder(final String name) {
-            super(name);
-        }
-
-        @Override
-        public Generator<Operator> build() {
-            return new OperatorGenerator(name());
-        }
-    }
-
     /**
      * A builder which acts as a micro DSL to produce generators of domains.
      */
@@ -483,6 +684,11 @@ public final class GeneratorsDSL {
         /** the highest value that can be contained in the domain. */
         private int spread   = DEFAULT_SPREAD;
 
+        /**
+         * Contructor with a name.
+         *
+         * @param name the name of the generator
+         */
         public GenDomainBuilder(final String name) {
             super(name);
         }
@@ -546,8 +752,7 @@ public final class GeneratorsDSL {
     }
 
     /**
-     * A builder which acts as a micro DSL to produce generators of partial
-     * assignments.
+     * A builder which acts as a micro DSL to produce generators of assignments.
      */
     public static final class GenAssignmentBuilder
        extends GenBuilder<Assignment> {
@@ -569,6 +774,11 @@ public final class GeneratorsDSL {
          */
         private int valueMax  = DEFAULT_VALUE_MAX;
 
+        /**
+         * Contructor with a name.
+         *
+         * @param name the name of the generator
+         */
         public GenAssignmentBuilder(final String name) {
             super(name);
         }
@@ -645,10 +855,11 @@ public final class GeneratorsDSL {
     }
 
     /**
-     * A builder which acts as a micro DSL to produce generators of partial
-     * assignments.
+     * A builder which acts as a micro DSL to produce generators of monolithic
+     * partial assignments. That is generators of partial assignments having
+     * one single component.
      */
-    public static final class GenSimplePartialAssignmentBuilder
+    public static final class GenMonolithicPartialAssignmentBuilder
             extends GenBuilder<PartialAssignment> {
         /**
          * The minimum number of variables in the partial assignment.
@@ -669,7 +880,12 @@ public final class GeneratorsDSL {
         /** the max distance between any two values. */
         private int spread   = DEFAULT_SPREAD;
 
-        public GenSimplePartialAssignmentBuilder(final String name) {
+        /**
+         * Contructor with a name.
+         *
+         * @param name the name of the generator
+         */
+        public GenMonolithicPartialAssignmentBuilder(final String name) {
             super(name);
         }
 
@@ -680,7 +896,7 @@ public final class GeneratorsDSL {
          * @param n the number of variables in the generated partial assignments
          * @return this
          */
-        public GenSimplePartialAssignmentBuilder withVariables(final int n) {
+        public GenMonolithicPartialAssignmentBuilder withVariables(final int n) {
             this.nbVarsMin = n;
             this.nbVarsMax = n;
             return this;
@@ -694,7 +910,7 @@ public final class GeneratorsDSL {
          *          partial assignments
          * @return this
          */
-        public GenSimplePartialAssignmentBuilder withUpToVariables(final int n) {
+        public GenMonolithicPartialAssignmentBuilder withUpToVariables(final int n) {
             this.nbVarsMin = 0;
             this.nbVarsMax = n;
             return this;
@@ -709,7 +925,7 @@ public final class GeneratorsDSL {
          *          partial assignments
          * @return this
          */
-        public GenSimplePartialAssignmentBuilder withVariablesBetween(
+        public GenMonolithicPartialAssignmentBuilder withVariablesBetween(
                 final int from,
                 final int to) {
             this.nbVarsMin = from;
@@ -724,7 +940,7 @@ public final class GeneratorsDSL {
          *           partial assignments
          * @return this
          */
-        public GenSimplePartialAssignmentBuilder withDomainsOfSizeUpTo(final int n) {
+        public GenMonolithicPartialAssignmentBuilder withDomainsOfSizeUpTo(final int n) {
             this.domSzMax = n;
             return this;
         }
@@ -737,7 +953,7 @@ public final class GeneratorsDSL {
          *          the partial assignments
          * @return this
          */
-        public GenSimplePartialAssignmentBuilder withValuesRanging(
+        public GenMonolithicPartialAssignmentBuilder withValuesRanging(
            final int from,
            final int to) {
             this.minValue = from;
@@ -750,7 +966,7 @@ public final class GeneratorsDSL {
          * @param s the new spread
          * @return this
          */
-        public GenSimplePartialAssignmentBuilder spreading(final int s) {
+        public GenMonolithicPartialAssignmentBuilder spreading(final int s) {
             this.spread = s;
             return this;
         }
@@ -765,9 +981,21 @@ public final class GeneratorsDSL {
         }
     }
 
-    public static final class GenCompoundPartialAssignment
+    /**
+     * A builder which acts as a micro DSL to produce generators of partial
+     * assignments which may have more than one component. Because the utility
+     * methods of this builder specify the actual values of each component
+     * of the partial assignment, a generator created with this builder
+     * will always generate streams of size ONE. That is, it only generates
+     * ONE SINGLE PARTIAL ASSIGNMENT INSTANCE.
+     *
+     * This builder is mostly useful to implement the "forAnyPartialAssignment"
+     * idiom on the Stateless- and Stateful- assertions.
+     */
+    public static final class GenSinglePartialAssignment
        extends GenBuilder<PartialAssignment> {
 
+        /** The actual instance being generated. */
         private final BasicPartialAssignment instance;
 
         /**
@@ -777,60 +1005,254 @@ public final class GeneratorsDSL {
          *             is useful to be able to provide a meaningful information
          *             in the error reports.
          */
-        public GenCompoundPartialAssignment(final String name) {
+        public GenSinglePartialAssignment(final String name) {
             super(name);
             instance = new BasicPartialAssignment();
         }
 
-
-        public GenCompoundPartialAssignment with(final List<Domain> component) {
+        /**
+         * Adds a component, a list of arguments to the partial assignment.
+         * One such component is really meant to represent a set of arguments passed
+         * to the constructor of an actual constraint. The element constraint is
+         * a typical example that illustrates this. The element constraint
+         * `X[Y] = Z` has three components:
+         * <ul>
+         *     <li>X, an array of variables</li>
+         *     <li>Y, an index variable</li>
+         *     <li>Z, a value variable</li>
+         * </ul>
+         *
+         * A partial assignment generator for the element constraint can thus be
+         * configured with:
+         * <code>
+         *  PartialAssignmentGenerator pa = new PartialAssignmentGenerator("data");
+         *  pa.addListComponent(x);
+         *  pa.addSingleComponent(y);
+         *  pa.addSingleComponent(z);
+         * </code>
+         *
+         * @param component the component to add to the current partial assignment.
+         * @return this
+         */
+        public GenSinglePartialAssignment with(final List<Domain> component) {
             instance.addComponent(component);
             return this;
         }
 
-        public GenCompoundPartialAssignment with(final Domain[] component) {
+        /**
+         * Adds a component, a list of arguments to the partial assignment.
+         * One such component is really meant to represent a set of arguments passed
+         * to the constructor of an actual constraint. The element constraint is
+         * a typical example that illustrates this. The element constraint
+         * `X[Y] = Z` has three components:
+         * <ul>
+         *     <li>X, an array of variables</li>
+         *     <li>Y, an index variable</li>
+         *     <li>Z, a value variable</li>
+         * </ul>
+         *
+         * A partial assignment generator for the element constraint can thus be
+         * configured with:
+         * <code>
+         *  PartialAssignmentGenerator pa = new PartialAssignmentGenerator("data");
+         *  pa.addListComponent(x);
+         *  pa.addSingleComponent(y);
+         *  pa.addSingleComponent(z);
+         * </code>
+         *
+         * @param component the component to add to the current partial assignment.
+         * @return this
+         */
+        public GenSinglePartialAssignment with(final Domain[] component) {
             instance.addComponent(component);
             return this;
         }
 
-        public GenCompoundPartialAssignment with(final Domain component) {
+        /**
+         * Adds a component, a list of arguments to the partial assignment.
+         * One such component is really meant to represent a set of arguments passed
+         * to the constructor of an actual constraint. The element constraint is
+         * a typical example that illustrates this. The element constraint
+         * `X[Y] = Z` has three components:
+         * <ul>
+         *     <li>X, an array of variables</li>
+         *     <li>Y, an index variable</li>
+         *     <li>Z, a value variable</li>
+         * </ul>
+         *
+         * A partial assignment generator for the element constraint can thus be
+         * configured with:
+         * <code>
+         *  PartialAssignmentGenerator pa = new PartialAssignmentGenerator("data");
+         *  pa.addListComponent(x);
+         *  pa.addSingleComponent(y);
+         *  pa.addSingleComponent(z);
+         * </code>
+         *
+         * @param component the component to add to the current partial assignment.
+         * @return this
+         */
+        public GenSinglePartialAssignment with(final Domain component) {
             instance.addComponent(component);
             return this;
         }
 
-        public GenCompoundPartialAssignment with(final int component) {
+        /**
+         * Adds a component, a list of arguments to the partial assignment.
+         * One such component is really meant to represent a set of arguments passed
+         * to the constructor of an actual constraint. The element constraint is
+         * a typical example that illustrates this. The element constraint
+         * `X[Y] = Z` has three components:
+         * <ul>
+         *     <li>X, an array of variables</li>
+         *     <li>Y, an index variable</li>
+         *     <li>Z, a value variable</li>
+         * </ul>
+         *
+         * A partial assignment generator for the element constraint can thus be
+         * configured with:
+         * <code>
+         *  PartialAssignmentGenerator pa = new PartialAssignmentGenerator("data");
+         *  pa.addListComponent(x);
+         *  pa.addSingleComponent(y);
+         *  pa.addSingleComponent(z);
+         * </code>
+         *
+         * @param component the component to add to the current partial assignment.
+         * @return this
+         */
+        public GenSinglePartialAssignment with(final int component) {
             instance.addComponent(component);
             return this;
         }
 
-        public GenCompoundPartialAssignment then(final List<Domain> component) {
+        /**
+         * Adds a component, a list of arguments to the partial assignment.
+         * One such component is really meant to represent a set of arguments passed
+         * to the constructor of an actual constraint. The element constraint is
+         * a typical example that illustrates this. The element constraint
+         * `X[Y] = Z` has three components:
+         * <ul>
+         *     <li>X, an array of variables</li>
+         *     <li>Y, an index variable</li>
+         *     <li>Z, a value variable</li>
+         * </ul>
+         *
+         * A partial assignment generator for the element constraint can thus be
+         * configured with:
+         * <code>
+         *  PartialAssignmentGenerator pa = new PartialAssignmentGenerator("data");
+         *  pa.addListComponent(x);
+         *  pa.addSingleComponent(y);
+         *  pa.addSingleComponent(z);
+         * </code>
+         *
+         * @param component the component to add to the current partial assignment.
+         * @return this
+         */
+        public GenSinglePartialAssignment then(final List<Domain> component) {
             instance.addComponent(component);
             return this;
         }
 
-        public GenCompoundPartialAssignment then(final Domain[] component) {
+        /**
+         * Adds a component, a list of arguments to the partial assignment.
+         * One such component is really meant to represent a set of arguments passed
+         * to the constructor of an actual constraint. The element constraint is
+         * a typical example that illustrates this. The element constraint
+         * `X[Y] = Z` has three components:
+         * <ul>
+         *     <li>X, an array of variables</li>
+         *     <li>Y, an index variable</li>
+         *     <li>Z, a value variable</li>
+         * </ul>
+         *
+         * A partial assignment generator for the element constraint can thus be
+         * configured with:
+         * <code>
+         *  PartialAssignmentGenerator pa = new PartialAssignmentGenerator("data");
+         *  pa.addListComponent(x);
+         *  pa.addSingleComponent(y);
+         *  pa.addSingleComponent(z);
+         * </code>
+         *
+         * @param component the component to add to the current partial assignment.
+         * @return this
+         */
+        public GenSinglePartialAssignment then(final Domain[] component) {
             instance.addComponent(component);
             return this;
         }
 
-        public GenCompoundPartialAssignment then(final Domain component) {
+        /**
+         * Adds a component, a list of arguments to the partial assignment.
+         * One such component is really meant to represent a set of arguments passed
+         * to the constructor of an actual constraint. The element constraint is
+         * a typical example that illustrates this. The element constraint
+         * `X[Y] = Z` has three components:
+         * <ul>
+         *     <li>X, an array of variables</li>
+         *     <li>Y, an index variable</li>
+         *     <li>Z, a value variable</li>
+         * </ul>
+         *
+         * A partial assignment generator for the element constraint can thus be
+         * configured with:
+         * <code>
+         *  PartialAssignmentGenerator pa = new PartialAssignmentGenerator("data");
+         *  pa.addListComponent(x);
+         *  pa.addSingleComponent(y);
+         *  pa.addSingleComponent(z);
+         * </code>
+         *
+         * @param component the component to add to the current partial assignment.
+         * @return this
+         */
+        public GenSinglePartialAssignment then(final Domain component) {
             instance.addComponent(component);
             return this;
         }
 
-        public GenCompoundPartialAssignment then(final int component) {
+        /**
+         * Adds a component, a list of arguments to the partial assignment.
+         * One such component is really meant to represent a set of arguments passed
+         * to the constructor of an actual constraint. The element constraint is
+         * a typical example that illustrates this. The element constraint
+         * `X[Y] = Z` has three components:
+         * <ul>
+         *     <li>X, an array of variables</li>
+         *     <li>Y, an index variable</li>
+         *     <li>Z, a value variable</li>
+         * </ul>
+         *
+         * A partial assignment generator for the element constraint can thus be
+         * configured with:
+         * <code>
+         *  PartialAssignmentGenerator pa = new PartialAssignmentGenerator("data");
+         *  pa.addListComponent(x);
+         *  pa.addSingleComponent(y);
+         *  pa.addSingleComponent(z);
+         * </code>
+         *
+         * @param component the component to add to the current partial assignment.
+         * @return this
+         */
+        public GenSinglePartialAssignment then(final int component) {
             instance.addComponent(component);
             return this;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Generator<PartialAssignment> build() {
             return new BaseGenerator<PartialAssignment>(name()) {
+                /** {@inheritDoc} */
                 @Override
                 public Stream<PartialAssignment> generate(final Randomness randomness) {
                     return Stream.of(item(randomness));
                 }
 
+                /** {@inheritDoc} */
                 @Override
                 public PartialAssignment item(final Randomness randomness) {
                     return instance;
