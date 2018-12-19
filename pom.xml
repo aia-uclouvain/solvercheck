@@ -293,11 +293,6 @@
                                     be.uclouvain.solvercheck.*
                                 </targetTest>
                             </targetTests>
-                            <excludedClasses>
-                                <excludedClass>
-                                    be.uclouvain.solvercheck.generators.WithJavaGenerators
-                                </excludedClass>
-                            </excludedClasses>
                         </configuration>
                     </plugin>
 
