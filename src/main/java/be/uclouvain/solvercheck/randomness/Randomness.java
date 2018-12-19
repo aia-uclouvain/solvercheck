@@ -9,6 +9,12 @@ import java.util.stream.IntStream;
  * and the ability to draw a value from a given range
  */
 public final class Randomness extends Random {
+    /**
+     * Because Randomness extends Random which is Serializable, Randomness
+     * should declare its serial version uid.
+     */
+    private static final long serialVersionUID = 1L;
+
     /** The seed used to initialize the prng. */
     private long seed;
 

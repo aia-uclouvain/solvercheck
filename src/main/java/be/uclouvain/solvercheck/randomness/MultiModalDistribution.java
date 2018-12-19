@@ -21,7 +21,7 @@ public final class MultiModalDistribution implements Distribution {
      * @param likelihood the likelihood of picking one of the modes.
      */
     public MultiModalDistribution(final int[] modes, final double likelihood) {
-        this.modes      = modes;
+        this.modes      = Arrays.copyOf(modes, modes.length);
         this.likelihood = likelihood;
     }
 

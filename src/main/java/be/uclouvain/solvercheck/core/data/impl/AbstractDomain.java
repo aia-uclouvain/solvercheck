@@ -21,25 +21,25 @@ public abstract class AbstractDomain
 
     /** {@inheritDoc} */
     @Override
-    public Iterator<Integer> iterator() {
+    public final Iterator<Integer> iterator() {
         return increasing();
     }
 
     /** {@inheritDoc} */
     @Override
-    public Stream<Integer> increasingStream() {
+    public final Stream<Integer> increasingStream() {
         return StreamSupport.stream(from(this::increasing), true);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Stream<Integer> decreasingStream() {
+    public final Stream<Integer> decreasingStream() {
         return StreamSupport.stream(from(this::decreasing), true);
     }
 
     /** {@inheritDoc} */
     @Override
-    public String toString() {
+    public final String toString() {
         return String.format("{%s}",
                 stream().map(Object::toString)
                         .collect(Collectors.joining(",")));

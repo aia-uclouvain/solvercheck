@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  *
  * @param <T> the type of the generated objects (in the set).
  */
-public class SetGenerator<T> extends BaseGenerator<Set<T>> {
+public final class SetGenerator<T> extends BaseGenerator<Set<T>> {
     /** The generator in charge of producing the actual payload of the sets. */
     private final Generator<T> delegate;
     /** The minimum size of a generated list. */

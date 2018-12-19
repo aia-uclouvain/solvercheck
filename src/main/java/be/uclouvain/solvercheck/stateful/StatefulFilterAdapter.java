@@ -31,6 +31,7 @@ public final class StatefulFilterAdapter implements StatefulFilter {
     public StatefulFilterAdapter(final Filter filter) {
         this.filter = filter;
         this.snapshots = new Stack<>();
+        this.current = null; // throw exception if not explicitly initialized
     }
 
     /** {@inheritDoc} */

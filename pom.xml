@@ -77,7 +77,7 @@
 
         <pitest.version>1.4.2</pitest.version>
 
-        <spotbugs.version>3.1.8</spotbugs.version>
+        <spotbugs.version>3.1.9</spotbugs.version>
         <spotbugs.effort>Max</spotbugs.effort>
         <spotbugs.threshold>Low</spotbugs.threshold>
     </properties>

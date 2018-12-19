@@ -10,7 +10,9 @@ import java.util.stream.Collectors;
 
 /**
  * This class merely wraps an existing list type to interpret it as a (complete)
- * assignment {@see Assignment}.
+ * assignment.
+ *
+ * @see Assignment
  */
 public final class BasicAssignment extends AbstractList<Integer>
         implements Assignment, RandomAccess {

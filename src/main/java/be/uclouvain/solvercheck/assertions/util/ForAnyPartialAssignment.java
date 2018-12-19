@@ -23,9 +23,9 @@ public final class ForAnyPartialAssignment implements Assertion {
     private Predicate<PartialAssignment> check;
 
     /**
-     * A constructor that wraps a function PartialAssignment -> Assertion.
+     * A constructor that wraps a function PartialAssignment -&gt; Assertion.
      *
-     * @param fn the PartialAssignment -> Assertion function.
+     * @param fn the PartialAssignment -&gt; Assertion function.
      */
     public ForAnyPartialAssignment(final Function<PartialAssignment, Assertion> fn) {
         builder  = GeneratorsDSL.singlePartialAssignment();

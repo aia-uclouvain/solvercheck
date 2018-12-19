@@ -97,10 +97,11 @@ public final class AssertionRunner {
         try {
             future.get(duration, unit);
         } catch (ExecutionException exec) {
-            if (exec.getCause() instanceof AssertionError) {
-                throw (AssertionError) exec.getCause();
+            Throwable cause = exec.getCause();
+            if (cause instanceof AssertionError) {
+                throw (AssertionError) cause;
             } else {
-                throw new RuntimeException(exec.getCause());
+                throw new RuntimeException(cause);
             }
         } catch (TimeoutException timeout) {
             if (failOnTimeout) {

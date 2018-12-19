@@ -19,7 +19,9 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
 
 /**
  * This class merely decorates an existing list type to interpret it as a
- * partial assignment {@see PartialAssignment}.
+ * partial assignment.
+ *
+ * @see PartialAssignment
  */
 public final class BasicPartialAssignment
         extends AbstractList<Domain>

@@ -18,7 +18,8 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
 
 /**
  * This class merely wraps an existing set to interpret it as a Domain.
- * {@see Domain}
+ *
+ * @see Domain
  */
 public final class BasicDomain
         extends AbstractDomain
