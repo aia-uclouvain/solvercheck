@@ -84,8 +84,8 @@ public final class DomainGenerator extends BaseGenerator<Domain> {
                 set.add(i);
             } else {
                 long rem = spread - (maximum - minimum);
-                int ll   = (int) Math.max(Integer.MIN_VALUE, minimum - rem);
-                int mm   = (int) Math.min(Integer.MAX_VALUE, maximum + rem);
+                int ll   = (int) max(Integer.MIN_VALUE, minimum - rem, valMin);
+                int mm   = (int) min(Integer.MAX_VALUE, maximum + rem, valMax);
                 int i = valDist.next(randomness, ll, mm);
 
                 if (i > maximum) {
@@ -111,5 +111,17 @@ public final class DomainGenerator extends BaseGenerator<Domain> {
      */
     private static long min(final long x, final long y, final long z) {
         return Math.min(x, Math.min(y, z));
+    }
+
+    /**
+     * Returns the maximum of three values.
+     *
+     * @param x the first value
+     * @param y the 2nd value
+     * @param z the third value
+     * @return the smallest of the three value.
+     */
+    private static long max(final long x, final long y, final long z) {
+        return Math.max(x, Math.max(y, z));
     }
 }
