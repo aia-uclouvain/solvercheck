@@ -227,6 +227,9 @@ public final class Dive implements Runnable {
      * distribution.
      */
     private Iterator<Integer> variables(final PartialAssignment forDomains) {
+        if (forDomains.isEmpty()) {
+            return new ArrayList<Integer>().iterator();
+        }
         return randomness
            .intsBetween(0, forDomains.size() - 1)
            .iterator();
