@@ -641,7 +641,7 @@ public final class GeneratorsDSL {
          * @param n the maximum number of items in the generated list
          * @return this
          */
-        public GenSetBuilder ofSizeUpTo(final int n) {
+        public GenSetBuilder<T> ofSizeUpTo(final int n) {
             this.nbItemsMax = n;
             return this;
         }
@@ -651,7 +651,7 @@ public final class GeneratorsDSL {
          *
          * @return this
          */
-        public GenSetBuilder possiblyEmpty() {
+        public GenSetBuilder<T> possiblyEmpty() {
             this.canBeEmpty = true;
             return this;
         }
