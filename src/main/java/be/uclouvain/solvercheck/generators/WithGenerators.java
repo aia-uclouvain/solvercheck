@@ -226,7 +226,7 @@ public interface WithGenerators {
      * @return a builder meant to act as a micro DSL to instantiate
      * generators that produce random partial assignments.
      */
-    default GeneratorsDSL.GenMonolithicPartialAssignmentBuilder monolithicPartialAssignment() {
+    default GeneratorsDSL.GenMonolithicPartialAssignmentBuilder partialAssignment() {
         return GeneratorsDSL.monolithicPartialAssignment();
     }
     /**
@@ -240,7 +240,7 @@ public interface WithGenerators {
      * generators that produce random partial assignments.
      */
     default GeneratorsDSL.GenMonolithicPartialAssignmentBuilder
-                                monolithicPartialAssignment(final String name) {
+                                          partialAssignment(final String name) {
         return GeneratorsDSL.monolithicPartialAssignment(name);
     }
     /**
