@@ -5,6 +5,12 @@ import be.uclouvain.solvercheck.randomness.Distribution;
 import be.uclouvain.solvercheck.randomness.Randomness;
 import be.uclouvain.solvercheck.randomness.UniformDistribution;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -89,4 +95,34 @@ public final class DomainGenerator extends BaseGenerator<Domain> {
     private static long min(final long x, final long y, final long z) {
         return Math.min(x, Math.min(y, z));
     }
+
+
+
+    public static void main(String[] args) throws FileNotFoundException {
+        Randomness r = new Randomness(System.currentTimeMillis());
+        DomainGenerator dg = new DomainGenerator("", false, 5, -100, 100, 10);
+
+        HashMap<Integer, Integer> cnt = new HashMap<>();
+        dg.generate(r)
+           .limit(10000)
+           .forEach(d -> d.stream().forEach(value ->
+              cnt.put(value, 1 + cnt.getOrDefault(value, 0))));
+
+        PrintStream o = null;
+        try {
+            PrintStream out = new PrintStream(new FileOutputStream("/Users/user/Desktop/domains.csv"));
+            o = out;
+
+            out.println("Value,Count");
+            cnt.entrySet()
+               .stream()
+               .sorted(Comparator.comparing(Map.Entry::getKey))
+               .forEach(e -> out.println(e.getKey() + "," + e.getValue()));
+        } finally {
+            if (o != null) {
+                o.close();
+            }
+        }
+    }
+
 }
