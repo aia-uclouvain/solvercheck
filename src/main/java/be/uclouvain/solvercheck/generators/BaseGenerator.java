@@ -47,9 +47,6 @@ public abstract class BaseGenerator<T> implements Generator<T> {
         if (0 > low && 0 < high) {
             modes.add(0);
         }
-        if (1 > low && 1 < high) {
-            modes.add(1);
-        }
 
         int[] imodes = modes.stream().mapToInt(Integer::intValue).toArray();
 

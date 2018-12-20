@@ -15,8 +15,6 @@ import java.util.stream.Stream;
  * two values of the domain (spread).
  */
 public final class DomainGenerator extends BaseGenerator<Domain> {
-    /** The distribution of the *size* of the generated domains. */
-    private final Distribution szDist;
     /** The distribution of the values generated in the domains. */
     private final Distribution valDist;
     /** The minimum size of any generated domain. */
@@ -50,7 +48,6 @@ public final class DomainGenerator extends BaseGenerator<Domain> {
                            final int     valMax,
                            final int     spread) {
         super(name);
-        this.szDist  = UniformDistribution.getInstance();
         this.valDist = mkDist(valMin, valMax);
         this.szMin   = canBeEmpty ? 0 : 1;
         this.szMax   = (int) min(szMax, szMin + spread, (long) valMax - (long) valMin);
@@ -62,16 +59,23 @@ public final class DomainGenerator extends BaseGenerator<Domain> {
     /** {@inheritDoc} */
     @Override
     public Domain item(final Randomness randomness) {
-        final int size   = szDist .next(randomness, szMin, szMax);
-        final int anchor = valDist.next(randomness, valMin, valMax);
+        final int size   = uniform().next(randomness, szMin, szMax);
+        final int anchor = valDist  .next(randomness, valMin, valMax);
 
         final int lb = (int) Math.max(valMin, (long) anchor - (long) spread / 2);
         final int ub = (int) Math.min(valMax, (long) anchor + (long) spread / 2);
 
-        return Stream
-           .generate(() -> valDist.next(randomness, lb, ub))
-           .limit(size)
-           .collect(Domain.collector());
+        return Stream.concat(
+           Stream.of(anchor),
+           Stream.generate(() -> uniform().next(randomness, lb, ub)).limit(size - 1)
+        ).collect(Domain.collector());
+    }
+
+    /**
+     * @return An uniform distribution.
+     */
+    private static Distribution uniform() {
+        return UniformDistribution.getInstance();
     }
 
     /**
