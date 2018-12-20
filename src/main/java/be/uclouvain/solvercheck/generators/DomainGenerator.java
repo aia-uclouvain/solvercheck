@@ -60,15 +60,20 @@ public final class DomainGenerator extends BaseGenerator<Domain> {
     @Override
     public Domain item(final Randomness randomness) {
         final int size   = uniform().next(randomness, szMin, szMax);
-        final int anchor = valDist  .next(randomness, valMin, valMax);
 
-        final int lb = (int) Math.max(valMin, (long) anchor - (long) spread / 2);
-        final int ub = (int) Math.min(valMax, (long) anchor + (long) spread / 2);
+        if (size == 0) {
+            return Domain.from();
+        } else {
+            final int anchor = valDist.next(randomness, valMin, valMax);
 
-        return Stream.concat(
-           Stream.of(anchor),
-           Stream.generate(() -> uniform().next(randomness, lb, ub)).limit(size - 1)
-        ).collect(Domain.collector());
+            final int lb = (int) Math.max(valMin, (long) anchor - (long) spread / 2);
+            final int ub = (int) Math.min(valMax, (long) anchor + (long) spread / 2);
+
+            return Stream.concat(
+               Stream.of(anchor),
+               Stream.generate(() -> uniform().next(randomness, lb, ub)).limit(size - 1)
+            ).collect(Domain.collector());
+        }
     }
 
     /**

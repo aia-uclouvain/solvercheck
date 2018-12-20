@@ -13,7 +13,7 @@ public final class Defaults {
      * The default number of partial assignment generated (and tested) for each
      * anchor value.
      */
-    public static final int DEFAULT_EXAMPLES = 20;
+    public static final int DEFAULT_EXAMPLES = 100;
     /**
      * The default minimal value that may appear in a generated partial
      * assignment.
