@@ -18,9 +18,10 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
 
 /**
  * This class merely wraps an existing set to interpret it as a Domain.
- * {@see Domain}
+ *
+ * @see Domain
  */
-/* package */ final class BasicDomain
+public final class BasicDomain
         extends AbstractDomain
         implements RandomAccess {
 
@@ -33,7 +34,7 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.WEAKER;
      * @param values the values that can possibly be assigned to the variable to
      *               whom, this domain relates.
      */
-    /* package */ BasicDomain(final int...values) {
+    public BasicDomain(final int...values) {
         this.values = Arrays.stream(values)
                             .distinct()
                             .sorted()

@@ -1,11 +1,9 @@
 package be.uclouvain.solvercheck.utils;
 
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.utils.collections.Zip;
 import be.uclouvain.solvercheck.utils.collections.ZipEntry;
-import org.junit.Before;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
-import org.quicktheories.WithQuickTheories;
 
 import java.util.Iterator;
 import java.util.List;
@@ -14,58 +12,48 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TestZip implements WithQuickTheories {
-
-    private QuickTheory qt;
-
-    @Before
-    public void setUp() {
-        qt = qt().withGenerateAttempts(10000);
-    }
+public class TestZip implements WithSolverCheck {
 
     @Test
     public void iterateBothSameSize() {
-        qt.forAll(integers().between(0, 100))
-          .checkAssert( size ->
-                qt.forAll(
-                    lists().of(integers().all()).ofSize(size),
-                    lists().of(integers().all()).ofSize(size))
-                  .checkAssert((as, bs) -> {
-                      Zip zip = new Zip<>(as, bs);
+        assertThat(forAll(integer().between(0, 100))
+       .assertThat(size -> forAll(
+                    listOf(integer()).ofSize(size),
+                    listOf(integer()).ofSize(size))
+       .itIsTrueThat((as, bs) -> {
+          Zip zip = new Zip<>(as, bs);
 
-                      // these two *have to* be copies. Else they would be
-                      // consumed by the zipper
-                      Iterator<Integer> ai = as.iterator();
-                      Iterator<Integer> bi = bs.iterator();
+          // these two *have to* be copies. Else they would be
+          // consumed by the zipper
+          Iterator<Integer> ai = as.iterator();
+          Iterator<Integer> bi = bs.iterator();
 
-                      Iterator<ZipEntry<Integer, Integer>> zi = zip.iterator();
+          Iterator<ZipEntry<Integer, Integer>> zi = zip.iterator();
 
-                      while (zi.hasNext()) {
-                          ZipEntry<Integer, Integer> ze = zi.next();
-                          Integer ae = ai.next();
-                          Integer be = bi.next();
+          while (zi.hasNext()) {
+              ZipEntry<Integer, Integer> ze = zi.next();
+              Integer ae = ai.next();
+              Integer be = bi.next();
 
-                          assertEquals(ae, ze.first());
-                          assertEquals(be, ze.second());
-                      }
+              assertEquals(ae, ze.first());
+              assertEquals(be, ze.second());
+          }
 
-                      assertTrue(!ai.hasNext());
-                      assertTrue(!bi.hasNext());
-                  })
-            );
+          assertTrue(!ai.hasNext());
+          assertTrue(!bi.hasNext());
+          return true;
+      })));
     }
 
     @Test
     public void iterateALongerThanBShouldBeFilledWithNulls() {
-        qt.forAll(
-            integers().between(0, 10),
-            integers().between(0, 10))
+        assertThat(forAll(
+           integer().between(0, 10),
+           integer().between(0, 10))
           .assuming((i, j) -> i > j)
-          .checkAssert((i, j) ->
-             qt.forAll(
-                 lists().of(integers().all()).ofSize(i),
-                 lists().of(integers().all()).ofSize(j))
-               .checkAssert((as, bs) -> {
+          .assertThat((i, j) ->
+               forAll(listOf(integer()).ofSize(i), listOf(integer()).ofSize(j))
+               .itIsTrueThat((as, bs) -> {
                    Zip zip = new Zip<>(as, bs);
 
                    // these two *have to* be copies. Else they would be
@@ -86,21 +74,23 @@ public class TestZip implements WithQuickTheories {
 
                    assertTrue(!ai.hasNext());
                    assertTrue(!bi.hasNext());
+
+                   return true;
                })
-          );
+          ));
     }
 
     @Test
     public void iterateBLongerThanAShoudlBeFilledWithNulls() {
-        qt.forAll(
-            integers().between(0, 10),
-            integers().between(0, 10))
+        assertThat(forAll(
+           integer().between(0, 10),
+           integer().between(0, 10))
           .assuming((i, j) -> i < j)
-          .checkAssert((i, j) ->
-             qt.forAll(
-                 lists().of(integers().all()).ofSize(i),
-                 lists().of(integers().all()).ofSize(j))
-               .checkAssert((as, bs) -> {
+          .assertThat((i, j) ->
+              forAll(
+                 listOf(integer()).ofSize(i),
+                 listOf(integer()).ofSize(j))
+               .itIsTrueThat((as, bs) -> {
                    Zip zip = new Zip<>(as, bs);
 
                    // these two *have to* be copies. Else they would be
@@ -121,17 +111,19 @@ public class TestZip implements WithQuickTheories {
 
                    assertTrue(!ai.hasNext());
                    assertTrue(!bi.hasNext());
-               })
+                   return true;
+               }))
           );
     }
 
     @Test
     public void streamGoesOverAllElementsSequentially() {
-        qt.forAll(
-            lists().of(integers().all()).ofSizeBetween(0, 10),
-            lists().of(integers().all()).ofSizeBetween(0, 10))
-          .check((as, bs) -> {
-              var z = new Zip<>(as, bs).stream().collect(Collectors.toList());
+        assertThat(forAll(
+           listOf(integer().between(0, 10)),
+           listOf(integer().between(0, 10)))
+          .itIsTrueThat((as, bs) -> {
+              var z =
+                 new Zip<>(as, bs).stream().collect(Collectors.toList());
 
               Iterator<ZipEntry<Integer, Integer>> it = z.iterator();
 
@@ -151,7 +143,7 @@ public class TestZip implements WithQuickTheories {
               ok &= !it.hasNext();
 
               return ok;
-          });
+          }));
     }
 
     @Test

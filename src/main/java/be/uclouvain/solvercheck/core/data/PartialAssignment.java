@@ -80,6 +80,51 @@ public interface PartialAssignment
      */
     Assignment asAssignment();
 
+    /*
+    int addComponent(List<Domain> component);
+
+    int addComponent(Domain[] component);
+
+    int addComponent(Domain component);
+
+    int addComponent(int component);
+    */
+
+    /**
+     * Returns the ith (starting at one) component of the partial assignment.
+     * Whenever the notion of component makes sense, ne such component is
+     * really meant to represent a set of arguments passed to the constructor
+     * of an actual constraint. The element constraint is a typical example
+     * that illustrates this. The element constraint `X[Y] = Z` has three
+     * components:
+     * <ul>
+     *     <li>X, an array of variables</li>
+     *     <li>Y, an index variable</li>
+     *     <li>Z, a value variable</li>
+     * </ul>
+
+     * @param i the identifier (starts at 1) of the component.
+     * @return the list of domains in this component.
+     */
+    List<Domain> getComponent(int i);
+
+    /**
+     * Returns the list of all components of this partial assignment.
+     * Whenever the notion of component makes sense, ne such component is
+     * really meant to represent a set of arguments passed to the constructor
+     * of an actual constraint. The element constraint is a typical example
+     * that illustrates this. The element constraint `X[Y] = Z` has three
+     * components:
+     * <ul>
+     *     <li>X, an array of variables</li>
+     *     <li>Y, an index variable</li>
+     *     <li>Z, a value variable</li>
+     * </ul>
+
+     * @return the list of all component in this partial assignment.
+     */
+    List<List<Domain>> getAllComponents();
+
     /**
      * Creates a new PartialAssignement from the given list of domains.
      *
@@ -88,6 +133,17 @@ public interface PartialAssignment
      * @return a new PartialAssignement from the given list of domains
      */
     static PartialAssignment from(final List<Domain> domains) {
+        return PartialAssignmentFactory.from(domains);
+    }
+
+    /**
+     * Creates a new PartialAssignement from the given list of domains.
+     *
+     * @param domains the domains that will compose the new partial
+     *                assignment instance
+     * @return a new PartialAssignement from the given list of domains
+     */
+    static PartialAssignment from(final Domain...domains) {
         return PartialAssignmentFactory.from(domains);
     }
 
@@ -129,6 +185,19 @@ public interface PartialAssignment
             final int arity,
             final Collection<? extends List<Integer>> tuples) {
         return PartialAssignmentFactory.unionOf(arity, tuples);
+    }
+
+    /**
+     * Returns a partial assignment with the specified arity whose domains
+     * are all empty. This "error" partial assignment is meant to be used as
+     * a marker to tell that a contradiction has been detected.
+     *
+     * @param arity the desired arity for the partial assignment.
+     * @return a partial assignment with the specified arity whose domains
+     * are all empty.
+     */
+    static PartialAssignment error(final int arity) {
+        return PartialAssignmentFactory.error(arity);
     }
 
     /**

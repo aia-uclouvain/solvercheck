@@ -5,11 +5,13 @@ import be.uclouvain.solvercheck.core.data.Operator;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Filter;
 import be.uclouvain.solvercheck.core.task.StatefulFilter;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertSame;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -32,24 +34,26 @@ public class TestStatefulFilterAdapter implements WithSolverCheck {
 
     @Test
     public void setupPerformsAFirstFiltering() {
-        forAnyPartialAssignment()
+        assertThat(
+        forAll(partialAssignment())
         .assuming(pa -> !pa.isError())
-        .checkAssert(pa -> {
+        .itIsTrueThat(pa -> {
             tested.setup(pa);
 
             verify(filter, times(1)).filter(pa);
             reset(filter);
-        });
+            return true; // fails before in case of problem
+        }));
     }
 
 
     @Test
     public void pushPopRestoresTheState() {
-        forAnyPartialAssignment()
-           .withValuesBetween(10, 100)
-           .ofSizeBetween(1, 5)
+        assertThat(
+           forAll(partialAssignment().withValuesRanging(10, 100).withVariablesBetween(1, 5))
            .assuming(pa -> !pa.isError())
-           .checkAssert(pa -> {
+           .assuming(pa -> pa.size() >= 1)
+           .itIsTrueThat(pa -> {
                PartialAssignment restricted =
                        PartialAssignment.restrict(pa, 0, Operator.EQ, 4);
 
@@ -70,16 +74,16 @@ public class TestStatefulFilterAdapter implements WithSolverCheck {
                assertSame(pa1, tested.currentState());
 
                reset(filter);
-           });
+               return true;
+           }));
     }
 
     @Test
     public void popWillNotGoOverTheRoot() {
-        forAnyPartialAssignment()
-                .withValuesBetween(10, 100)
-                .ofSizeBetween(1, 5)
+        assertThat(
+           forAll(partialAssignment().withValuesRanging(10, 100).withVariablesBetween(1, 5))
                 .assuming(pa -> !pa.isError())
-                .checkAssert(pa -> {
+                .itIsTrueThat(pa -> {
                     when(filter.filter(pa))
                             .thenReturn(PartialAssignment.unionOf(pa.size(), List.of()));
 
@@ -88,11 +92,28 @@ public class TestStatefulFilterAdapter implements WithSolverCheck {
                     PartialAssignment pa1 = tested.currentState();
                     for (int i = 0; i < 10; i++) {
                         tested.popState();
-                        assertSame(pa1, tested.currentState());
+                        assertEquals(pa1, tested.currentState());
                     }
 
                     reset(filter);
-                });
+                    return true;
+                }));
+    }
+
+    @Test
+    public void whenCurrentStateIsErrorItReturnsAnErrorPa() {
+        assertThat(
+           forAll(partialAssignment().withValuesRanging(10, 100).withVariablesBetween(1, 5))
+           .assuming(PartialAssignment::isError)
+           .itIsTrueThat(pa -> {
+               when(filter.filter(pa))
+                  .thenReturn(PartialAssignment.unionOf(pa.size(), List.of()));
+               
+               tested.setup(pa);
+
+               Assert.assertEquals(PartialAssignment.error(pa.size()), tested.currentState());
+               return true;
+           }));
     }
 
 }

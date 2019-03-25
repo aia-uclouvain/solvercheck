@@ -1,16 +1,14 @@
 package be.uclouvain.solvercheck.consistencies.utils;
 
-import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.consistencies.ConsistencyUtil;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
+import be.uclouvain.solvercheck.generators.WithGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import be.uclouvain.solvercheck.utils.collections.Range;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
-import org.quicktheories.WithQuickTheories;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,14 +16,11 @@ import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static be.uclouvain.solvercheck.checkers.Checkers.allDiff;
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.MIN_VALUE;
 
-public class TestConsistencyUtil implements WithQuickTheories, WithCpGenerators {
+public class TestConsistencyUtil implements WithSolverCheck, WithGenerators {
 
 
     @Test
@@ -67,11 +62,12 @@ public class TestConsistencyUtil implements WithQuickTheories, WithCpGenerators 
 
     @Test
     public void shrinkBounds() {
-        qt().withExamples(10)
-            .withGenerateAttempts(10000)
-            .forAll(integers().between(0, 10), integers().between(0, 10))
-            .assuming((x, y) -> x <= y)
-            .checkAssert((x, y) ->
+        assertThat(
+            forAll(
+               integer("X").between(0, 10),
+               integer("Y").between(0, 10))
+            .assuming((x, y) -> x <= y )
+            .assertThat((x, y) -> randomness ->
                 forAnyPartialAssignment(partialAssignment -> {
                     boolean ok = true;
                     int arity = partialAssignment.size();
@@ -98,7 +94,8 @@ public class TestConsistencyUtil implements WithQuickTheories, WithCpGenerators 
                     }
                     return ok;
                 })
-            );
+            )
+        );
     }
 
     @Test
@@ -141,7 +138,11 @@ public class TestConsistencyUtil implements WithQuickTheories, WithCpGenerators 
             final Predicate<PartialAssignment> assumptions,
             final Predicate<PartialAssignment> actual) {
 
-        new ForAnyPartialAssignment().assuming(assumptions).check(actual);
+        assertThat(
+           forAll(partialAssignment())
+               .assuming(assumptions)
+               .assertThat(pa -> rnd -> actual.test(pa))
+        );
     }
 
 }

@@ -1,51 +1,72 @@
 package be.uclouvain.solvercheck.core.data;
 
-import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import org.junit.Test;
-import org.quicktheories.WithQuickTheories;
+
+import java.util.Arrays;
 
 import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
+import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class TestAssignmentFactory
-        implements WithQuickTheories, WithCpGenerators {
+public class TestAssignmentFactory implements WithSolverCheck {
 
     @Test
     public void testFromList() {
-        qt().forAll(lists().of(integers().all()).ofSizeBetween(0, 1000))
-                .check(lst ->
-                        lst.equals(AssignmentFactory.from(lst))
-                );
+        assertThat(
+           forAll(listOf(integer())).assertThat(lst -> rnd ->
+             assertEquals(lst, AssignmentFactory.from(lst))
+           )
+        );
+    }
+
+    @Test
+    public void testFromArray() {
+        assertThat(
+           forAll(arrayOf(Integer.class, integer())).assertThat(a -> rnd ->
+              assertEquals(
+                 Arrays.stream(a).collect(toList()),
+                 AssignmentFactory.from(Arrays.stream(a).mapToInt(Integer::intValue).toArray()))
+           )
+        );
     }
 
     @Test
     public void testFromPartialAssignmentEqualsAsAssignmentWhenCompete() {
-        new ForAnyPartialAssignment()
-                .withDomainsOfSizeUpTo(1)
-                .assuming(PartialAssignment::isComplete)
-                .check(partialAssignment ->
-                        partialAssignment.asAssignment()
-                            .equals(AssignmentFactory.from(partialAssignment))
-                );
+        assertThat(
+           forAll(partialAssignment().withDomainsOfSizeUpTo(1))
+           .assuming(PartialAssignment::isComplete)
+           .assertThat(partialAssignment -> rnd -> {
+               assertEquals(
+                  partialAssignment.asAssignment(),
+                  AssignmentFactory.from(partialAssignment));
+           })
+        );
     }
 
     @Test
     public void testFromPartialAssignmentFailsWhenNotCompete() {
-        new ForAnyPartialAssignment()
-                .assuming(partialAssignment -> !partialAssignment.isComplete())
-                .check(partialAssignment ->
-                    failsThrowing(
-                        IllegalStateException.class,
-                        () -> AssignmentFactory.from(partialAssignment))
-                );
+        assertThat(
+           forAll(partialAssignment())
+           .assuming(pa -> !pa.isComplete())
+           .assertThat(partialAssignment -> rnd ->
+            assertTrue(
+               failsThrowing(
+                  IllegalStateException.class,
+                  () -> AssignmentFactory.from(partialAssignment))
+            )
+           )
+        );
     }
 
     @Test
     public void testCollector() {
-        qt().forAll(lists().of(integers().all()).ofSizeBetween(0, 1000))
-            .check(lst ->
-                lst.equals(lst.stream().collect(AssignmentFactory.collector()))
-            );
+        assertThat(
+          forAll(listOf(integer())).assertThat(lst -> rnd ->
+           assertEquals(lst, lst.stream().collect(AssignmentFactory.collector()))
+          )
+        );
     }
 }

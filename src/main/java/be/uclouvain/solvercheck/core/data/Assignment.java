@@ -1,6 +1,7 @@
 package be.uclouvain.solvercheck.core.data;
 
 import be.uclouvain.solvercheck.core.data.impl.AssignmentFactory;
+
 import java.util.List;
 import java.util.stream.Collector;
 
@@ -18,6 +19,16 @@ public interface Assignment extends List<Integer> {
      * @return Creates a new Assignement from the given list of assigned values
      */
     static Assignment from(final List<Integer> assignedValues) {
+        return AssignmentFactory.from(assignedValues);
+    }
+
+    /**
+     * @param assignedValues the list of values assigned to each of the
+     *                       variables. (ith item in the list corresponds to
+     *                       the value assigned to variable x_i)
+     * @return Creates a new Assignement from the given list of assigned values
+     */
+    static Assignment from(final int... assignedValues) {
         return AssignmentFactory.from(assignedValues);
     }
 

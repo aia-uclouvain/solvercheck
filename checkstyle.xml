@@ -125,7 +125,7 @@
                 just because it it 81 characters long rather than 80 is plain
                 ridiculous.
             -->
-            <property name="max" value="90" />
+            <property name="max" value="95" />
         </module>
         <module name="MethodLength"/>
         <module name="ParameterNumber"/>

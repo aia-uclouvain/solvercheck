@@ -18,38 +18,34 @@ public class CoherenceTest implements WithSolverCheck {
     @Test
     public void statelessBoundZisWeakerThanArc() {
         assertThat(
-            a(boundZConsistent(allDiff()))
-              .isWeakerThan(arcConsistent(allDiff()))
-              .forAnyPartialAssignment()
-              .withValuesBetween(0, 3)
+           forAll(partialAssignment().withValuesRanging(0, 3)).assertThat(
+             a(boundZConsistent(allDiff())).isWeakerThan(arcConsistent(allDiff()))
+           )
         );
     }
 
     @Test
     public void statelessBoundZisWeakerThanBoundD() {
         assertThat(
-            a(boundZConsistent(allDiff()))
-              .isWeakerThan(boundDConsistent(allDiff()))
-              .forAnyPartialAssignment()
-              .withValuesBetween(0, 3)
+           forAll(partialAssignment().withValuesRanging(0, 3)).assertThat(
+             a(boundZConsistent(allDiff())).isWeakerThan(boundDConsistent(allDiff()))
+           )
         );
     }
     @Test
     public void statelessBoundDisWeakerThanArc() {
         assertThat(
-            a(boundDConsistent(allDiff()))
-              .isWeakerThan(arcConsistent(allDiff()))
-              .forAnyPartialAssignment()
-              .withValuesBetween(0, 3)
+           forAll(partialAssignment().withValuesRanging(0, 3)).assertThat(
+             a(boundDConsistent(allDiff())).isWeakerThan(arcConsistent(allDiff()))
+           )
         );
     }
     @Test
     public void statelessArcIStrongerThanRange() {
         assertThat(
-            a(arcConsistent(allDiff()))
-              .isStrongerThan(rangeConsistent(allDiff()))
-              .forAnyPartialAssignment()
-              .withValuesBetween(0, 3)
+           forAll(partialAssignment().withValuesRanging(0, 3)).assertThat(
+             a(arcConsistent(allDiff())).isStrongerThan(rangeConsistent(allDiff()))
+           )
         );
     }
 
@@ -58,39 +54,39 @@ public class CoherenceTest implements WithSolverCheck {
     @Test
     public void statefulBoundZisWeakerThanArc() {
         assertThat(
-            a(stateful(boundZConsistent(allDiff())))
-            .isWeakerThan(stateful(arcConsistent(allDiff())))
-            .forAnyPartialAssignment()
-            .diving(5)
-            .withValuesBetween(0, 3)
+           forAll(partialAssignment().withValuesRanging(0, 3)).assertThat(
+             a(stateful(boundZConsistent(allDiff())))
+              .isWeakerThan(stateful(arcConsistent(allDiff())))
+              .diving(5)
+           )
         );
     }
 
     @Test
     public void statefulBoundZisWeakerThanBoundD() {
         assertThat(
-            a(stateful(boundZConsistent(allDiff())))
-            .isWeakerThan(stateful(boundDConsistent(allDiff())))
-            .forAnyPartialAssignment()
-            .withValuesBetween(0, 3)
+           forAll(partialAssignment().withValuesRanging(0, 3)).assertThat(
+             a(stateful(boundZConsistent(allDiff())))
+              .isWeakerThan(stateful(boundDConsistent(allDiff())))
+           )
         );
     }
     @Test
     public void statefulBoundDisWeakerThanArc() {
         assertThat(
-            a(stateful(boundDConsistent(allDiff())))
-            .isWeakerThan(stateful(arcConsistent(allDiff())))
-            .forAnyPartialAssignment()
-            .withValuesBetween(0, 3)
+           forAll(partialAssignment().withValuesRanging(0, 3)).assertThat(
+             a(stateful(boundDConsistent(allDiff())))
+              .isWeakerThan(stateful(arcConsistent(allDiff())))
+           )
         );
     }
     @Test
     public void statefulArcIStrongerThanRange() {
         assertThat(
-            a(stateful(arcConsistent(allDiff())))
-            .isStrongerThan(stateful(rangeConsistent(allDiff())))
-            .forAnyPartialAssignment()
-            .withValuesBetween(0, 3)
+           forAll(partialAssignment().withValuesRanging(0, 3)).assertThat(
+             a(stateful(arcConsistent(allDiff())))
+              .isStrongerThan(stateful(rangeConsistent(allDiff())))
+           )
         );
     }
 

@@ -1,19 +1,15 @@
 package be.uclouvain.solvercheck.consistencies.arc;
 
-import be.uclouvain.solvercheck.checkers.WithCheckers;
-import be.uclouvain.solvercheck.consistencies.WithConsistencies;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
 import be.uclouvain.solvercheck.core.task.Checker;
 import be.uclouvain.solvercheck.core.task.Filter;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.quicktheories.QuickTheory;
-import org.quicktheories.WithQuickTheories;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,18 +18,13 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALEN
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
 
 public class TestArcConsistency
-        implements WithQuickTheories,
-                   WithCpGenerators,
-        WithConsistencies,
-                   WithCheckers {
+        implements WithSolverCheck {
 
-    private QuickTheory qt;
     private Checker checker;
     private Filter  filter;
 
     @Before
     public void setUp() {
-        qt = qt().withGenerateAttempts(10000);
         checker= allDiff();
         filter = arcConsistent(checker);
     }
@@ -52,14 +43,14 @@ public class TestArcConsistency
      */
     @Test
     public void itMustBeWeaklyMonotonic() {
-        qt.forAll(partialAssignments())
-          .assuming(pa -> !pa.isError())
-          .checkAssert(pa -> {
-              PartialAssignment filtered = filter.filter(pa);
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> rnd -> {
+               PartialAssignment filtered = filter.filter(pa);
 
-              // subseteq test
-              Assert.assertTrue(List.of(STRONGER, EQUIVALENT).contains(filtered.compareWith(pa)));
-          });
+               // subseteq test
+               Assert.assertTrue(List.of(STRONGER, EQUIVALENT).contains(filtered.compareWith(pa)));
+           })
+        );
     }
 
     /**
@@ -68,14 +59,14 @@ public class TestArcConsistency
      */
     @Test
     public void itMustBeTheLeastFixpoint() {
-        qt.forAll(partialAssignments())
-          .assuming(pa -> !pa.isError())
-          .checkAssert(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> rnd -> {
               PartialAssignment filtered  = filter.filter(pa);
               PartialAssignment filtered2 = filter.filter(filtered);
 
               Assert.assertEquals(EQUIVALENT, filtered.compareWith(filtered2));
-          });
+          })
+        );
     }
 
     /**
@@ -83,9 +74,8 @@ public class TestArcConsistency
      */
     @Test
     public void itRemovesNoSolution() {
-        qt.forAll(partialAssignments())
-          .assuming(pa -> !pa.isError())
-          .checkAssert(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> rnd -> {
               PartialAssignment filtered = filter.filter(pa);
 
               PartialAssignment solutions =
@@ -101,7 +91,8 @@ public class TestArcConsistency
                       .contains(solutions.compareWith(filtered));
 
               Assert.assertTrue(error || solsOk);
-          });
+          })
+        );
     }
 
     /**
@@ -109,9 +100,8 @@ public class TestArcConsistency
      */
     @Test
     public void testConsistencyDefinition() {
-        qt.forAll(partialAssignments())
-          .assuming(pa -> !pa.isError())
-          .checkAssert(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> rnd -> {
               PartialAssignment filtered  = filter.filter(pa);
 
               CartesianProduct<Integer> possibilities =
@@ -131,6 +121,7 @@ public class TestArcConsistency
                       }
                   }
               }
-          });
+          })
+        );
     }
 }

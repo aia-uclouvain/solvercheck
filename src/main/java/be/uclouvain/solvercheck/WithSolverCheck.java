@@ -3,8 +3,7 @@ package be.uclouvain.solvercheck;
 import be.uclouvain.solvercheck.assertions.WithAssertions;
 import be.uclouvain.solvercheck.checkers.WithCheckers;
 import be.uclouvain.solvercheck.consistencies.WithConsistencies;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
-import be.uclouvain.solvercheck.generators.WithJavaGenerators;
+import be.uclouvain.solvercheck.generators.WithGenerators;
 import be.uclouvain.solvercheck.stateful.WithStateful;
 
 /**
@@ -22,7 +21,7 @@ import be.uclouvain.solvercheck.stateful.WithStateful;
 public interface WithSolverCheck
     extends
         WithAssertions,
-        WithCpGenerators, WithJavaGenerators,
+   WithGenerators,
         WithCheckers,
         WithConsistencies,
         WithStateful {

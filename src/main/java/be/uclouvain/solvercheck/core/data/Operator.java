@@ -45,20 +45,20 @@ public enum Operator {
      *
      * @return true iff x [THIS] y is true. False otherwise.
      */
-    public boolean check(final int x, final int y) {
+    public boolean check(final Number x, final Number y) {
         switch (this) {
             case EQ:
-                return x == y;
+                return x.longValue() == y.longValue();
             case NE:
-                return x != y;
+                return x.longValue() != y.longValue();
             case LE:
-                return x <= y;
+                return x.longValue() <= y.longValue();
             case LT:
-                return x <  y;
+                return x.longValue() <  y.longValue();
             case GE:
-                return x >= y;
+                return x.longValue() >= y.longValue();
             case GT:
-                return x >  y;
+                return x.longValue() >  y.longValue();
             default:
                 throw new RuntimeException("This should be unreachable");
         }

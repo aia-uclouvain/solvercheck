@@ -1,32 +1,62 @@
 package be.uclouvain.solvercheck.core.data;
 
-import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.impl.PartialAssignmentFactory;
-import be.uclouvain.solvercheck.generators.WithCpGenerators;
+import be.uclouvain.solvercheck.generators.GenBuilder;
 import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import org.junit.Test;
-import org.quicktheories.WithQuickTheories;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class TestPartialAssignmentFactory
-        implements WithQuickTheories, WithCpGenerators {
+import static be.uclouvain.solvercheck.utils.Utils.failsThrowing;
+
+public class TestPartialAssignmentFactory implements WithSolverCheck {
 
     // FROM
     @Test
     public void testFromList() {
-        qt().forAll(lists().of(domains()).ofSizeBetween(0, 1000))
-            .check(lst ->
-                lst.equals(PartialAssignmentFactory.from(lst))
-            );
+        assertThat(forAll(listsOfDomains()).itIsTrueThat(lst ->
+            lst.equals(PartialAssignmentFactory.from(lst))
+        ));
+    }
+    @Test
+    public void testFromArray() {
+        assertThat(forAll(listsOfDomains()).itIsTrueThat(lst -> {
+            Domain[] array = lst.toArray(new Domain[0]);
+            return Arrays.asList(array).equals(PartialAssignmentFactory.from(array));
+        }));
+    }
+
+    // ERROR
+    @Test
+    public void testError() {
+        assertThat(forAll(integer("arity").between(0, 100))
+       .itIsTrueThat(arity -> {
+           PartialAssignment result = PartialAssignmentFactory.error(arity);
+
+           return result.size() == arity
+               && result.stream().allMatch(Domain::isEmpty);
+       }));
+    }
+
+    @Test
+    public void errorMustRejectNegativeArity() {
+        assertThat(forAll(integer("arity").between(-100, -1))
+        .itIsTrueThat(arity ->
+              failsThrowing(
+                 IllegalArgumentException.class,
+                 () -> PartialAssignmentFactory.error(arity)))
+        );
     }
 
     // RESTRICT
     @Test
     public void testRestrict() {
-        qt().forAll(operators(), integers().all()).checkAssert((op, value) ->
-          new ForAnyPartialAssignment().check(partialAssignment -> {
+        assertThat(
+           forAll(operator("op"), integer("value")).assertThat((op, value) ->
+           forAll(partialAssignment()).itIsTrueThat(partialAssignment -> {
 
              int arity = partialAssignment.size();
 
@@ -46,8 +76,7 @@ public class TestPartialAssignmentFactory
              }
 
              return ok;
-          })
-        );
+          })));
     }
 
     private boolean satisfiesRestriction(
@@ -73,30 +102,27 @@ public class TestPartialAssignmentFactory
     // COLLECTOR
     @Test
     public void testCollector() {
-        qt().forAll(lists().of(domains()).ofSizeBetween(0, 100))
-            .check(lst -> {
-                PartialAssignment d = lst.stream().collect(PartialAssignmentFactory.collector());
+        assertThat(forAll(listsOfDomains()).itIsTrueThat(lst -> {
+            PartialAssignment d = lst.stream().collect(PartialAssignmentFactory.collector());
 
-                return d.containsAll(lst) && lst.containsAll(d);
-            });
+            return d.containsAll(lst) && lst.containsAll(d);
+        }));
     }
 
     // UNION OF
     @Test
     public void unionOfTheCartesianProductMustEqualOriginalPartialAssignmentWhenNoDomainIsEmpty() {
-        qt().forAll(partialAssignments().build())
-            .assuming(x -> x.stream().noneMatch(Domain::isEmpty))
-            .check   (x ->
-                x.equals(PartialAssignment.unionOf(
-                        x.size(),
-                        CartesianProduct.of(x)))
-            );
+        assertThat(forAll(partialAssignment())
+        .assuming(x -> x.stream().noneMatch(Domain::isEmpty))
+        .itIsTrueThat(x ->
+            x.equals(PartialAssignment.unionOf(x.size(),CartesianProduct.of(x)))
+        ));
     }
     @Test
     public void unionOfTheCartesianProductMustYieldAnEmptyPartialAssignmentOfTheGivenAriry() {
-        new ForAnyPartialAssignment()
+        assertThat(forAll(partialAssignment())
             .assuming(PartialAssignment::isError)
-            .check(partialAssignment -> {
+            .itIsTrueThat(partialAssignment -> {
                     CartesianProduct<Integer> cp =
                         CartesianProduct.of(partialAssignment);
 
@@ -108,6 +134,11 @@ public class TestPartialAssignmentFactory
 
                     return sameSize && allEmpty;
                 }
-            );
+            ));
+    }
+
+
+    private GenBuilder<List<Domain>> listsOfDomains() {
+        return listOf("List of domains", domain().withValuesBetween(0, 10));
     }
 }

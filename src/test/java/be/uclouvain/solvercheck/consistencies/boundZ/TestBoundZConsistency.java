@@ -1,8 +1,6 @@
 package be.uclouvain.solvercheck.consistencies.boundZ;
 
-import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
-import be.uclouvain.solvercheck.checkers.WithCheckers;
-import be.uclouvain.solvercheck.consistencies.WithConsistencies;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
@@ -19,8 +17,9 @@ import java.util.stream.Collectors;
 
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
+import static org.junit.Assert.assertTrue;
 
-public class TestBoundZConsistency implements WithConsistencies, WithCheckers {
+public class TestBoundZConsistency implements WithSolverCheck {
 
     private Checker checker;
     private Filter  filter;
@@ -45,15 +44,15 @@ public class TestBoundZConsistency implements WithConsistencies, WithCheckers {
      */
     @Test
     public void itMustBeWeaklyMonotonic() {
-        new ForAnyPartialAssignment()
-             .assuming(pa -> !pa.isError())
-             .check(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> randomness -> {
                  PartialAssignment filtered = filter.filter(pa);
 
                  // subseteq test
-                 return List.of(STRONGER, EQUIVALENT)
-                         .contains(filtered.compareWith(pa));
-             });
+                 assertTrue(List.of(STRONGER, EQUIVALENT)
+                         .contains(filtered.compareWith(pa)));
+             })
+        );
     }
 
     /**
@@ -62,14 +61,14 @@ public class TestBoundZConsistency implements WithConsistencies, WithCheckers {
      */
     @Test
     public void itMustBeTheLeastFixpoint() {
-        new ForAnyPartialAssignment()
-            .assuming(pa -> !pa.isError())
-            .checkAssert(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> randomness -> {
                 PartialAssignment filtered  = filter.filter(pa);
                 PartialAssignment filtered2 = filter.filter(filtered);
 
                 Assert.assertEquals(EQUIVALENT, filtered.compareWith(filtered2));
-            });
+            })
+        );
     }
 
     /**
@@ -77,9 +76,8 @@ public class TestBoundZConsistency implements WithConsistencies, WithCheckers {
      */
     @Test
     public void itRemovesNoSolution() {
-        new ForAnyPartialAssignment()
-            .assuming(pa -> !pa.isError())
-            .checkAssert(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> randomness -> {
 
               PartialAssignment filtered = filter.filter(pa);
 
@@ -95,8 +93,9 @@ public class TestBoundZConsistency implements WithConsistencies, WithCheckers {
               boolean solsOk= List.of(STRONGER, EQUIVALENT)
                       .contains(solutions.compareWith(filtered));
 
-              Assert.assertTrue(error || solsOk);
-          });
+              assertTrue(error || solsOk);
+          })
+        );
     }
 
     /**
@@ -104,9 +103,8 @@ public class TestBoundZConsistency implements WithConsistencies, WithCheckers {
      */
     @Test
     public void testConsistencyDefinition() {
-        new ForAnyPartialAssignment()
-           .assuming(pa -> !pa.isError())
-           .checkAssert(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> randomness -> {
                PartialAssignment filtered  = filter.filter(pa);
 
                CartesianProduct<Integer> possibilities =
@@ -127,15 +125,16 @@ public class TestBoundZConsistency implements WithConsistencies, WithCheckers {
                                ass.get(var).equals(domain.minimum())
                                        && checker.test(Assignment.from(ass))
                        );
-                       Assert.assertTrue(minHasSupport);
+                       assertTrue(minHasSupport);
 
                        boolean maxHasSupport = possibilities.stream().anyMatch(ass ->
                                ass.get(var).equals(domain.minimum())
                                        && checker.test(Assignment.from(ass))
                        );
-                       Assert.assertTrue(maxHasSupport);
+                       assertTrue(maxHasSupport);
                    }
                }
-           });
+           })
+        );
     }
 }

@@ -1,8 +1,6 @@
 package be.uclouvain.solvercheck.consistencies.range;
 
-import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
-import be.uclouvain.solvercheck.checkers.WithCheckers;
-import be.uclouvain.solvercheck.consistencies.WithConsistencies;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
@@ -20,7 +18,7 @@ import java.util.stream.Collectors;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
 
-public class TestRangeConsistency implements WithConsistencies, WithCheckers {
+public class TestRangeConsistency implements WithSolverCheck {
 
     private Checker checker;
     private Filter  filter;
@@ -45,15 +43,15 @@ public class TestRangeConsistency implements WithConsistencies, WithCheckers {
      */
     @Test
     public void itMustBeWeaklyMonotonic() {
-        new ForAnyPartialAssignment()
-             .assuming(pa -> !pa.isError())
-             .checkAssert(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> randomness -> {
                  PartialAssignment filtered = filter.filter(pa);
 
                  // subseteq test
                  Assert.assertTrue(List.of(STRONGER, EQUIVALENT)
                          .contains(filtered.compareWith(pa)));
-             });
+             })
+        );
     }
 
     /**
@@ -62,14 +60,14 @@ public class TestRangeConsistency implements WithConsistencies, WithCheckers {
      */
     @Test
     public void itMustBeTheLeastFixpoint() {
-        new ForAnyPartialAssignment()
-            .assuming(pa -> !pa.isError())
-            .checkAssert(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> randomness -> {
                PartialAssignment filtered = filter.filter(pa);
                PartialAssignment filtered2 = filter.filter(filtered);
 
                Assert.assertEquals(EQUIVALENT, filtered.compareWith(filtered2));
-            });
+            })
+        );
     }
 
     /**
@@ -77,9 +75,8 @@ public class TestRangeConsistency implements WithConsistencies, WithCheckers {
      */
     @Test
     public void itRemovesNoSolution() {
-        new ForAnyPartialAssignment()
-            .assuming(pa -> !pa.isError())
-            .checkAssert(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> randomness -> {
 
                PartialAssignment filtered = filter.filter(pa);
 
@@ -96,7 +93,8 @@ public class TestRangeConsistency implements WithConsistencies, WithCheckers {
                       .contains(solutions.compareWith(filtered));
 
               Assert.assertTrue(error || solsOk);
-         });
+         })
+        );
     }
 
     /**
@@ -104,9 +102,8 @@ public class TestRangeConsistency implements WithConsistencies, WithCheckers {
      */
     @Test
     public void testConsistencyDefinition() {
-        new ForAnyPartialAssignment()
-            .assuming(pa -> !pa.isError())
-            .checkAssert(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> randomness -> {
                 PartialAssignment filtered  = filter.filter(pa);
 
                 CartesianProduct<Integer> possibilities =
@@ -133,6 +130,7 @@ public class TestRangeConsistency implements WithConsistencies, WithCheckers {
                         }
                     }
                 }
-            });
+            })
+        );
     }
 }

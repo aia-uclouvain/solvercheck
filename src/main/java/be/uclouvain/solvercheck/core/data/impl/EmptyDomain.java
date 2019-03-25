@@ -15,7 +15,7 @@ import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
  * empty domains represent the same empty set, this class is implemented
  * using the singleton pattern.
  */
-/* package */ final class EmptyDomain extends AbstractDomain {
+public final class EmptyDomain extends AbstractDomain {
     /** The singleton instance. */
     private static final EmptyDomain SINGLETON = new EmptyDomain();
 

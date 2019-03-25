@@ -1,8 +1,6 @@
 package be.uclouvain.solvercheck.consistencies.range;
 
-import be.uclouvain.solvercheck.assertions.ForAnyPartialAssignment;
-import be.uclouvain.solvercheck.checkers.WithCheckers;
-import be.uclouvain.solvercheck.consistencies.WithConsistencies;
+import be.uclouvain.solvercheck.WithSolverCheck;
 import be.uclouvain.solvercheck.core.data.Assignment;
 import be.uclouvain.solvercheck.core.data.Domain;
 import be.uclouvain.solvercheck.core.data.PartialAssignment;
@@ -20,8 +18,7 @@ import java.util.stream.Collectors;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.EQUIVALENT;
 import static be.uclouvain.solvercheck.utils.relations.PartialOrdering.STRONGER;
 
-public class TestRangeConsistencyDomainFilter
-        implements WithConsistencies, WithCheckers {
+public class TestRangeConsistencyDomainFilter implements WithSolverCheck {
 
     private Checker checker;
     private DomainFilter filter;
@@ -48,16 +45,16 @@ public class TestRangeConsistencyDomainFilter
      */
     @Test
     public void itMustBeWeaklyMonotonic() throws Exception {
-        new ForAnyPartialAssignment()
-            .assuming(pa -> !pa.isError())
-            .checkAssert(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> randomness -> {
                 for (int var = 0; var < pa.size(); var++) {
                     Domain filtered = filter.filter(var, pa);
 
                     Assert.assertTrue(List.of(STRONGER, EQUIVALENT)
                           .contains(filtered.compareWith(pa.get(var))));
                 }
-            });
+            })
+        );
     }
 
     /**
@@ -65,9 +62,8 @@ public class TestRangeConsistencyDomainFilter
      */
     @Test
     public void itRemovesNoSolution() {
-        new ForAnyPartialAssignment()
-            .assuming(pa -> !pa.isError())
-            .checkAssert(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> randomness -> {
                 PartialAssignment solutions =
                    PartialAssignment.unionOf(pa.size(),
                       CartesianProduct.of(pa)
@@ -79,7 +75,8 @@ public class TestRangeConsistencyDomainFilter
                     Domain filtered = filter.filter(i, pa);
                     Assert.assertTrue(filtered.containsAll(solutions.get(i)));
                 }
-            });
+            })
+        );
     }
 
     /**
@@ -87,9 +84,8 @@ public class TestRangeConsistencyDomainFilter
      */
     @Test
     public void testConsistencyDefinition() {
-        new ForAnyPartialAssignment()
-            .assuming(pa -> !pa.isError())
-            .checkAssert(pa -> {
+        assertThat(
+           forAll(partialAssignment()).assertThat(pa -> randomness -> {
                 CartesianProduct<Integer> boundSupports =
                         CartesianProduct.of(
                             pa.stream().map(d ->
@@ -113,6 +109,7 @@ public class TestRangeConsistencyDomainFilter
                         }
                     }
                 }
-            });
+            })
+        );
     }
 }

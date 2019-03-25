@@ -8,7 +8,7 @@
     <!-- IDENTIFICATION **************************************************** -->
     <groupId>org.bitbucket.xaviergillard</groupId>
     <artifactId>SolverCheck</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
 
     <!-- DESCRIPTION ******************************************************* -->
     <name>org.bitbucket.xaviergillard:SolverCheck</name>
@@ -77,25 +77,12 @@
 
         <pitest.version>1.4.2</pitest.version>
 
-        <spotbugs.version>3.1.6</spotbugs.version>
+        <spotbugs.version>3.1.9</spotbugs.version>
         <spotbugs.effort>Max</spotbugs.effort>
         <spotbugs.threshold>Low</spotbugs.threshold>
     </properties>
 
     <dependencies>
-        <!--
-            QuickTheories the PBT library for java.
-
-            Note:
-            It is not test scoped because it is at the heart from what
-            SolverCheck should do
-        -->
-        <dependency>
-            <groupId>org.quicktheories</groupId>
-            <artifactId>quicktheories</artifactId>
-            <version>0.25</version>
-        </dependency>
-
         <!--
             AssertJ provides an assertion DSL to evaluate your solver. Hence,
             it is not test
@@ -125,7 +112,7 @@
 
 
     <!-- =================================================================== -->
-    <!-- So far, this POM provides three distinct profiles, each aiming at   -->
+    <!-- So far, this POM provides the following profiles, each aiming at    -->
     <!-- a specific goal:                                                    -->
     <!--    * The `default` profile, targets fast completion times. This is  -->
     <!--      the profile that should be used while developing.              -->
@@ -133,6 +120,10 @@
     <!--      during its `verify` phase. It should be used every once in a   -->
     <!--      while. And it should definitely be used before pushing a       -->
     <!--      series of commits.                                             -->
+    <!--    * The `fast` profile generates a maven site with the QA reports  -->
+    <!--      that are fairly quick to produce. This includes Checkstyle,    -->
+    <!--      SpotBugs and JaCoCo. Mutation testing is *not* part of this    -->
+    <!--      profile.                                                       -->
     <!--    * The `release` profile is the one that should be used to        -->
     <!--      publish releases on maven central (through sonatype oss)       -->
     <!-- =================================================================== -->
@@ -302,11 +293,6 @@
                                     be.uclouvain.solvercheck.*
                                 </targetTest>
                             </targetTests>
-                            <excludedClasses>
-                                <excludedClass>
-                                    be.uclouvain.solvercheck.generators.WithJavaGenerators
-                                </excludedClass>
-                            </excludedClasses>
                         </configuration>
                     </plugin>
 

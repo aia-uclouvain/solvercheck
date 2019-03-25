@@ -15,6 +15,18 @@ import java.util.function.Function;
  */
 public interface WithConsistencies {
     /**
+     * Lets an user build a forward-checking consistent (FC) Filter from some
+     * given Checker. This means that domains will only be filtered to
+     * satisfying assignment iff all but one variable is fixed.
+     *
+     * @param checker the checker backing the desired FC Filter
+     * @return an FC filter that implements the given `checker` constraint.
+     */
+    default Filter forwardChecking(final Checker checker) {
+        return new ForwardChecking(checker);
+    }
+
+    /**
      * Lets an user build an arc-consistent (GAC) Filter from some
      * given Checker. This means that domains will be filtered to only contain
      * values that actually belong to some support of the constraint.

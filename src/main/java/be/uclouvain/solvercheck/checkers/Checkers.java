@@ -91,7 +91,7 @@ public final class Checkers {
      */
     public static Checker sum(final Operator op, final int constant) {
         return s -> op.check(
-                        s.stream().mapToInt(Integer::intValue).sum(),
+                        s.stream().mapToLong(Integer::longValue).sum(),
                         constant);
     }
 
