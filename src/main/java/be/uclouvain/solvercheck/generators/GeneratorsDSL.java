@@ -9,6 +9,7 @@ import be.uclouvain.solvercheck.randomness.Randomness;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -978,7 +979,7 @@ public final class GeneratorsDSL {
      * idiom on the Stateless- and Stateful- assertions.
      */
     public static final class GenSinglePartialAssignment
-       extends GenBuilder<PartialAssignment> {
+       extends GenBuilder<PartialAssignment> implements Supplier<PartialAssignment> {
 
         /** The actual instance being generated. */
         private final BasicPartialAssignment instance;
@@ -1225,6 +1226,15 @@ public final class GeneratorsDSL {
         public GenSinglePartialAssignment then(final int component) {
             instance.addComponent(component);
             return this;
+        }
+
+        /**
+         * {@inheritDoc}
+         * @return the single partial assignment instance.
+         */
+        @Override
+        public PartialAssignment get() {
+            return instance;
         }
 
         /** {@inheritDoc} */
