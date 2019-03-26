@@ -5,7 +5,7 @@
     <!-- IDENTIFICATION **************************************************** -->
     <groupId>org.bitbucket.xaviergillard</groupId>
     <artifactId>SolverCheck</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4-SNAPSHOT</version>
 
     <!-- DESCRIPTION ******************************************************* -->
     <name>org.bitbucket.xaviergillard:SolverCheck</name>
