@@ -8,7 +8,7 @@ import static be.uclouvain.solvercheck.consistencies.ConsistencyUtil.boundSuppor
 import static be.uclouvain.solvercheck.consistencies.ConsistencyUtil.exists;
 
 /**
- * This class lets an user build a Range consistent Filter from some given
+ * This class lets a user build a Range consistent Filter from some given
  * Checker. This means that domains will be filtered to only contain values
  * belonging to some **bound support** of the constraint.
  */

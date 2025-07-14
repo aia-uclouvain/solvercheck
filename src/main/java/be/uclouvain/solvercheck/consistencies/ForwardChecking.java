@@ -9,12 +9,12 @@ import be.uclouvain.solvercheck.utils.collections.CartesianProduct;
 import java.util.stream.Collectors;
 
 /**
- * This class implements a the consistency level reached by an algorithm
+ * This class implements the consistency level reached by an algorithm
  * implementing `forward checking`. It turns any checker into a Filter with
  * FC consistency.
  *
  * <div>
- *     <h1>Note:</h1>
+ *     <h2>Note:</h2>
  *     The definition of forward checking as a consistency is given in the
  *     handbook of constraint programming at pages 63 -- 64.
  *

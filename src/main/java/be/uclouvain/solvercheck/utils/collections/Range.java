@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  * An inclusive range of value: [lower; upper[.
  *
  * <div>
- *     <h3>Note</h3>
+ *     <h2>Note</h2>
  *     Even though this implementation assumes that a range is a set of
  *     integers, it is encoded using <b>long</b>. This is because we do want to
  *     be able to represent all ranges from Integer.MIN_VALUE to

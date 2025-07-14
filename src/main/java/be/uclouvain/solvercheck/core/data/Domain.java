@@ -47,7 +47,7 @@ public interface Domain extends Set<Integer>, PartiallyOrderable<Domain> {
      * IMMUTABLE, SIZED and SUBSIZED characteristics).
      *
      * <div>
-     *     <h1>Note</h1>
+     *     <h4>Note</h4>
      *     The returned stream may be parallel. Hence any consumer using
      *     these streams should be thread-safe.
      * </div>
@@ -63,7 +63,7 @@ public interface Domain extends Set<Integer>, PartiallyOrderable<Domain> {
      * IMMUTABLE, SIZED and SUBSIZED characteristics).
      *
      * <div>
-     *     <h1>Note</h1>
+     *     <h4>Note</h4>
      *     The returned stream may be parallel. Hence any consumer using
      *     these streams should be thread-safe.
      * </div>

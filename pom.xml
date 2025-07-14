@@ -1,20 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<!--
+  ~ DDOLib is under MIT License
+  ~ Copyright (c)  2025 UCLouvain-Cetic
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <groupId>org.ddolib</groupId>
+    <artifactId>ddolib</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0.°</version>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>Discrete Optimization Library based on Decision Diagrams</description>
+    <url>https://github.com/DDOLIB-CETIC-UCL/DDOLib</url>
+    <organization>
+        <name>Cetic-UCLouvain</name>
+        <url>https://github.com/DDOLIB-CETIC-UCL/DDOLib</url>
+    </organization>
 
-    <!-- IDENTIFICATION **************************************************** -->
-    <groupId>org.bitbucket.xaviergillard</groupId>
-    <artifactId>SolverCheck</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
-
-    <!-- DESCRIPTION ******************************************************* -->
-    <name>org.bitbucket.xaviergillard:SolverCheck</name>
-    <description>
-        Efficient testing of constraints in JVM-based CP solvers.
-    </description>
-    <url>https://bitbucket.org/xaviergillard/solvercheck/</url>
-
-    <!-- LICENSING INFORMATION ********************************************* -->
     <licenses>
         <license>
             <name>MIT License</name>
@@ -22,7 +25,6 @@
         </license>
     </licenses>
 
-    <!-- DEV. TEAM ********************************************************* -->
     <developers>
         <developer>
             <name>Xavier Gillard</name>
@@ -30,487 +32,104 @@
             <organization>UCLouvain</organization>
             <organizationUrl>http://www.uclouvain.be</organizationUrl>
         </developer>
+        <developer>
+            <name>Pierre Schaus</name>
+            <email>pierre.schaus@uclouvain.be</email>
+            <organization>UCLouvain / ICTEAM / INGI</organization>
+            <organizationUrl></organizationUrl>
+        </developer>
     </developers>
 
-    <!-- SCM *************************************************************** -->
-    <scm>
-        <connection>
-            scm:git:ssh://git@bitbucket.org/xaviergillard/solvercheck.git
-        </connection>
-        <developerConnection>
-            scm:git:ssh://git@bitbucket.org:/xaviergillard/solvercheck.git
-        </developerConnection>
-        <url>
-            https://bitbucket.org/xaviergillard/solvercheck/src
-        </url>
-      <tag>HEAD</tag>
-  </scm>
-
-    <!-- Releases are to be published on Maven Central through Sonatype OSS  -->
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <!-- ACTUAL PROJECT CONFIGURATION ************************************** -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <maven.compiler.version>3.5.1</maven.compiler.version>
-        <maven.compiler.source>1.10</maven.compiler.source>
-        <maven.compiler.target>1.10</maven.compiler.target>
-
-        <maven.source.version>2.2.1</maven.source.version>
-        <maven.javadoc.version>2.9.1</maven.javadoc.version>
-
-        <nexus.version>1.6.7</nexus.version>
-        <gpg.version>1.6</gpg.version>
-
-        <site.version>3.7.1</site.version>
-        <checkstyle.version>3.0.0</checkstyle.version>
-        <jacoco.version>0.8.2</jacoco.version>
-
-        <pitest.version>1.4.2</pitest.version>
-
-        <spotbugs.version>3.1.9</spotbugs.version>
-        <spotbugs.effort>Max</spotbugs.effort>
-        <spotbugs.threshold>Low</spotbugs.threshold>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <checkstyle.config.location>${basedir}/checkstyle.xml</checkstyle.config.location>
+        <junit.jupiter.version>5.9.1</junit.jupiter.version>
     </properties>
-
     <dependencies>
-        <!--
-            AssertJ provides an assertion DSL to evaluate your solver. Hence,
-            it is not test
-            scoped either.
-        -->
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.11.1</version>
-        </dependency>
-
-        <!-- ####### TEST DEPENDENCIES ##################################### -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>2.22.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20250517</version>
+        </dependency>
     </dependencies>
-
-
-    <!-- =================================================================== -->
-    <!-- So far, this POM provides the following profiles, each aiming at    -->
-    <!-- a specific goal:                                                    -->
-    <!--    * The `default` profile, targets fast completion times. This is  -->
-    <!--      the profile that should be used while developing.              -->
-    <!--    * The `QA` profile, generates all the QA artifacts (site etc..)  -->
-    <!--      during its `verify` phase. It should be used every once in a   -->
-    <!--      while. And it should definitely be used before pushing a       -->
-    <!--      series of commits.                                             -->
-    <!--    * The `fast` profile generates a maven site with the QA reports  -->
-    <!--      that are fairly quick to produce. This includes Checkstyle,    -->
-    <!--      SpotBugs and JaCoCo. Mutation testing is *not* part of this    -->
-    <!--      profile.                                                       -->
-    <!--    * The `release` profile is the one that should be used to        -->
-    <!--      publish releases on maven central (through sonatype oss)       -->
-    <!-- =================================================================== -->
-    <profiles>
-        <!-- USE THIS PROFILE FOR DEVELOPMENT ****************************** -->
-        <profile>
-            <id>default</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <version>${maven.compiler.version}</version>
-                        <configuration>
-                            <target>${maven.compiler.target}</target>
-                            <source>${maven.compiler.source}</source>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- USE THIS PROFILE FOR DEPLOYMENT ******************************* -->
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <!-- PLUGINS REQUIRED FOR PUBLICATION ON MAVEN CENTRAL   -->
-                    <!--                                                     -->
-                    <!-- Note:                                               -->
-                    <!-- A SNAPSHOT is published with the following command: -->
-                    <!-- `mvn clean deploy -P release`                       -->
-                    <!--                                                     -->
-                    <!-- A RELEASE is published with the following commands: -->
-                    <!-- `mvn clean deploy -P release`                       -->
-
-                    <!--
-                        Perform a reproductible build and attach the sources
-                        and javadoc of the compiled code to the produced
-                        artifacts.
-                    -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <version>${maven.compiler.version}</version>
-                        <configuration>
-                            <target>${maven.compiler.target}</target>
-                            <source>${maven.compiler.source}</source>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>${maven.source.version}</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>${maven.javadoc.version}</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <!--
-                        The Nexus Staging Maven Plugin is the recommended way
-                        to deploy your components to OSSRH and release them
-                        to the Central Repository.
-                    -->
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>${nexus.version}</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin>
-
-                    <!-- The GPG plugin, used to sign published artifacts.   -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>${gpg.version}</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- USE THIS PROFILE FOR QUALITY ASSURANCE ************************ -->
-        <profile>
-            <id>QA</id>
-            <build>
-                <plugins>
-                    <!--
-                    Generate a project site with many useful reports with the
-                    `mvn site` command.
-
-                    In order to get a complete site comprising all the useful
-                    information, one should use the following command:
-                    ```
-                    mvn clean verify site -P QA
-                    site
-                    ```
-                    -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-site-plugin</artifactId>
-                        <version>${site.version}</version>
-                    </plugin>
-
-
-                    <!--
-                        PIT ::
-                        Mutation testing to assess the quality of my test base
-
-                        Run mutation tests with:
-                        ```
-                        mvn org.pitest:pitest-maven:mutationCoverage
-                        ```
-                    -->
-                    <plugin>
-                        <groupId>org.pitest</groupId>
-                        <artifactId>pitest-maven</artifactId>
-                        <version>${pitest.version}</version>
-                        <executions>
-                            <execution>
-                                <id>MutationsCoverage</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>mutationCoverage</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <targetClasses>
-                                <targetClass>
-                                    be.uclouvain.solvercheck.*
-                                </targetClass>
-                            </targetClasses>
-                            <targetTests>
-                                <targetTest>
-                                    be.uclouvain.solvercheck.*
-                                </targetTest>
-                            </targetTests>
-                        </configuration>
-                    </plugin>
-
-
-                    <!--
-                        Installs JaCoCo agent to collect coverage data.
-                    -->
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>${jacoco.version}</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>prepare-agent</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>report</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>report</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-            <reporting>
-                <plugins>
-                    <!--
-                        JAVADOC::
-                        The documentation of the project should be readily
-                        available on the project's site.
-                    -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>${maven.javadoc.version}</version>
-                    </plugin>
-
-                    <!--
-                        CHECKSTYLE::
-                        To ensure that the code follows some well established
-                        coding guidelines.
-                    -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-checkstyle-plugin</artifactId>
-                        <version>${checkstyle.version}</version>
-                        <configuration>
-                            <!--
-                                Use my own checkstyle configuration which adapts
-                                SUN rules set to allow:
-                                1. shadowing by constructor parameters
-                                2. targetted warning suppression through
-                                   annotations
-                            -->
-                            <configLocation>./checkstyle.xml</configLocation>
-                            <!-- Ignore the style of tests source code -->
-                            <sourceDirectories>
-                                ${project.build.sourceDirectory}
-                            </sourceDirectories>
-                        </configuration>
-                    </plugin>
-
-                    <!--
-                        SPOTBUGS::
-                        To preemptively identify some potential bugs in the
-                        code of the project.
-                    -->
-                    <plugin>
-                        <groupId>com.github.spotbugs</groupId>
-                        <artifactId>spotbugs-maven-plugin</artifactId>
-                        <version>${spotbugs.version}</version>
-                        <configuration>
-                            <effort>${spotbugs.effort}</effort>
-                            <threshold>${spotbugs.threshold}</threshold>
-                        </configuration>
-                    </plugin>
-
-                    <!--
-                        Tells to generate the mutation tests reports:
-
-                        mvn clean org.pitest:pitest-maven:mutationCoverage site
-                    -->
-                    <plugin>
-                        <groupId>org.pitest</groupId>
-                        <artifactId>pitest-maven</artifactId>
-                        <version>${pitest.version}</version>
-                        <reportSets>
-                            <reportSet>
-                                <reports>
-                                    <report>report</report>
-                                </reports>
-                            </reportSet>
-                        </reportSets>
-                    </plugin>
-
-                    <!--
-                        JACOCO::
-                        To measure the fraction of the code which has been
-                        covered by tests.
-                    -->
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>${jacoco.version}</version>
-                        <reportSets>
-                            <reportSet>
-                                <reports>
-                                    <report>report</report>
-                                </reports>
-                            </reportSet>
-                        </reportSets>
-                    </plugin>
-                </plugins>
-            </reporting>
-        </profile>
-
-        <!-- USE THIS PROFILE TO GET FAST QA REPORTS *********************** -->
-        <!-- It provides: Checkstyle, SpotBugs and Branch Coverage (JaCoCo)  -->
-        <profile>
-            <id>fast</id>
-            <build>
-                <plugins>
-                    <!--
-                    Generate a project site with some useful reports.
-                    -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-site-plugin</artifactId>
-                        <version>${site.version}</version>
-                    </plugin>
-
-                    <!--
-                        Installs JaCoCo agent to collect coverage data.
-                    -->
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>${jacoco.version}</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>prepare-agent</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>report</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>report</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-            <reporting>
-                <plugins>
-                    <!--
-                        CHECKSTYLE::
-                        To ensure that the code follows some well established
-                        coding guidelines.
-                    -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-checkstyle-plugin</artifactId>
-                        <version>${checkstyle.version}</version>
-                        <configuration>
-                            <!--
-                                Use my own checkstyle configuration which adapts
-                                SUN rules set to allow:
-                                1. shadowing by constructor parameters
-                                2. targetted warning suppression through
-                                   annotations
-                            -->
-                            <configLocation>./checkstyle.xml</configLocation>
-                            <!-- Ignore the style of tests source code -->
-                            <sourceDirectories>
-                                ${project.build.sourceDirectory}
-                            </sourceDirectories>
-                        </configuration>
-                    </plugin>
-
-                    <!--
-                        SPOTBUGS::
-                        To preemptively identify some potential bugs in the
-                        code of the project.
-                    -->
-                    <plugin>
-                        <groupId>com.github.spotbugs</groupId>
-                        <artifactId>spotbugs-maven-plugin</artifactId>
-                        <version>${spotbugs.version}</version>
-                        <configuration>
-                            <effort>${spotbugs.effort}</effort>
-                            <threshold>${spotbugs.threshold}</threshold>
-                        </configuration>
-                    </plugin>
-
-                    <!--
-                        JACOCO::
-                        To measure the fraction of the code which has been
-                        covered by tests.
-                    -->
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>${jacoco.version}</version>
-                        <reportSets>
-                            <reportSet>
-                                <reports>
-                                    <report>report</report>
-                                </reports>
-                            </reportSet>
-                        </reportSets>
-                    </plugin>
-                </plugins>
-            </reporting>
-        </profile>
-    </profiles>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.10</version>
+                <!--configuration>
+                    <append>true</append>
+                    <excludes>
+                        <exclude>**/examples/**</exclude>
+                    </excludes>
+                </configuration-->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M3</version>
+                <configuration>
+                    <skipTests>false</skipTests>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <reportOutputDirectory>${project.reporting.outputDirectory}</reportOutputDirectory>
+                    <destDir>javadoc</destDir>
+                    <source>21</source>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+            </plugin>
+        </plugins>
+    </build>
 </project>

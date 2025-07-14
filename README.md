@@ -1,17 +1,17 @@
 # SolverCheck 
 ---
 
-[![Maven Central](https://img.shields.io/maven-central/v/org.bitbucket.xaviergillard/SolverCheck.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.bitbucket.xaviergillard%22%20AND%20a:%22SolverCheck%22)
-[![Javadocs](https://www.javadoc.io/badge/org.bitbucket.xaviergillard/SolverCheck.svg)](https://www.javadoc.io/doc/org.bitbucket.xaviergillard/SolverCheck)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-[![Build Status](http://jenkins2.info.ucl.ac.be/job/SolverCheck/badge/icon)](http://jenkins2.info.ucl.ac.be/job/SolverCheck/)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4f6250ef42444390aa30619e10193e64)](https://www.codacy.com/app/xaviergillard/solvercheck?utm_source=xaviergillard@bitbucket.org&amp;utm_medium=referral&amp;utm_content=xaviergillard/solvercheck&amp;utm_campaign=Badge_Grade)
-[![codecov](https://codecov.io/bb/xaviergillard/solvercheck/branch/master/graph/badge.svg)](https://codecov.io/bb/xaviergillard/solvercheck)
+![Doc](https://github.com/aia-uclouvain/solvercheck/actions/workflows/publish.yml/badge.svg)
+![Coverage](https://github.com/aia-uclouvain/solvercheck/actions/workflows/test.yml/badge.svg)
+<!-- ![Test coverage](https://raw.githubusercontent.com/<username>/<repository>/badges/badges/<branch>/badge.svg) -->
 
 
 SolverCheck is a library to test the implementation of constraints in CP solvers.
 
+
+It was introduced in the following paper :
+
+* Gillard, X., Schaus, P., & Deville, Y. (2019). SolverCheck: Declarative testing of constraints. In International Conference on Principles and Practice of Constraint Programming.
 ---  
 
 ## Installation
@@ -25,52 +25,9 @@ your pom.xml
   <version>1.0.0</version>
   <scope>test</scope>
 </dependency>
-``` 
-
-### Manual installation
-If you're not using Maven (you should definitely give it a try !), you can 
-still use `SolverCheck` as it is a plain dependency (.jar) which you can add 
-to your classpath. To do so, you should: 
-* Download the jar from [here](https://repo1.maven.org/maven2/org/bitbucket/xaviergillard/SolverCheck/1.0.0/SolverCheck-1.0.0.jar)
-* Add it to your classpath `java -cp <your cp including solvercheck> 
-your_application`
-
-## Documentation
-The complete javadoc of the project available 
-[here](http://javadoc.io/doc/org.bitbucket.xaviergillard/SolverCheck/1.0.0). 
-Alternatively, the complete maven-site with all javadoc and quality assurance 
-reports can be downloaded from [here](https://bitbucket.org/xaviergillard/solvercheck/downloads/SolverCheck-1.0.0.qa_site.tgz).
-
-## Quality Assurance
-A high amount of effort has been paid to write `SolverCheck` in a clear 
-(intelligible) and correct way. Additionally, some tools are used to 
-automatically assess the quality of `SolverCheck`'s codebase as well as the 
-quality of the tests it generates. 
-
-Practically, the following tools are used:
-* `Checkstyle` to enforce a consistent coding standard.
-* `Spotbugs` to statically detect frequently occurring bug patterns.
-* [`JaCoCo`](http://jenkins2.info.ucl.ac.be/job/SolverCheck/ws/target/site/jacoco/index.html) to compute the **branch** coverage of the test base.
-* [`PIT`](http://jenkins2.info.ucl.ac.be/job/SolverCheck/ws/target/pit-reports/) to compute the **mutations** coverage of the test base.
-
-The complete maven-site with all javadoc and quality assurance reports can be 
-downloaded [here](https://bitbucket.org/xaviergillard/solvercheck/downloads/SolverCheck-1.0.0.qa_site.tgz).
+```
 
 ## Releases
 ### 1.0.0
 * Initial version of the tool, provides all the necessary tooling.
-
-### 1.0.1-SNAPSHOT (ongoing)
-* Reduces the default number of shrink cycles to improve practical usability.
-* Increase the default number of examples generated for each anchor-value.
-* Add some utility methods to ease the development of test-utility methods.
-* Additional `ForwardChecking` consistency.
-
-##### TODO:
-* [ ] Pruners/non-monotonic stuff
-* [ ] Write the rest of the Readme
-* [ ] Write examples
-* [ ] Assess quality of known solvers
-* [ ] Scheduling
-* [ ] Write paper.
 
