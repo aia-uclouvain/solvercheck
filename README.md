@@ -3,8 +3,7 @@
 
 ![Doc](https://github.com/aia-uclouvain/solvercheck/actions/workflows/publish.yml/badge.svg)
 ![Coverage](https://github.com/aia-uclouvain/solvercheck/actions/workflows/test.yml/badge.svg)
-<!-- ![Test coverage](https://raw.githubusercontent.com/<username>/<repository>/badges/badges/<branch>/badge.svg) -->
-
+[![](https://jitpack.io/v/aia-uclouvain/solvercheck.svg)](https://jitpack.io/#aia-uclouvain/solvercheck)
 
 SolverCheck is a library to test the implementation of constraints in CP solvers.
 
@@ -26,8 +25,3 @@ your pom.xml
   <scope>test</scope>
 </dependency>
 ```
-
-## Releases
-### 1.0.0
-* Initial version of the tool, provides all the necessary tooling.
-

@@ -12,7 +12,7 @@ import be.uclouvain.solvercheck.stateful.WithStateful;
  * SolverCheck is to "implement" this interface (it is really just about
  * putting the keyword: your class does not have to provide any code in
  * order to implement the interface). As a result, your implementing class
- * will have an immediate access to all the methods required to write
+ * will have an immediate acccess to all the methods required to write
  * property-based tests for your constraints.
  *
  * This interface should really be thought of as a stackable trait in Scala

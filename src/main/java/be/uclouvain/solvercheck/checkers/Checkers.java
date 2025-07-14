@@ -38,7 +38,7 @@ import static be.uclouvain.solvercheck.utils.Utils.isValidIndex;
  *        cohérent avec ce qui est fait pour les consistances)
  */
 public final class Checkers {
-    /** An utility class has no public constructor. */
+    /** A utility class has no public constructor. */
     private Checkers() { }
 
     /** @return a fake checker evaluates any given assignment to true. */
