@@ -70,6 +70,14 @@ public class TestGeneratorsDSL implements WithSolverCheck {
     }
 
     @Test
+    public void testArray() {
+        assertThat(
+                forAll(arrayOf(Integer[].class, arrayOf(Integer.class, integer().between(0, 6)).ofSize(10)).ofSize(10)).itIsTrueThat(x ->
+                        x.length == 10 && x[0].length == 10 && x[0][0] >= 0 && x[0][0] <= 6)
+        );
+    }
+
+    @Test
     public void defaultDomain() {
         assertThat(forAll(GeneratorsDSL.domain()).itIsTrueThat(Objects::nonNull));
     }

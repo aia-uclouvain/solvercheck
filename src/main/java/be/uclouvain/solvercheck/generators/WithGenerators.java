@@ -97,6 +97,8 @@ public interface WithGenerators {
                                                                final GenBuilder<T> bldr) {
         return GeneratorsDSL.arrayOf(clazz, bldr);
     }
+
+
     /**
      * Creates a named array of Ts generator builder. That is, an object that
      * facilitates the creation of streams of arrays of T.

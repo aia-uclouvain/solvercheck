@@ -381,7 +381,7 @@ public final class ForAllAssertion {
                 }
                 return "Unknown type ! (This should never happen)";
             } else {
-                return Arrays.toString((Object[]) t);
+                return Arrays.deepToString((Object[]) t);
             }
         } else {
             return t.toString();

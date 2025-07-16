@@ -37,7 +37,7 @@ public interface WithCheckers {
     }
     /**
      * A checker that tells whether the sum of the values of all variables of
-     * the given assignment satisfy some given linear condition.
+     * the given assignment satisfies some given linear condition.
      *
      * .. Example::
      *    sum(LT, 3) evaluates an assignment to true iff the sum of all the
@@ -58,7 +58,7 @@ public interface WithCheckers {
      * @param value the constant that imposes some value constraint
      *              on the sum
      * @return checker that tells whether the sum of the values of all variables
-     *      of the given assignment satisfy some given linear condition.
+     *      of the given assignment satisfies some given linear condition.
      */
     default Checker sum(final Operator operator, final int value) {
         return Checkers.sum(operator, value);

@@ -168,7 +168,7 @@ public interface WithAssertions {
      * .. Example::
      *   The following example illustrates how one can use a parametric
      *   assertion to validate the behavior of the table constraint on
-     *   **virtually all** partial assignments and **virtually all** possble
+     *   **virtually all** partial assignments and **virtually all** possible
      *   table extensions.
      *
      *   <pre>
